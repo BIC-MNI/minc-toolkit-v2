@@ -25,3 +25,6 @@
 [submodule "EZminc"]
 	path = EZminc
 	url = git://github.com/BIC-MNI/EZminc.git
+[submodule "ray_trace"]
+	path = ray_trace
+	url = git://github.com/BIC-MNI/ray_trace.git
