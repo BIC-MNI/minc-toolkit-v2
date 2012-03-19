@@ -28,3 +28,6 @@
 [submodule "ray_trace"]
 	path = ray_trace
 	url = git://github.com/BIC-MNI/ray_trace.git
+[submodule "glim_image"]
+	path = glim_image
+	url = git://github.com/BIC-MNI/glim_image.git
