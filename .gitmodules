@@ -31,3 +31,9 @@
 [submodule "glim_image"]
 	path = glim_image
 	url = git://github.com/BIC-MNI/glim_image.git
+[submodule "oobicpl"]
+	path = oobicpl
+	url = git://github.com/BIC-MNI/oobicpl.git
+[submodule "arguments"]
+	path = arguments
+	url = git://github.com/BIC-MNI/arguments.git
