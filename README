@@ -23,11 +23,19 @@ Here is a list of bundled packages:
 
 Installation
 ------------
-1. If installing from github make sure to initialize and update submodules, i.e
+Installing from github, need CMake > 2.6 , preferably > 2.8.3 
+
+  git clone git://github.com/vfonov/minc-toolkit.git minc-toolkit
+  cd minc-toolkit
   git submodule init
   git submodule update
-  
-2. To compile and install use CMake , version > 2.6 (Recommend > 2.8.3)
+  cd ..
+  mkdir minc-toolkit-build
+  cd minc-toolkit-build
+  ccmake ../minc-toolkit
+  .....enter location of all dependencies, if not detected automatically ...
+  make 
+  make install
 
 
 Dependencies
@@ -45,7 +53,3 @@ Following packages are needed to compile all tools:
  * GSL    - http://www.gnu.org/software/gsl/
  * FFTW3  - http://www.fftw.org/
  * ITK    - http://www.itk.org/
-
-
-
-
