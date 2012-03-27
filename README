@@ -47,7 +47,7 @@ Following packages are needed to compile all tools:
  * Perl - http://www.perl.org/
  * BISON - http://www.gnu.org/software/bison/
  * FLEX -  http://flex.sf.net/
- * NETPBM - http://netpbm.alioth.debian.org                 http://downloads.sourceforge.net/project/netpbm/super_stable/10.35.74/netpbm-10.35.74.tgz
+ * NETPBM - http://netpbm.alioth.debian.org                 http://downloads.sourceforge.net/project/netpbm/super_stable/10.35.84/netpbm-10.35.84.tgz
  * PCRE  -  http://www.pcre.org/                            http://downloads.sourceforge.net/project/pcre/pcre/8.12/pcre-8.12.tar.gz
  * PCRE++ - http://www.daemon.de/PCRE                       http://www.daemon.de/idisk/Apps/pcre++/pcre++-0.9.5.tar.gz
  * GSL    - http://www.gnu.org/software/gsl/

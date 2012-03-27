@@ -1,0 +1,8 @@
+#! /bin/sh
+
+p=`pwd`
+
+echo Building NETPBM in $p
+rm -rf $p/pkg
+make
+make package pkgdir=$p/pkg
