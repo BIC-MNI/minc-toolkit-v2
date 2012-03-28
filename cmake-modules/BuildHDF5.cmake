@@ -1,4 +1,4 @@
-macro(build_hdf5 install_prefix)
+macro(build_hdf5 install_prefix zlib_include_dir zlib_library)
 
 ExternalProject_Add(HDF5
         SOURCE_DIR HDF5
@@ -8,7 +8,7 @@ ExternalProject_Add(HDF5
         INSTALL_DIR     "${install_prefix}"
         BUILD_COMMAND   make 
         INSTALL_COMMAND make install 
-        CONFIGURE_COMMAND ./configure --prefix=${install_prefix} --with-pic --disable-shared --disable-cxx --disable-f77 --disable-f90 --disable-examples --disable-hl --disable-docs
+        CONFIGURE_COMMAND ./configure --prefix=${install_prefix} --with-zlib=${zlib_include_dir},${zlib_library} --with-pic --disable-shared --disable-cxx --disable-f77 --disable-f90 --disable-examples --disable-hl --disable-docs
       )
 
 SET(HDF5_INCLUDE_DIR ${install_prefix}/include )
