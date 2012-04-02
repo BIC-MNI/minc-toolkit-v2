@@ -1,6 +1,6 @@
 [submodule "minc"]
 	path = minc
-	url = git://github.com/BIC-MNI/minc.git
+	url = git://github.com/vfonov/minc.git
 [submodule "bicpl"]
 	path = bicpl
 	url = git://github.com/BIC-MNI/bicpl.git
@@ -37,3 +37,6 @@
 [submodule "arguments"]
 	path = arguments
 	url = git://github.com/BIC-MNI/arguments.git
+[submodule "itk-interface/minc4itk"]
+	path = itk-interface/minc4itk
+	url = git://github.com/vfonov/minc4itk.git
