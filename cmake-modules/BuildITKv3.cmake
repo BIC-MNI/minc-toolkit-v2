@@ -50,4 +50,11 @@ macro(build_itkv3 install_prefix)
   SET(ITK_USE_FILE  ${CMAKE_CURRENT_BINARY_DIR}/ITKv3-build/UseITK.cmake)
   SET(ITK_FOUND ON)
   
+  SET(ITK_INCLUDE_DIRS "${CMAKE_CURRENT_BINARY_DIR}/ITKv3-build;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Code/Algorithms;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Code/BasicFilters;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Code/Common;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Code/Numerics;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Code/IO;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Code/Numerics/FEM;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Code/Numerics/NeuralNetworks;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Code/SpatialObject;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Utilities/MetaIO;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Utilities/NrrdIO;${CMAKE_CURRENT_BINARY_DIR}/ITKv3-build/Utilities/NrrdIO;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Utilities/DICOMParser;${CMAKE_CURRENT_BINARY_DIR}/ITKv3-build/Utilities/DICOMParser;${CMAKE_CURRENT_BINARY_DIR}/ITKv3-build/Utilities/expat;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Utilities/expat;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Utilities/nifti/niftilib;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Utilities/nifti/znzlib;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Utilities/itkExtHdrs;${CMAKE_CURRENT_BINARY_DIR}/ITKv3-build/Utilities;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Utilities;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Utilities/vxl/v3p/netlib;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Utilities/vxl/vcl;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Utilities/vxl/core;${CMAKE_CURRENT_BINARY_DIR}/ITKv3-build/Utilities/vxl/v3p/netlib;${CMAKE_CURRENT_BINARY_DIR}/ITKv3-build/Utilities/vxl/vcl;${CMAKE_CURRENT_BINARY_DIR}/ITKv3-build/Utilities/vxl/core;${CMAKE_CURRENT_BINARY_DIR}/ITKv3-build/Utilities/gdcm;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Utilities/gdcm/src;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Code/Review;${CMAKE_CURRENT_BINARY_DIR}/ITKv3/Code/Review/Statistics")
+
+# The ITK library directories.
+  SET(ITK_LIBRARY_DIRS "${CMAKE_CURRENT_BINARY_DIR}/ITKv3-build/bin")
+
+  SET(ITK_LIBRARIES ITKAlgorithms ITKStatistics ITKFEM ITKQuadEdgeMesh)
+
 endmacro(build_itkv3)

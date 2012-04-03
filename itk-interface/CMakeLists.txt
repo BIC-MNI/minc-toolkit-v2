@@ -1,7 +1,9 @@
-#message(WARNING ${ITK_USE_FILE})
-IF(EXISTS ${ITK_USE_FILE})
-  INCLUDE(${ITK_USE_FILE})
-ENDIF(EXISTS ${ITK_USE_FILE})
+# Add include directories needed to use ITK.
+INCLUDE_DIRECTORIES(BEFORE ${ITK_INCLUDE_DIRS})
+
+# Add link directories needed to use ITK.
+LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
+
 
 SET(ITKIOMINC_SRC
      minc4itk/src/itkMincHelpers.cxx
