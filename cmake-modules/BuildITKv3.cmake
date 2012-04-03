@@ -45,8 +45,9 @@ macro(build_itkv3 install_prefix)
     INSTALL_COMMAND make install DESTDIR=${CMAKE_CURRENT_BINARY_DIR}/external
     INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external/${install_prefix}
   )
-  #FORCE_BUILD_CHECK(${proj})
+  #FORCE_BUILD_CHECK(ITKv3)
   SET(ITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/ITKv3-build)
+  SET(ITK_USE_FILE  ${CMAKE_CURRENT_BINARY_DIR}/ITKv3-build/UseITK.cmake)
   SET(ITK_FOUND ON)
   
 endmacro(build_itkv3)
