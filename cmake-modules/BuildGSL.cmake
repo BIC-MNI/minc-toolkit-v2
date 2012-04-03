@@ -8,12 +8,13 @@ ExternalProject_Add(GSL
         INSTALL_DIR     "${CMAKE_BINARY_DIR}/external"
         BUILD_COMMAND   make 
         INSTALL_COMMAND make DESTDIR=${CMAKE_BINARY_DIR}/external install 
-        CONFIGURE_COMMAND ./configure --prefix=/ --with-pic --disable-shared --enable-static
+        CONFIGURE_COMMAND ./configure --prefix=${install_prefix} --with-pic --disable-shared --enable-static
+#        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
       )
 
-SET(GSL_INCLUDE_DIR ${CMAKE_BINARY_DIR}/external/include )
-SET(GSL_LIBRARY  ${CMAKE_BINARY_DIR}/external/lib/libgsl.a )
-SET(GSL_CBLAS_LIBRARY ${CMAKE_BINARY_DIR}/external/lib/libgslcblas.a )
+SET(GSL_INCLUDE_DIR ${CMAKE_BINARY_DIR}/external/${install_prefix}/include )
+SET(GSL_LIBRARY  ${CMAKE_BINARY_DIR}/external/${install_prefix}/lib/libgsl.a )
+SET(GSL_CBLAS_LIBRARY ${CMAKE_BINARY_DIR}/external/${install_prefix}/lib/libgslcblas.a )
 SET(GSL_FOUND ON)
 
 endmacro(build_gsl)

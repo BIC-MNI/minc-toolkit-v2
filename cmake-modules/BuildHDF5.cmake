@@ -8,11 +8,12 @@ ExternalProject_Add(HDF5
   INSTALL_DIR     "${CMAKE_BINARY_DIR}/external"
   BUILD_COMMAND   make 
   INSTALL_COMMAND make DESTDIR=${CMAKE_BINARY_DIR}/external install 
-  CONFIGURE_COMMAND ./configure --prefix=/ --with-zlib=${zlib_include_dir},${zlib_library} --with-pic --disable-shared --disable-cxx --disable-f77 --disable-f90 --disable-examples --disable-hl --disable-docs
+  CONFIGURE_COMMAND ./configure --prefix=${install_prefix} --with-zlib=${zlib_include_dir},${zlib_library} --with-pic --disable-shared --disable-cxx --disable-f77 --disable-f90 --disable-examples --disable-hl --disable-docs
+#  INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
 )
 
-SET(HDF5_INCLUDE_DIR ${CMAKE_BINARY_DIR}/external/include )
-SET(HDF5_LIBRARY     ${CMAKE_BINARY_DIR}/external/lib/libhdf5.a )
+SET(HDF5_INCLUDE_DIR ${CMAKE_BINARY_DIR}/external/${install_prefix}/include )
+SET(HDF5_LIBRARY     ${CMAKE_BINARY_DIR}/external/${install_prefix}/lib/libhdf5.a )
 SET(HDF5_FOUND ON)
 
 endmacro(build_hdf5)

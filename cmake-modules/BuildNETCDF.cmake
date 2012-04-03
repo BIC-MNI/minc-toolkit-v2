@@ -8,11 +8,12 @@ ExternalProject_Add(NETCDF
   INSTALL_DIR     "${CMAKE_BINARY_DIR}/external"
   BUILD_COMMAND   make 
   INSTALL_COMMAND make DESTDIR=${CMAKE_BINARY_DIR}/external install 
-  CONFIGURE_COMMAND ./configure --prefix=/ --with-pic --disable-doxygen --disable-hdf4 --disable-netcdf-4 --disable-shared --disable-dap
+  CONFIGURE_COMMAND ./configure --prefix=${install_prefix} --with-pic --disable-doxygen --disable-hdf4 --disable-netcdf-4 --disable-shared --disable-dap
+#  INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
 )
 
-SET(NETCDF_LIBRARY     ${CMAKE_BINARY_DIR}/external/lib/libnetcdf.a )
-SET(NETCDF_INCLUDE_DIR ${CMAKE_BINARY_DIR}/external/include )
+SET(NETCDF_LIBRARY     ${CMAKE_BINARY_DIR}/external/${install_prefix}/lib/libnetcdf.a )
+SET(NETCDF_INCLUDE_DIR ${CMAKE_BINARY_DIR}/external/${install_prefix}/include )
 SET(NETCDF_FOUND ON)
 
 

@@ -8,12 +8,12 @@ ExternalProject_Add(ZLIB
   INSTALL_DIR     "${CMAKE_BINARY_DIR}/external"
   BUILD_COMMAND   make 
   INSTALL_COMMAND make DESTDIR=${CMAKE_BINARY_DIR}/external install
-  CONFIGURE_COMMAND CFLAGS=-fPIC ./configure --prefix=/ --static  
+  CONFIGURE_COMMAND CFLAGS=-fPIC ./configure --prefix=${install_prefix} --static  
 )
 
 
-SET(ZLIB_INCLUDE_DIR ${CMAKE_BINARY_DIR}/external/include )
-SET(ZLIB_LIBRARY     ${CMAKE_BINARY_DIR}/external/lib/libz.a )
+SET(ZLIB_INCLUDE_DIR ${CMAKE_BINARY_DIR}/external/${install_prefix}/include )
+SET(ZLIB_LIBRARY     ${CMAKE_BINARY_DIR}/external/${install_prefix}/lib/libz.a )
 SET(ZLIB_FOUND ON)
 
 

@@ -8,12 +8,12 @@ ExternalProject_Add(PCRE
   INSTALL_DIR     "${CMAKE_BINARY_DIR}/external"
   BUILD_COMMAND   make 
   INSTALL_COMMAND make DESTDIR=${CMAKE_BINARY_DIR}/external install 
-  CONFIGURE_COMMAND ./configure --prefix=/ --with-pic --disable-shared --enable-cpp 
+  CONFIGURE_COMMAND ./configure --prefix=${install_prefix} --with-pic --disable-shared --enable-cpp 
 )
 
-SET(PCRE_INCLUDE_DIR  ${CMAKE_BINARY_DIR}/external/include )
-SET(PCRE_LIBRARY      ${CMAKE_BINARY_DIR}/external/lib/libpcre.a )
-SET(PCRECPP_LIBRARY   ${CMAKE_BINARY_DIR}/external/lib/libpcrecpp.a )
+SET(PCRE_INCLUDE_DIR  ${CMAKE_BINARY_DIR}/external/${install_prefix}/include )
+SET(PCRE_LIBRARY      ${CMAKE_BINARY_DIR}/external/${install_prefix}/lib/libpcre.a )
+SET(PCRECPP_LIBRARY   ${CMAKE_BINARY_DIR}/external/${install_prefix}/lib/libpcrecpp.a )
 SET(PCRE_FOUND ON)
  
 
