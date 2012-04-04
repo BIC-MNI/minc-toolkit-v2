@@ -1,8 +1,6 @@
 # Add include directories needed to use ITK.
 INCLUDE_DIRECTORIES(BEFORE ${ITK_INCLUDE_DIRS})
 
-message(WARNING ${ITK_LIBRARY_DIRS})
-
 # Add link directories needed to use ITK.
 LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
 
