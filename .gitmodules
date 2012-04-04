@@ -40,3 +40,12 @@
 [submodule "itk-interface/minc4itk"]
 	path = itk-interface/minc4itk
 	url = git://github.com/vfonov/minc4itk.git
+[submodule "Register"]
+	path = Register
+	url = git://github.com/BIC-MNI/Register.git
+[submodule "Display"]
+	path = Display
+	url = git@github.com:BIC-MNI/Display.git
+[submodule "postf"]
+	path = postf
+	url = git@github.com:BIC-MNI/postf.git

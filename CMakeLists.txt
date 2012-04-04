@@ -25,9 +25,6 @@ SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/README.txt")
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING.txt")
 
  
-IF(UNIX AND NOT APPLE)
-
-ENDIF(UNIX AND NOT APPLE)
 
 INCLUDE(CPack)
 
@@ -78,6 +75,7 @@ OPTION(USE_SYSTEM_PCRE   "Use System PCRE "       OFF)
 OPTION(USE_SYSTEM_GSL    "Use System GSL "        OFF)
 OPTION(USE_SYSTEM_FFTW3F "Use System FFTW3F "     OFF)
 OPTION(BUILD_ITK_TOOLS   "Build ITK-based tools"  OFF)
+OPTION(BUILD_VISUAL_TOOLS   "Build visual tools (Display, Register, postf)"  OFF)
 OPTION(USE_SYSTEM_ITK    "Use System ITK" OFF)
 
 
@@ -284,6 +282,18 @@ IF(BUILD_ITK_TOOLS)
   ENDIF(NOT USE_SYSTEM_FFTW3F)
 ENDIF(BUILD_ITK_TOOLS)
 
+
+IF(BUILD_VISUAL_TOOLS)
+  ADD_SUBDIRECTORY(Register)
+  ADD_DEPENDENCIES(Register minc2)
+  
+  ADD_SUBDIRECTORY(Display)
+  ADD_DEPENDENCIES(Display minc2)
+  
+  ADD_SUBDIRECTORY(postf)
+  ADD_DEPENDENCIES(postf minc2)
+ENDIF(BUILD_VISUAL_TOOLS)
+
 # DO nothing?
 IF(USE_SUPERBUILD)
   #install external dependencies to final destination
@@ -299,10 +309,6 @@ IF(USE_SUPERBUILD)
   # do we really need to install share?
   INSTALL(DIRECTORY ${CMAKE_BINARY_DIR}/external/${CMAKE_INSTALL_PREFIX}/share
         DESTINATION .)
-  
-  
-  # dealing with ITKv3
-  
 ENDIF(USE_SUPERBUILD)
 
 
