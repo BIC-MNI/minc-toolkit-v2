@@ -7,12 +7,12 @@ macro(build_itkv3 install_prefix)
   endif()
   
   set(CMAKE_OSX_EXTERNAL_PROJECT_ARGS)
-  if(APPLE)
-    list(APPEND CMAKE_OSX_EXTERNAL_PROJECT_ARGS
-      -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
-      -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
-      -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET})
-  endif()
+#  if(APPLE)
+#    list(APPEND CMAKE_OSX_EXTERNAL_PROJECT_ARGS
+#      -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
+#      -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
+#      -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET})
+#  endif()
 
   ExternalProject_Add(ITKv3
     URL "http://downloads.sourceforge.net/project/itk/itk/3.20/InsightToolkit-3.20.1.tar.gz"
@@ -26,9 +26,9 @@ macro(build_itkv3 install_prefix)
         -DBUILD_SHARED_LIBS:BOOL=${MT_BUILD_SHARED_LIBS}
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
-        -DCMAKE_CXX_FLAGS:STRING=${DCMAKE_CXX_FLAGS}
+        -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
-        -DCMAKE_C_FLAGS:STRING=${DCMAKE_C_FLAGS}
+        -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
         ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DBUILD_EXAMPLES:BOOL=OFF
@@ -36,7 +36,6 @@ macro(build_itkv3 install_prefix)
         -DITK_USE_REVIEW:BOOL=ON
         -DITK_USE_REVIEW_STATISTICS:BOOL=ON
         -DITK_USE_OPTIMIZED_REGISTRATION_METHODS:BOOL=ON
-        #-DITK_USE_PORTABLE_ROUND:BOOL=ON # Unused
         -DITK_USE_CENTERED_PIXEL_COORDINATES_CONSISTENTLY:BOOL=ON
         -DITK_USE_TRANSFORM_IO_FACTORIES:BOOL=ON
         -DITK_LEGACY_REMOVE:BOOL=ON
@@ -53,7 +52,15 @@ macro(build_itkv3 install_prefix)
 
 # The ITK library directories.
   SET(ITK_LIBRARY_DIRS "${CMAKE_CURRENT_BINARY_DIR}/ITKv3-build/bin")
-
-  SET(ITK_LIBRARIES ITKAlgorithms ITKStatistics ITKFEM ITKQuadEdgeMesh)
+  SET(ITK_LIBRARIES  ITKAlgorithms ITKStatistics ITKFEM ITKQuadEdgeMesh 
+  		     ITKBasicFilters ITKCommon ITKIO ITKNrrdIO 
+		     ITKSpatialObject ITKMetaIO
+                     ITKDICOMParser ITKEXPAT
+                     ITKniftiio ITKTransformIOReview  ITKznz 
+  		     itkgdcm itkpng itktiff itkzlib itkvcl 
+		     itkvcl itkv3p_netlib  
+		     itkv3p_lsqr itkvnl_algo
+		     itksys itkjpeg8 itkjpeg12 itkjpeg16 itkopenjpeg
+		     )
 
 endmacro(build_itkv3)
