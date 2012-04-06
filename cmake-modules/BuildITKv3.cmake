@@ -1,5 +1,4 @@
 macro(build_itkv3 install_prefix)
-#      ${LOCAL_CMAKE_BUILD_OPTIONS}
   if(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
   else()
@@ -52,15 +51,22 @@ macro(build_itkv3 install_prefix)
 
 # The ITK library directories.
   SET(ITK_LIBRARY_DIRS "${CMAKE_CURRENT_BINARY_DIR}/ITKv3-build/bin")
-  SET(ITK_LIBRARIES  ITKAlgorithms ITKStatistics ITKFEM ITKQuadEdgeMesh 
-  		     ITKBasicFilters ITKCommon ITKIO ITKNrrdIO 
-		     ITKSpatialObject ITKMetaIO
-                     ITKDICOMParser ITKEXPAT
-                     ITKniftiio ITKTransformIOReview  ITKznz 
-  		     itkgdcm itkpng itktiff itkzlib itkvcl 
-		     itkvcl itkv3p_netlib  
-		     itkv3p_lsqr itkvnl_algo
-		     itksys itkjpeg8 itkjpeg12 itkjpeg16 itkopenjpeg
-		     )
-
+  
+  SET(ITK_LIBRARIES  
+          ${CMAKE_THREAD_LIBS_INIT} 
+          ITKAlgorithms ITKStatistics ITKFEM ITKQuadEdgeMesh 
+          ITKBasicFilters  ITKIO ITKNrrdIO 
+          ITKSpatialObject ITKMetaIO
+          ITKDICOMParser ITKEXPAT
+          ITKniftiio ITKTransformIOReview  ITKCommon ITKznz 
+          itkgdcm itkpng itktiff itkzlib itkvcl 
+          itkvcl 
+          itkv3p_lsqr  itkvnl_algo itkvnl itkv3p_netlib 
+          itksys itkjpeg8 itkjpeg12 itkjpeg16 itkopenjpeg
+          )
+	
+	IF(UNIX)
+		SET(ITK_LIBRARIES  ${ITK_LIBRARIES} dl)
+	ENDIF(UNIX)
+	
 endmacro(build_itkv3)

@@ -40,9 +40,9 @@ ADD_LIBRARY(ITKIOMINC ${ITKIOMINC_SRC} ${ITKIOMINC_HEADER})
 
 TARGET_LINK_LIBRARIES(ITKIOMINC
   minc_io
-  ${ITK_LIBRARIES}
   itkvnl_algo 
   itkvnl 
+  ${ITK_LIBRARIES}
   volume_io2
   minc2
   m 
