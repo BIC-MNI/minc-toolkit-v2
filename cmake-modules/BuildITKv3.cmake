@@ -1,4 +1,4 @@
-macro(build_itkv3 install_prefix)
+macro(build_itkv3 install_prefix )
   if(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
   else()
@@ -12,6 +12,11 @@ macro(build_itkv3 install_prefix)
 #      -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
 #      -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET})
 #  endif()
+  if(MT_BUILD_SHARED_LIBS) 
+    SET(ITK_SHARED_LIBRARY "ON")
+  else(MT_BUILD_SHARED_LIBS) 
+    SET(ITK_SHARED_LIBRARY "OFF")
+  endif(MT_BUILD_SHARED_LIBS) 
 
   ExternalProject_Add(ITKv3
     URL "http://downloads.sourceforge.net/project/itk/itk/3.20/InsightToolkit-3.20.1.tar.gz"
@@ -22,7 +27,8 @@ macro(build_itkv3 install_prefix)
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-        -DBUILD_SHARED_LIBS:BOOL=${MT_BUILD_SHARED_LIBS}
+        -DBUILD_SHARED_LIBS:BOOL=${ITK_SHARED_LIBRARY}
+        -DCMAKE_SKIP_RPATH:BOOL=YES
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
         -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
