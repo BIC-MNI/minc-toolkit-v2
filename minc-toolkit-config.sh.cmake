@@ -1,0 +1,7 @@
+# minc-toolkit configuration parameters for @MINC_TOOLKIT_VERSION_FULL@
+# 
+export PATH=@CMAKE_INSTALL_PREFIX@/bin:${PATH}
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:@CMAKE_INSTALL_PREFIX@/lib
+export MINC_FORCE_V2=1
+export MINC_COMPRESS=4
+export VOLUME_CACHE_THRESHOLD=-1

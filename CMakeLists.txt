@@ -5,9 +5,9 @@ enable_language(CXX)
 cmake_minimum_required(VERSION 2.6)
 
 SET(MINC_TOOLKIT_PACKAGE_VERSION_MAJOR 0)
-SET(MINC_TOOLKIT_PACKAGE_VERSION_MINOR 2)
+SET(MINC_TOOLKIT_PACKAGE_VERSION_MINOR 3)
 SET(MINC_TOOLKIT_PACKAGE_VERSION_PATCH 0)
-SET(MINC_TOOLKIT_RELEASE_DATE "20120403")
+SET(MINC_TOOLKIT_RELEASE_DATE "20120408")
 
 SET(MINC_TOOLKIT_VERSION_FULL "${MINC_TOOLKIT_PACKAGE_VERSION_MAJOR}.${MINC_TOOLKIT_PACKAGE_VERSION_MINOR}.${MINC_TOOLKIT_PACKAGE_VERSION_PATCH}-${MINC_TOOLKIT_RELEASE_DATE}")
 
@@ -60,7 +60,7 @@ OPTION(USE_SYSTEM_PCRE   "Use System PCRE "       OFF)
 OPTION(USE_SYSTEM_GSL    "Use System GSL "        OFF)
 OPTION(USE_SYSTEM_FFTW3F "Use System FFTW3F "     OFF)
 OPTION(BUILD_ITK_TOOLS   "Build ITK-based tools"  OFF)
-OPTION(BUILD_VISUAL_TOOLS   "Build visual tools (Display, Register, postf, ray_trace) requires OpenGL & Glut"  OFF)
+OPTION(BUILD_VISUAL_TOOLS "Build visual tools (Display, Register, postf, ray_trace) requires OpenGL & Glut"  OFF)
 OPTION(USE_SYSTEM_ITK    "Use System ITK" OFF)
 
 # for superbuild
@@ -299,7 +299,12 @@ IF(USE_SUPERBUILD)
         DESTINATION .)
 ENDIF(USE_SUPERBUILD)
 
+# write configuration information
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/minc-toolkit-config.sh.cmake ${CMAKE_CURRENT_BINARY_DIR}/minc-toolkit-config.sh @ONLY)
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/minc-toolkit-config.sh DESTINATION .)
+
+# setup additional variables for making Debian package
+INCLUDE(DebianPackageAddons)
 
 # according to http://www.cmake.org/pipermail/cmake/2011-November/047137.html it's better to put this in the end
-INCLUDE(DebianPackageAddons)
 INCLUDE(CPack)
