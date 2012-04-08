@@ -40,12 +40,6 @@ ENDIF(${CPACK_SYSTEM_NAME} MATCHES Windows)
 
 SET(CPACK_PACKAGE_FILE_NAME "minc-toolkit-${MINC_TOOLKIT_VERSION_FULL}-${CPACK_SYSTEM_NAME}")
 
-# For Apple, we need to base the filename on the architecture
-#IF(CMAKE_SYSTEM_NAME MATCHES Darwin)
-#  STRING(REPLACE ";" "-" ARCHBIT ${CMAKE_OSX_ARCHITECTURES})
-#  SET(CPACK_SYSTEM_NAME "MacOS-${ARCHBIT}")
-#ENDIF(CMAKE_SYSTEM_NAME MATCHES Darwin)
-
 # register local modules
 SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}/cmake-modules")
 INCLUDE(PreventInSourceBuilds)
@@ -307,4 +301,5 @@ ENDIF(USE_SUPERBUILD)
 
 
 # according to http://www.cmake.org/pipermail/cmake/2011-November/047137.html it's better to put this in the end
+INCLUDE(DebianPackageAddons)
 INCLUDE(CPack)
