@@ -37,9 +37,6 @@
 [submodule "arguments"]
 	path = arguments
 	url = git@ssh.github.com:BIC-MNI/arguments.git
-[submodule "itk-interface/minc4itk"]
-	path = itk-interface/minc4itk
-	url = git@ssh.github.com:vfonov/minc4itk.git
 [submodule "Register"]
 	path = Register
 	url = git@ssh.github.com:BIC-MNI/Register.git
