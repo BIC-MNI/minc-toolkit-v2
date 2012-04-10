@@ -52,3 +52,6 @@
 [submodule "mrisim"]
 	path = mrisim
 	url = git://github.com/BIC-MNI/mrisim.git
+[submodule "bicgl"]
+	path = bicgl
+	url = git://github.com/BIC-MNI/bicgl.git
