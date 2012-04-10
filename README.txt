@@ -28,8 +28,14 @@ Installing from github, need CMake > 2.6 , preferably > 2.8.3
   git clone git://github.com/vfonov/minc-toolkit.git minc-toolkit
   cd minc-toolkit
   git submodule init
-  git submodule update
-  cd ..
+  git submodule update --recursive
+  cd Display
+  git submodule init 
+  git submodule update --recursive
+  cd ../Register
+  git submodule init 
+  git submodule update --recursive
+  cd ../..
   mkdir minc-toolkit-build
   cd minc-toolkit-build
   ccmake ../minc-toolkit
@@ -53,14 +59,16 @@ Following packages are needed to compile all tools:
  * GSL    - http://www.gnu.org/software/gsl/
  * FFTW3  - http://www.fftw.org/
  * ITK    - http://www.itk.org/                            (optional)
- * GLUT  
- * libxi
- * libxmu
+ * GLUT   - http://freeglut.sourceforge.net/
+ * libxi  - 
+ * libxmu 
  
 Installing Dependencies on Ubuntu 11.10
 ------------
 
-sudo apt-get install zlib1g zlib1g-dev  \
+sudo apt-get install 
+ cmake cmake-curses-gui \
+ zlib1g zlib1g-dev  \
  netcdf-bin libnetcdf6 libnetcdf-dev \
  libhdf5-serial-1.8.4 libhdf5-serial-dev hdf5-tools \
  bison flex libnetpbm10 libnetpbm10-dev \
@@ -69,6 +77,5 @@ sudo apt-get install zlib1g zlib1g-dev  \
  libgsl0-dev libfftw3-3 libfftw3-dev \
  freeglut3 freeglut3-dev \
  libxi6 libxi-dev libxmu6 libxmu-dev libxmu-headers
- 
 
  
