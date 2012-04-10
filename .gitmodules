@@ -1,57 +1,60 @@
 [submodule "minc"]
 	path = minc
-	url = git://github.com/vfonov/minc.git
+	url = git@ssh.github.com:vfonov/minc.git
 [submodule "bicpl"]
 	path = bicpl
-	url = git://github.com/BIC-MNI/bicpl.git
+	url = git@ssh.github.com:BIC-MNI/bicpl.git
 [submodule "N3"]
 	path = N3
-	url = git://github.com/BIC-MNI/N3.git
+	url = git@ssh.github.com:BIC-MNI/N3.git
 [submodule "EBTKS"]
 	path = EBTKS
-	url = git://github.com/BIC-MNI/EBTKS.git
+	url = git@ssh.github.com:BIC-MNI/EBTKS.git
 [submodule "mni_autoreg"]
 	path = mni_autoreg
-	url = git://github.com/BIC-MNI/mni_autoreg.git
+	url = git@ssh.github.com:BIC-MNI/mni_autoreg.git
 [submodule "classify"]
 	path = classify
-	url = git://github.com/BIC-MNI/classify.git
+	url = git@ssh.github.com:BIC-MNI/classify.git
 [submodule "conglomerate"]
 	path = conglomerate
-	url = git://github.com/BIC-MNI/conglomerate.git
+	url = git@ssh.github.com:BIC-MNI/conglomerate.git
 [submodule "inormalize"]
 	path = inormalize
-	url = git://github.com/BIC-MNI/inormalize.git
+	url = git@ssh.github.com:BIC-MNI/inormalize.git
 [submodule "EZminc"]
 	path = EZminc
-	url = git://github.com/vfonov/EZminc.git
+	url = git@ssh.github.com:vfonov/EZminc.git
 [submodule "ray_trace"]
 	path = ray_trace
-	url = git://github.com/BIC-MNI/ray_trace.git
+	url = git@ssh.github.com:BIC-MNI/ray_trace.git
 [submodule "glim_image"]
 	path = glim_image
-	url = git://github.com/BIC-MNI/glim_image.git
+	url = git@ssh.github.com:BIC-MNI/glim_image.git
 [submodule "oobicpl"]
 	path = oobicpl
-	url = git://github.com/BIC-MNI/oobicpl.git
+	url = git@ssh.github.com:BIC-MNI/oobicpl.git
 [submodule "arguments"]
 	path = arguments
-	url = git://github.com/BIC-MNI/arguments.git
+	url = git@ssh.github.com:BIC-MNI/arguments.git
 [submodule "itk-interface/minc4itk"]
 	path = itk-interface/minc4itk
-	url = git://github.com/vfonov/minc4itk.git
+	url = git@ssh.github.com:vfonov/minc4itk.git
 [submodule "Register"]
 	path = Register
-	url = git://github.com/BIC-MNI/Register.git
+	url = git@ssh.github.com:BIC-MNI/Register.git
 [submodule "Display"]
 	path = Display
-	url = git://github.com/BIC-MNI/Display.git
+	url = git@ssh.github.com:BIC-MNI/Display.git
 [submodule "postf"]
 	path = postf
-	url = git://github.com/BIC-MNI/postf.git
+	url = git@ssh.github.com:BIC-MNI/postf.git
 [submodule "mrisim"]
 	path = mrisim
-	url = git://github.com/BIC-MNI/mrisim.git
+	url = git@ssh.github.com:BIC-MNI/mrisim.git
 [submodule "bicgl"]
 	path = bicgl
-	url = git://github.com/BIC-MNI/bicgl.git
+	url = git@ssh.github.com:BIC-MNI/bicgl.git
+[submodule "minc4itk"]
+	path = minc4itk
+	url = git@ssh.github.com:vfonov/minc4itk.git

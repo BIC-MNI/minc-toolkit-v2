@@ -236,10 +236,11 @@ IF(BUILD_ITK_TOOLS)
   ENDIF(USE_SYSTEM_FFTW3F)
 
   # minc4itk integration library
-  ADD_SUBDIRECTORY(itk-interface)
+  #ADD_SUBDIRECTORY(itk-interface)
+  ADD_SUBDIRECTORY(minc4itk)
   # setup minc4itk variables
-  SET(MINC4ITK_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/itk-interface/minc4itk/include)
-  SET(MINC4ITK_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/itk-interface)
+  SET(MINC4ITK_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/minc4itk/include)
+  SET(MINC4ITK_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/minc4itk/)
   
   ADD_DEPENDENCIES(ITKIOMINC minc2)
   
