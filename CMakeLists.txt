@@ -309,8 +309,15 @@ IF(USE_SUPERBUILD)
 ENDIF(USE_SUPERBUILD)
 
 # write configuration information
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/minc-toolkit-config.sh.cmake ${CMAKE_CURRENT_BINARY_DIR}/minc-toolkit-config.sh @ONLY)
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/minc-toolkit-config.sh DESTINATION .)
+IF(UNIX)
+  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/minc-toolkit-config.unix.sh.cmake ${CMAKE_CURRENT_BINARY_DIR}/minc-toolkit-config.sh @ONLY)
+  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/minc-toolkit-config.sh DESTINATION .)
+ENDIF(UNIX)
+
+IF(APPLE)
+  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/minc-toolkit-config.apple.sh.cmake ${CMAKE_CURRENT_BINARY_DIR}/minc-toolkit-config.sh @ONLY)
+  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/minc-toolkit-config.sh DESTINATION .)
+ENDIF(APPLE)
 
 # setup additional variables for making Debian package
 INCLUDE(DebianPackageAddons)
