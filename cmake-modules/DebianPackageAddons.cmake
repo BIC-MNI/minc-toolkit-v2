@@ -8,7 +8,7 @@ IF(BUILD_VISUAL_TOOLS)
 ENDIF(BUILD_VISUAL_TOOLS)
 
 IF(BUILD_ITK_TOOLS)
-  LIST(APPEND DEBIAN_DEPENDENCIES libssl1.0.0 libuuid1 libjpeg62 libexpat1 libtiff4 )
+  LIST(APPEND DEBIAN_DEPENDENCIES  libuuid1 libjpeg62 libexpat1 libtiff4 ) # libssl1.0.0 - the name changes depending on distribution
 ENDIF(BUILD_ITK_TOOLS)
 
 IF(USE_SYSTEM_ITK)
