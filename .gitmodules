@@ -58,3 +58,6 @@
 [submodule "mni-perllib"]
 	path = mni-perllib
 	url = git://github.com/BIC-MNI/mni-perllib.git
+[submodule "bic-pipelines"]
+	path = bic-pipelines
+	url = git://github.com/vfonov/bic-pipelines.git
