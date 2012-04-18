@@ -61,3 +61,6 @@
 [submodule "bic-pipelines"]
 	path = bic-pipelines
 	url = git://github.com/vfonov/bic-pipelines.git
+[submodule "BEaST"]
+	path = BEaST
+	url = git://github.com/BIC-MNI/BEaST.git
