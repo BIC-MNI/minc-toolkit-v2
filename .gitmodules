@@ -24,7 +24,7 @@
 	url = git://github.com/BIC-MNI/inormalize.git
 [submodule "EZminc"]
 	path = EZminc
-	url = git://github.com/vfonov/EZminc.git
+	url = git://github.com/BIC-MNI/EZminc.git
 [submodule "ray_trace"]
 	path = ray_trace
 	url = git://github.com/BIC-MNI/ray_trace.git
@@ -54,7 +54,7 @@
 	url = git://github.com/BIC-MNI/bicgl.git
 [submodule "minc4itk"]
 	path = minc4itk
-	url = git://github.com/vfonov/minc4itk.git
+	url = git://github.com/BIC-MNI/minc4itk.git
 [submodule "mni-perllib"]
 	path = mni-perllib
 	url = git://github.com/BIC-MNI/mni-perllib.git
