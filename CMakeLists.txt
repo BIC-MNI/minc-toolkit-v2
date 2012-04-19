@@ -228,6 +228,7 @@ ADD_SUBDIRECTORY(glim_image)
 ADD_SUBDIRECTORY(mni_autoreg)
 ADD_SUBDIRECTORY(inormalize)
 ADD_SUBDIRECTORY(mrisim)
+ADD_SUBDIRECTORY(bic-pipelines)
 
 # build tools that require ITK
 IF(BUILD_ITK_TOOLS)
