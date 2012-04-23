@@ -1,7 +1,7 @@
 # Additional settings for building a debian package
 
 # make a list of used system libraries
-SET(DEBIAN_DEPENDENCIES libc6 libstdc++6 libtext-format-perl libgetopt-tabular-perl imagemagick perl )
+SET(DEBIAN_DEPENDENCIES libc6 libstdc++6 imagemagick perl )
 
 IF(BUILD_VISUAL_TOOLS)
   LIST(APPEND DEBIAN_DEPENDENCIES freeglut3 libgl1  libxcb1 libxdmcp6 libx11-6 libxext6 libxau6  )
