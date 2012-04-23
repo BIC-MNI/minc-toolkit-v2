@@ -1,0 +1,54 @@
+                              Getopt::Tabular
+                                version 0.2
+                               19 June, 1997
+
+Copyright (c) 1995-97 Greg Ward. All rights reserved.  This is free
+software; you can redistribute it and/or modify it under the same terms as
+Perl itself.
+
+Getopt::Tabular is a Perl 5 module for table-driven argument parsing,
+vaguely inspired by John Ousterhout's Tk_ParseArgv.  See Tabular.pod for
+details.  It is available from
+
+    ftp://ftp.bic.mni.mcgill.ca/users/greg
+
+and should be available through CPAN at
+
+    http://www.perl.com/CPAN/authors/id/GWARD
+
+
+Some nice features of Getopt::Tabular are:
+  
+* Command-line arguments are carefully type-checked, both by pattern and
+  number---e.g. if an option requires two integers, GetOptions makes sure
+  that exactly two integers follow it!
+
+* The valid command-line arguments are specified in a data structure
+  separate from the call to GetOptions; this makes it easier to have very
+  long lists of options, and to parse options from multiple sources
+  (e.g. the command line, an environment variable, and a configuration
+  file).
+
+* Getopt::Tabular can intelligently generate help text based on your option
+  descriptions.
+
+* The type system is extensible, and if you can define your desired
+  argument type using a single Perl regular expression then it's
+  particularly easy to extend.
+
+* Options can be abbreviated and come in any order.
+
+* A "spoof" mode in which arguments are parsed without side-effects.
+
+To test and install Getopt::Tabular:
+
+    perl ./Makefile.PL
+    make test
+    make install
+
+That's it!  The test suite isn't very complete yet, but it's a start.  The
+documentation is quite extensive; only a few minor features aren't covered.
+Also, there is a demo program that shows off several of the module's
+features.
+
+Email problems, questions, bug reports, etc. to greg@bic.mni.mcgill.ca.

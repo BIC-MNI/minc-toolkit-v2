@@ -229,6 +229,7 @@ ADD_SUBDIRECTORY(mni_autoreg)
 ADD_SUBDIRECTORY(inormalize)
 ADD_SUBDIRECTORY(mrisim)
 ADD_SUBDIRECTORY(bic-pipelines)
+ADD_SUBDIRECTORY(perl-modules)
 
 # build tools that require ITK
 IF(BUILD_ITK_TOOLS)

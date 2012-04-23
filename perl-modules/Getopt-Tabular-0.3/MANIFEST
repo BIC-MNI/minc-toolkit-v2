@@ -1,0 +1,8 @@
+MANIFEST
+README
+Changes
+Makefile.PL
+Tabular.pm
+Tabular.pod
+demo
+test.pl

@@ -1,0 +1,18 @@
+Version 0.3 (7 Apr 1999, Greg Ward <gward@python.net>)
+-----------
+  * help string now shows default parameter values and "negative"
+    boolean options  
+  * no more dependence on `tput cols` for width of help text --
+    just hard-code 80 columns!
+
+
+Version 0.2 (18 Jun 1997, Greg Ward <greg@bic.mni.mcgill.ca>)
+-----------
+  * changed to support "spoof" argument parsing (for minimal-side-effect
+    checking of command-line)
+  * added test program
+
+
+Version 0.1 (10 Nov 1996, Greg Ward <greg@bic.mni.mcgill.ca>)
+-----------
+  * first public release
