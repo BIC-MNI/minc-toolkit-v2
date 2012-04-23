@@ -1,0 +1,107 @@
+Revision history for Perl extension Text::Format.
+
+0.53 Fri Jan 28 13:02:01 IST 2011
+    - Adopted by Shlomi Fish (while disclaiming all rights).
+    - Convert the build system to Module-Build, while adding keywords
+    and resources.
+    - The archive name is now the more standard Text-Format-0.53.tar.gz.
+    - Fix some typos in the documentation.
+
+0.52 Sun Mar 29 11:32:50 1998
+    - fixed some warnings that appeared when using hanging indents
+      (tagged paragraphs).  Also added tha ability to use a list
+      as an argument to new() and config() so you can pass a hash ref or
+      a list as long as the list length is mod 2 == 0
+
+0.51 Tue Feb 24 13:32:22 1998
+    - no real bug fix, just the MANIFEST was wrong, also I got a test
+      script for testing the justify feature from the guy who originally
+      wrote the code for justify
+
+0.50 Sat Feb 21 10:19:33 1998
+    - there were no bugs but I figured that the new feature should
+      really have its own release.  I also tried to make the
+      justification a little faster, and the extra spaces are now added
+      starting on the right side of the text instead of the left
+    - fixed up the docs a little as well
+
+0.46 Wed Feb 18 17:19:43 1998
+    - fixed bug in justify when there was only one word left for the
+      last line it would consider the previous line to be the last line
+      and not justify it. :-(
+
+0.45 Wed Feb 18 00:04:01 1998
+    - changed the way hanging indents behave when there are more
+      paragraphs than indent tags, previously the first tag was reused,
+      now an empty text is used if there are no more tags available.
+    - added the justify feature, this will jsutify the text to both
+      margins, the rightAlign feture would jusstify to the rigght margin
+      and default is to justify to the left margin.  if rightAlign or
+      rightFill are set then justify is ignored.  rightFill fills the
+      right side with spaces
+
+0.44 Thu Feb 12 16:31:08 1998
+    - added quotes to hash keys as 5.003 didn't like unquoted hash keys
+      starting with an underscore
+
+0.43 Sat Feb  7 14:55:39 1998
+    - fixed some warnings that were occurring
+
+0.42 Fri Feb  6 18:37:13 1998
+    - no real changes as far as the user is concerned
+    - changed some internal subroutines from being just a reference to
+      being a real subroutine so Objects that inherit from Text::Format
+      can use them
+
+0.41  Mon Feb  2 22:57:33 1998
+    - fixed non-breaking space bug
+    - added some more error checking to new() and config()
+
+0.40  Thu Jan 29 16:47:41 1998
+    - added support for non-breaking space
+    - made some changes that make the module incompatible with the
+      previous version
+      * firstIndent and bodyIndent now take a number as an argument and
+        spaces are used for the indents at all times rather than the
+        previously specified strings
+      * expandTabs is gone - to expand tabs prior to using center()
+        just use Text::Format->expand() first
+      * subroutines wrap and fill renamed to format() and paragraphs()
+        to reflect their usage
+    - fixed the bug due to the right margin not being considered when
+      doing right alignment
+
+0.33  Wed Jan 21 17:50:39 1998
+    - added left margin and right margin spec, left out by accident
+      before
+
+0.32  Sat Jan 17 11:45:48 1998
+    - fixed another bug :-(
+
+0.31  Fri Jan 16 17:23:18 1998
+    - renamed module to Format.pm (was Manip.pm)
+      fixed a warning; was operating on an undef'ed string without
+      checking now check for defined strings
+
+0.30  Wed Jan 14 22:20:37 1998
+    - added ability to do hanging indents, fixed the interface for a
+      better object oriented design, fixed some more bugs
+
+0.23  Fri Jan 10 22:56:40 1998
+    - few bug fixes
+
+0.22  Fri Jan 10 17:39:23 1998
+    - addition of expand/unexpand routines
+
+0.21  Thu Jan  9 20:23:34 1998
+    - addition of center routine
+
+0.20  Wed Jan  8 22:20:28 1998
+    - change to object oriented module
+
+0.10  Tue Jan  6 15:28:29 1998
+    - original version
+      routines are : wrap, fill
+      basically the same as Text::Wrap at this point just without the
+      chance for dying, it's just a basic module - Andreas Koenig
+      suggested to make it object oriented

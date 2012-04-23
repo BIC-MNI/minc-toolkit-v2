@@ -1,0 +1,37 @@
+---
+abstract: 'Various subroutines to format text.'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  Test::More: 0
+  vars: 0
+configure_requires:
+  Module::Build: 0
+generated_by: 'Module::Build version 0.3617'
+keywords:
+  - format
+  - formatting
+  - margin
+  - margins
+  - string
+  - text
+  - width
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Format
+provides:
+  Text::Format:
+    file: lib/Text/Format.pm
+    version: 0.53
+requires:
+  Carp: 0
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  homepage: http://www.shlomifish.org/open-source/projects/Text-Format/
+  license: http://dev.perl.org/licenses/
+  repository: http://bitbucket.org/shlomif/web-cpan
+version: 0.53

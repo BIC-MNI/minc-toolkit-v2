@@ -1,0 +1,103 @@
+#!/usr/local/bin/perl5 -w
+
+# Example program for the Getopt::Tabular package.  See Getopt/Tabular.pod
+# for detailed explanation of How Things Work.
+#
+# originally by Greg Ward 1995/07/06 - 1995/07/09 (for ParseArgs package)
+# adapted to Getopt::Tabular 1996/11/10
+
+use Getopt::Tabular qw/GetOptions SetError/;
+
+# Data needed for parsing command line options
+
+@Ints = (0, 0);			# you don't really need to supply pre-defined
+$Float = 0;			# values -- I just do it here to avoid 
+$String = "";			# "Identifier used only once" warnings
+@UStrings = ();
+$Flag = 0;
+@Foo = ();
+
+$help = <<"EOH";
+This is a pretty useless program.  All it does is demonstrate my
+Getopt::Tabular package.
+EOH
+
+$usage = <<"EOH";
+Usage: $0 [options]
+EOH
+
+# Here's the important bit: the option table.  The *first* element of each
+# entry is the option name, which can be whatever you like; the *second*
+# element is the option type, which must be one of string, integer, float,
+# constant, boolean, copy, arrayconst, hashconst, call, or eval.
+
+&Getopt::Tabular::AddPatternType
+   ("upperstring", "[A-Z]+",
+    ["string of uppercase letters", "strings of uppercase letters"]);
+
+@opt_table = (["-int",    "integer", 2, \@Ints,   "two integers", 
+               "i1 i2"],
+              ["-float",  "float",   1, \$Float,  "a floating-point number" ],
+              ["-string", "string",  1, \$String, "a string" ],
+              ["-ustring","upperstring",3,\@UStrings,
+               "an uppercase string (example of a user-defined pattern type)"],
+              ["-flag",   "boolean", 0, \$Flag,   "a boolean flag" ],
+              ["-foo", "call",    0, \&get_foo, "do nothing important"],
+              ["-show",   "eval",    0, 'print "Ints = @Ints\n";',
+               "print the current values of -int option"]
+             );
+
+# Here's an example subroutine used by the "-foo" option -- note that
+# it modifies the list referenced by its second argument, which is perfectly
+# legal; this modification propagates back up to change @ARGV after 
+# &GetOptions is finished.
+
+sub get_foo
+{
+   my ($arg, $args) = @_;
+   my $next;
+
+   print "Hello, you have used the $arg option\n";
+   unless (@$args)
+   {
+      &SetError ("bad_foo", "no arguments found for $arg option");
+      return 0;
+   }
+
+   while ($next = shift @$args)
+   {
+      last if $next =~ /^-/;
+      push (@Foo, $next);
+      print "Got $next from \@\$args\n";
+   }
+
+   if (defined $next)                   # not the last option?
+   {
+      print "Putting $next back on \@\$args\n";
+      unshift (@$args, $next);
+   }
+   1;
+}
+
+# Here's where we actually do real work -- set the two help messages
+# (the summary of options is generated automatically) and then parse
+# those arguments.
+
+&Getopt::Tabular::SetHelp ($help, $usage);
+#&GetOptions (\@opt_table, \@ARGV) || exit 1;
+if (! &GetOptions (\@opt_table, \@ARGV, \@newARGV))
+{
+   die "GetOptions returned error status; reason: $Getopt::Tabular::ErrorClass\n";
+}
+
+print <<"END";
+Values after parsing:
+   \$Ints = @Ints
+   \$Float = $Float
+   \$String = $String
+   \@UStrings = @UStrings
+   \$Flag = $Flag
+   \@Foo = @Foo
+END
+print " Original arguments: @ARGV\n";
+print "Remaining arguments: @newARGV\n";
