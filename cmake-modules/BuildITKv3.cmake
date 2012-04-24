@@ -44,6 +44,8 @@ macro(build_itkv3 install_prefix )
         -DITK_USE_CENTERED_PIXEL_COORDINATES_CONSISTENTLY:BOOL=ON
         -DITK_USE_TRANSFORM_IO_FACTORIES:BOOL=ON
         -DITK_LEGACY_REMOVE:BOOL=ON
+        -DUUID_INCLUDE_DIR:PATH= # to avoid dependecy on libuuid for now
+        -DUUID_LIBRARY:FILEPATH= # to avoid dependecy on libuuid for now
         -DKWSYS_USE_MD5:BOOL=ON # Required by SlicerExecutionModel
     INSTALL_COMMAND make install DESTDIR=${CMAKE_CURRENT_BINARY_DIR}/external
     INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external/${install_prefix}
