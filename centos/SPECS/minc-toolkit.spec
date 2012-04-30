@@ -1,7 +1,7 @@
 Summary: Medical Imaging NetCDF Toolkit, bundle of MINC-based softwares.
 Name: minc-toolkit
-Version: 0.3.2
-Release: 1
+Version: 0.3.6
+Release: 2
 License: GPL
 Source: minc-toolkit-%{version}.tar.bz2
 Patch0: minc-toolkit_cmake-modules_FindNETPBM.patch
@@ -10,9 +10,14 @@ Patch2: minc-toolkit_minc-toolkit-config.unix.csh.cmake.patch
 Patch3: minc-toolkit_minc-toolkit-config.unix.sh.cmake.patch
 # Fix a stupid RPM perl dependency check
 Patch4: minc-toolkit_mni_autoreg_perl_mritoself.in.patch
+# Disable Display
+Patch5: minc-toolkit_CMakeLists.patch
 BuildRoot: /var/tmp/%{name}-root
 URL: git://github.com/vfonov/minc-toolkit.git
 BuildRequires: netcdf-devel, hdf5-devel, freeglut-devel, pcre-devel, libXmu-devel, gsl-devel, fftw-devel
+
+%define _prefix /usr/local
+
 
 %description
 This metaproject is designed to bundle together various related MINC-based packages which historically have been developed in a semi-independent way:
@@ -36,6 +41,7 @@ This metaproject is designed to bundle together various related MINC-based packa
 %patch2
 %patch3
 %patch4
+%patch5
 
 %build
 mkdir build
@@ -53,7 +59,7 @@ pushd build
 -DUSE_SYSTEM_ITK:BOOL=ON \
 -DBUILD_ITK_TOOLS:BOOL=ON \
 -DBUILD_VISUAL_TOOLS:BOOL=ON \
--DITK_DIR=%{_libdir}
+-DITK_DIR=/usr/%{_lib}
 make %{?_smp_mflags}
 popd
 
@@ -99,5 +105,11 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Wed Mar 28 2012 Haz-Edine Assemlal <hassemlal@neurorx.com> 1.0
+* Mon Apr 23 2012 Haz-Edine Assemlal <hassemlal@neurorx.com> 0.3.6-2
+- change the prefix from /usr to /usr/local
+
+* Mon Apr 23 2012 Haz-Edine Assemlal <hassemlal@neurorx.com> 0.3.6
+- update to the most recent version of minc-toolkit
+
+* Wed Mar 28 2012 Haz-Edine Assemlal <hassemlal@neurorx.com> 0.3.2
 - add patch to fix compilation in MINC library
