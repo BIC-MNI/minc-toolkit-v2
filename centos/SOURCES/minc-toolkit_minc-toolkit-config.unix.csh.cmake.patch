@@ -1,34 +1,15 @@
 --- minc-toolkit-config.unix.csh.cmake.orig	2012-04-23 16:56:42.961279089 -0400
-+++ minc-toolkit-config.unix.csh.cmake	2012-04-23 16:57:15.557310177 -0400
-@@ -1,23 +1,23 @@
- # minc-toolkit configuration parameters for @MINC_TOOLKIT_VERSION_FULL@
++++ minc-toolkit-config.unix.csh.cmake	2012-05-01 15:20:17.522833201 -0400
+@@ -10,14 +10,14 @@
+ endif
  
- setenv MINC_TOOLKIT_VERSION "@MINC_TOOLKIT_VERSION_FULL@"
--setenv PATH @CMAKE_INSTALL_PREFIX@/bin:@CMAKE_INSTALL_PREFIX@/pipeline:${PATH}
-+#setenv PATH @CMAKE_INSTALL_PREFIX@/bin:@CMAKE_INSTALL_PREFIX@/pipeline:${PATH}
- 
--if ( ! ${?PERL5LIB} ) then
--setenv PERL5LIB @CMAKE_INSTALL_PREFIX@/perl:@CMAKE_INSTALL_PREFIX@/pipeline
--else
--setenv PERL5LIB @CMAKE_INSTALL_PREFIX@/perl:@CMAKE_INSTALL_PREFIX@/pipeline:${PERL5LIB}
--endif
--
--if ( ! ${?LD_LIBRARY_PATH} ) then
+ if ( ! ${?LD_LIBRARY_PATH} ) then
 -setenv LD_LIBRARY_PATH @CMAKE_INSTALL_PREFIX@/lib:@CMAKE_INSTALL_PREFIX@/lib/InsightToolkit
--else
++setenv LD_LIBRARY_PATH @CMAKE_INSTALL_PREFIX@/lib
+ else
 -setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:@CMAKE_INSTALL_PREFIX@/lib:@CMAKE_INSTALL_PREFIX@/lib/InsightToolkit
--endif
-+#if ( ! ${?PERL5LIB} ) then
-+#setenv PERL5LIB @CMAKE_INSTALL_PREFIX@/perl:@CMAKE_INSTALL_PREFIX@/pipeline
-+#else
-+#setenv PERL5LIB @CMAKE_INSTALL_PREFIX@/perl:@CMAKE_INSTALL_PREFIX@/pipeline:${PERL5LIB}
-+#endif
-+
-+#if ( ! ${?LD_LIBRARY_PATH} ) then
-+#setenv LD_LIBRARY_PATH @CMAKE_INSTALL_PREFIX@/lib:@CMAKE_INSTALL_PREFIX@/lib/InsightToolkit
-+#else
-+#setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:@CMAKE_INSTALL_PREFIX@/lib:@CMAKE_INSTALL_PREFIX@/lib/InsightToolkit
-+#endif
++setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:@CMAKE_INSTALL_PREFIX@/lib
+ endif
  
  
  setenv MNI_DATAPATH @CMAKE_INSTALL_PREFIX@/share
