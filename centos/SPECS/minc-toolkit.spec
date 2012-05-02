@@ -16,7 +16,7 @@ BuildRoot: /var/tmp/%{name}-root
 URL: git://github.com/vfonov/minc-toolkit.git
 BuildRequires: netcdf-devel, hdf5-devel, freeglut-devel, pcre-devel, libXmu-devel, gsl-devel, fftw-devel
 
-%define _prefix /usr/local
+%define _prefix /opt/%{name}/%{version}
 
 
 %description
@@ -74,9 +74,9 @@ pushd build
 make install DESTDIR=%{buildroot}
 
 # Make sure to lib64
-%if "%{?_lib}" == "lib64" 
-    mv %{buildroot}%{_prefix}/lib %{buildroot}%{_prefix}/lib64
-%endif 
+#%if "%{?_lib}" == "lib64" 
+#    mv %{buildroot}%{_prefix}/lib %{buildroot}%{_prefix}/lib64
+#%endif 
 
 # Create /etc
 mv %{buildroot}%{_prefix}/etc %{buildroot}
