@@ -1,0 +1,12 @@
+--- mni_autoreg/perl/mritoself.in.orig	2012-04-13 20:17:39.579149006 -0400
++++ mni_autoreg/perl/mritoself.in	2012-04-13 20:18:09.774649386 -0400
+@@ -337,8 +337,7 @@
+    if ($VeryClose && !defined $InputXfm )
+    {
+       die <<END
+-You must specify an input transformation (with -transform) when you
+-use the -veryclose option.
++You must specify an input transformation (with -transform) when you use the -veryclose option.
+ END
+    }        
+ 

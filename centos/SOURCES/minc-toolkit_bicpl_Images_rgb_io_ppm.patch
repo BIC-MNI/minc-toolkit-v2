@@ -1,0 +1,11 @@
+--- bicpl/Images/rgb_io_ppm.c.orig	2012-03-28 22:07:12.588401808 -0400
++++ bicpl/Images/rgb_io_ppm.c	2012-03-28 22:07:24.026413316 -0400
+@@ -6,7 +6,7 @@
+ 
+ #include "bicpl_internal.h"
+ 
+-#include <ppm.h>
++#include <netpbm/ppm.h>
+ 
+ 
+ 

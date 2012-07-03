@@ -1,0 +1,13 @@
+--- CMakeLists.txt.orig	2012-04-23 17:12:06.902526303 -0400
++++ CMakeLists.txt	2012-04-23 17:12:12.061906213 -0400
+@@ -303,8 +303,8 @@
+   ADD_SUBDIRECTORY(ray_trace)
+   ADD_DEPENDENCIES(ray_trace bicgl minc2 bicpl)
+ 
+-  ADD_SUBDIRECTORY(Display)
+-  ADD_DEPENDENCIES(Display bicgl minc2 bicpl)
++#  ADD_SUBDIRECTORY(Display)
++#  ADD_DEPENDENCIES(Display bicgl minc2 bicpl)
+   
+   ADD_SUBDIRECTORY(Register)
+   ADD_DEPENDENCIES(register bicgl minc2 bicpl)

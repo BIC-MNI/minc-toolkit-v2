@@ -1,0 +1,10 @@
+--- classify/CMakeLists.txt.orig	2012-04-13 23:33:22.945405067 -0400
++++ classify/CMakeLists.txt	2012-04-13 23:36:25.908437991 -0400
+@@ -84,6 +84,7 @@
+   voldiff
+   DESTINATION bin)
+ 
++INSTALL(TARGETS ann bayes fcm hcm knn mindist scripts cleantag DESTINATION lib)
+ 
+ INSTALL(
+  FILES

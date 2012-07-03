@@ -1,4 +1,4 @@
-macro(build_hdf5 install_prefix zlib_include_dir zlib_library)
+macro(build_hdf5 install_prefix staging_prefix zlib_include_dir zlib_library)
 
 ExternalProject_Add(HDF5
   SOURCE_DIR HDF5
@@ -12,8 +12,8 @@ ExternalProject_Add(HDF5
 #  INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
 )
 
-SET(HDF5_INCLUDE_DIR ${CMAKE_BINARY_DIR}/external/${install_prefix}/include )
-SET(HDF5_LIBRARY     ${CMAKE_BINARY_DIR}/external/${install_prefix}/lib/libhdf5.a )
+SET(HDF5_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
+SET(HDF5_LIBRARY     ${staging_prefix}/${install_prefix}/lib/libhdf5.a )
 SET(HDF5_FOUND ON)
 
 endmacro(build_hdf5)

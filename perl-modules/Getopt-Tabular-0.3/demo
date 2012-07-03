@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl5 -w
+#!/usr/bin/env perl -w
 
 # Example program for the Getopt::Tabular package.  See Getopt/Tabular.pod
 # for detailed explanation of How Things Work.

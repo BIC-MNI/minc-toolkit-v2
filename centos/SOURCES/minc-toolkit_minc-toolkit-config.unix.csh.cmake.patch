@@ -1,0 +1,21 @@
+--- minc-toolkit-config.unix.csh.cmake.orig	2012-04-23 16:56:42.961279089 -0400
++++ minc-toolkit-config.unix.csh.cmake	2012-05-01 15:20:17.522833201 -0400
+@@ -10,14 +10,14 @@
+ endif
+ 
+ if ( ! ${?LD_LIBRARY_PATH} ) then
+-setenv LD_LIBRARY_PATH @CMAKE_INSTALL_PREFIX@/lib:@CMAKE_INSTALL_PREFIX@/lib/InsightToolkit
++setenv LD_LIBRARY_PATH @CMAKE_INSTALL_PREFIX@/lib
+ else
+-setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:@CMAKE_INSTALL_PREFIX@/lib:@CMAKE_INSTALL_PREFIX@/lib/InsightToolkit
++setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:@CMAKE_INSTALL_PREFIX@/lib
+ endif
+ 
+ 
+ setenv MNI_DATAPATH @CMAKE_INSTALL_PREFIX@/share
+ 
+-setenv MINC_FORCE_V2 1
+-setenv MINC_COMPRESS 4
++#setenv MINC_FORCE_V2 1
++setenv MINC_COMPRESS 6
+ setenv VOLUME_CACHE_THRESHOLD -1

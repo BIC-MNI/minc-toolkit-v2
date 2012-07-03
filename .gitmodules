@@ -64,3 +64,6 @@
 [submodule "BEaST"]
 	path = BEaST
 	url = git://github.com/BIC-MNI/BEaST.git
+[submodule "mincANTS"]
+	path = mincANTS
+	url = git://github.com/vfonov/mincANTS.git

@@ -1,0 +1,11 @@
+--- cmake-modules/FindNETPBM.cmake.orig	2012-03-28 21:44:06.716401918 -0400
++++ cmake-modules/FindNETPBM.cmake	2012-03-28 21:49:45.497402199 -0400
+@@ -7,7 +7,7 @@
+ # also defined, but not for general use are
+ #  NETPBM_LIBRARY, where to find the NETPBM library.
+ 
+-FIND_PATH(NETPBM_INCLUDE_DIR pam.h
++FIND_PATH(NETPBM_INCLUDE_DIR netpbm/pam.h
+ /usr/local/include
+ /usr/include
+ )
