@@ -67,3 +67,6 @@
 [submodule "mincANTS"]
 	path = mincANTS
 	url = git://github.com/vfonov/mincANTS.git
+[submodule "c3d"]
+	path = c3d
+	url = git://github.com/vfonov/c3d.git
