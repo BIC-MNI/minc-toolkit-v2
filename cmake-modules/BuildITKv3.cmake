@@ -70,7 +70,7 @@ macro(build_itkv3 install_prefix staging_prefix)
           ITKniftiio ITKTransformIOReview  ITKCommon ITKznz 
           itkgdcm itkpng itktiff itkzlib itkvcl 
           itkvcl 
-          itkv3p_lsqr  itkvnl_algo itkvnl itkv3p_netlib 
+          itkv3p_lsqr  itkvnl_algo itkvnl_inst itkvnl itkv3p_netlib 
           itksys itkjpeg8 itkjpeg12 itkjpeg16 itkopenjpeg
           )
 	
