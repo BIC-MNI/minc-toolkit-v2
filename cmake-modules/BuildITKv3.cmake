@@ -61,7 +61,9 @@ macro(build_itkv3 install_prefix staging_prefix)
   
   SET(ITK_LIBRARIES  
           ${CMAKE_THREAD_LIBS_INIT} 
-          ITKAlgorithms ITKStatistics ITKFEM ITKQuadEdgeMesh 
+          ITKAlgorithms ITKStatistics 
+          ITKNumerics 
+          ITKFEM ITKQuadEdgeMesh 
           ITKBasicFilters  ITKIO ITKNrrdIO 
           ITKSpatialObject ITKMetaIO
           ITKDICOMParser ITKEXPAT
