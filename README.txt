@@ -63,18 +63,13 @@ Following packages are needed to compile all tools:
  * libxi  - 
  * libxmu 
  
-Installing Dependencies on Ubuntu 11.10
+Installing Dependencies on Ubuntu 10.04
 ------------
 
-sudo apt-get install 
+sudo apt-get install \
+ build-essential g++ \
  cmake cmake-curses-gui \
- zlib1g zlib1g-dev  \
- netcdf-bin libnetcdf6 libnetcdf-dev \
- libhdf5-serial-1.8.4 libhdf5-serial-dev hdf5-tools \
- bison flex libnetpbm10 libnetpbm10-dev \
- libpcre3 libpcre3-dev \
- libpcre++0 libpcre++-dev \
- libgsl0-dev libfftw3-3 libfftw3-dev \
+ bison flex \
  freeglut3 freeglut3-dev \
  libxi6 libxi-dev libxmu6 libxmu-dev libxmu-headers
 
