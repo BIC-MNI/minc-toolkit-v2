@@ -280,7 +280,9 @@ IF(BUILD_ITK_TOOLS)
   
   ADD_SUBDIRECTORY(EZminc)
   ADD_DEPENDENCIES(minc_image_proc minc2)
+  ADD_DEPENDENCIES(mincnlm minc2)
   ADD_DEPENDENCIES(mrfseg minc2)
+  ADD_DEPENDENCIES(mrflib minc2)
   
   IF(MT_BUILD_MINC_ANTS)
     ADD_SUBDIRECTORY(mincANTS)
