@@ -1,4 +1,4 @@
-macro(build_gsl install_prefix)
+macro(build_gsl install_prefix staging_prefix)
 
 ExternalProject_Add(GSL
         SOURCE_DIR GSL
@@ -12,9 +12,9 @@ ExternalProject_Add(GSL
 #        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
       )
 
-SET(GSL_INCLUDE_DIR ${CMAKE_BINARY_DIR}/external/${install_prefix}/include )
-SET(GSL_LIBRARY  ${CMAKE_BINARY_DIR}/external/${install_prefix}/lib/libgsl.a )
-SET(GSL_CBLAS_LIBRARY ${CMAKE_BINARY_DIR}/external/${install_prefix}/lib/libgslcblas.a )
+SET(GSL_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
+SET(GSL_LIBRARY  ${staging_prefix}/${install_prefix}/lib/libgsl.a )
+SET(GSL_CBLAS_LIBRARY ${staging_prefix}/${install_prefix}/lib/libgslcblas.a )
 SET(GSL_FOUND ON)
 
 endmacro(build_gsl)

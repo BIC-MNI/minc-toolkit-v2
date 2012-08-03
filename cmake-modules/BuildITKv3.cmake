@@ -1,4 +1,4 @@
-macro(build_itkv3 install_prefix )
+macro(build_itkv3 install_prefix staging_prefix)
   if(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
   else()
@@ -35,7 +35,6 @@ macro(build_itkv3 install_prefix )
         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
         -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
         ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
-        -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DBUILD_EXAMPLES:BOOL=OFF
         -DBUILD_TESTING:BOOL=OFF
         -DITK_USE_REVIEW:BOOL=ON
@@ -43,10 +42,12 @@ macro(build_itkv3 install_prefix )
         -DITK_USE_OPTIMIZED_REGISTRATION_METHODS:BOOL=ON
         -DITK_USE_CENTERED_PIXEL_COORDINATES_CONSISTENTLY:BOOL=ON
         -DITK_USE_TRANSFORM_IO_FACTORIES:BOOL=ON
-        -DITK_LEGACY_REMOVE:BOOL=ON
+        -DITK_LEGACY_REMOVE:BOOL=OFF
+        -DUUID_INCLUDE_DIR:PATH= # to avoid dependecy on libuuid for now
+        -DUUID_LIBRARY:FILEPATH= # to avoid dependecy on libuuid for now
         -DKWSYS_USE_MD5:BOOL=ON # Required by SlicerExecutionModel
-    INSTALL_COMMAND make install DESTDIR=${CMAKE_CURRENT_BINARY_DIR}/external
-    INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external/${install_prefix}
+    INSTALL_COMMAND make install DESTDIR=${staging_prefix}
+    INSTALL_DIR ${staging_prefix}/${install_prefix}
   )
   #FORCE_BUILD_CHECK(ITKv3)
   SET(ITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/ITKv3-build)
@@ -60,14 +61,16 @@ macro(build_itkv3 install_prefix )
   
   SET(ITK_LIBRARIES  
           ${CMAKE_THREAD_LIBS_INIT} 
-          ITKAlgorithms ITKStatistics ITKFEM ITKQuadEdgeMesh 
+          ITKAlgorithms ITKStatistics 
+          ITKNumerics 
+          ITKFEM ITKQuadEdgeMesh 
           ITKBasicFilters  ITKIO ITKNrrdIO 
           ITKSpatialObject ITKMetaIO
           ITKDICOMParser ITKEXPAT
           ITKniftiio ITKTransformIOReview  ITKCommon ITKznz 
           itkgdcm itkpng itktiff itkzlib itkvcl 
           itkvcl 
-          itkv3p_lsqr  itkvnl_algo itkvnl itkv3p_netlib 
+          itkv3p_lsqr  itkvnl_algo itkvnl_inst itkvnl itkv3p_netlib 
           itksys itkjpeg8 itkjpeg12 itkjpeg16 itkopenjpeg
           )
 	
