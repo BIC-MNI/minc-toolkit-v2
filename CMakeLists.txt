@@ -45,9 +45,6 @@ SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}/cmake-modules"
 INCLUDE(PreventInSourceBuilds)
 AssureOutOfSourceBuilds(minc-toolkit)
 
-ENABLE_TESTING()
-INCLUDE(CTest)
-
 # default install directories
 SET(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR} CACHE PATH "Install path prefix, prepended onto install directories.")
 SET(CPACK_SET_DESTDIR    ON)
@@ -65,6 +62,9 @@ OPTION(USE_SYSTEM_FFTW3F "Use System FFTW3F "     OFF)
 OPTION(BUILD_ITK_TOOLS    "Build ITK-based tools"  OFF)
 OPTION(BUILD_VISUAL_TOOLS "Build visual tools (Display, Register, postf, ray_trace) requires OpenGL & Glut"  OFF)
 OPTION(USE_SYSTEM_ITK    "Use System ITK" OFF)
+
+ENABLE_TESTING()
+INCLUDE(CTest)
 
 # for superbuild
 IF(USE_SYSTEM_ZLIB AND USE_SYSTEM_NETCDF AND USE_SYSTEM_HDF5  AND USE_SYSTEM_PCRE  AND USE_SYSTEM_GSL AND USE_SYSTEM_FFTW3F AND USE_SYSTEM_ITK)
@@ -365,8 +365,6 @@ INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/minc-toolkit-config.sh ${CMAKE_CURRENT
 
 # setup additional variables for making Debian package
 INCLUDE(DebianPackageAddons)
-
-
 
 # according to http://www.cmake.org/pipermail/cmake/2011-November/047137.html it's better to put this in the end
 INCLUDE(CPack)
