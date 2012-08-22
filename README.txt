@@ -25,24 +25,10 @@ Installation
 ------------
 Installing from github, need CMake > 2.6 , preferably > 2.8.3 
 
-  git clone git://github.com/vfonov/minc-toolkit.git minc-toolkit
-  cd minc-toolkit
-  git submodule init
-  git submodule update --recursive
-  cd Display
-  git submodule init 
-  git submodule update --recursive
-  cd ../Register
-  git submodule init 
-  git submodule update --recursive
-  cd ../..
-  mkdir minc-toolkit-build
-  cd minc-toolkit-build
-  ccmake ../minc-toolkit
-  .....enter location of all dependencies, if not detected automatically ...
-  make 
-  make install
-
+  git clone --recursive git://github.com/vfonov/minc-toolkit.git minc-toolkit
+  mkdir build && cd build
+  ccmake .. # Enter the location of all dependencies, if not detected automatically ...
+  make && make test && make install
 
 Dependencies
 ------------
