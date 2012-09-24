@@ -67,3 +67,9 @@
 [submodule "c3d"]
 	path = c3d
 	url = git://github.com/vfonov/c3d.git
+[submodule "libminc"]
+	path = libminc
+	url = git://github.com/BIC-MNI/libminc.git
+[submodule "minc-tools"]
+	path = minc-tools
+	url = git://github.com/BIC-MNI/minc-tools.git
