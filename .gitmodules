@@ -1,6 +1,3 @@
-[submodule "minc"]
-	path = minc
-	url = git://github.com/BIC-MNI/minc.git
 [submodule "bicpl"]
 	path = bicpl
 	url = git://github.com/BIC-MNI/bicpl.git
