@@ -72,11 +72,11 @@ Installing from github, need CMake > 2.6 , preferably > 2.8.3
  * FFTW3  - http://www.fftw.org/                            http://www.fftw.org/fftw-3.3.2.tar.gz
  
 ##Installing Dependencies on Ubuntu 10.04, 12.04
-<code>
+<pre><code>
 sudo apt-get install \
  build-essential g++ \
  cmake cmake-curses-gui \
  bison flex \
  freeglut3 freeglut3-dev \
  libxi6 libxi-dev libxmu6 libxmu-dev libxmu-headers
-</code>
+</code></pre>
