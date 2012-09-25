@@ -16,8 +16,19 @@ Here is a list of bundled packages:
  * classify - Tissue classification tools
  * mni_autoreg - MNI Automated Registration Package, supports both linear and non-linear registration, implements ANIMAL algorithm
  * ray_trace - 3D visualisation tool 
+ * glim_image - voxel-level general linar modelling tool
+ * bic-pipelines - basic brain MRI processing pipeline
+ * BEaST  - automatic brain extraction tool
+ * mrisim  - MRI simulation tool
+ * mni-perllib - perl library commonly used in perl scripts developed in BIC-MNI
  * EZminc -  Eazy MINC - higher level C++ interface to minc, includes distortion correction tool, non-local means filter, markov random field tissue classification tool, modified diffeomorphic demons non-linear registration tool
-
+ * register - interactive 3D image viewer and co-registration tool
+ * Display  - interactive 3D image viewer and segmentation tool
+ * postf    - interactive 3D image viewer for statistical results
+ * ITK      - Imaging Tookkit
+ * minc4itk - MINC to ITK glue library
+ * c3d      - Convert3D multipurpose image processing tool from UPENN
+ * mincANTS - ANTS nonlinear registration tool from UPENN
 
 ##Installation
 
