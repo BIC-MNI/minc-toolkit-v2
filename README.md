@@ -33,7 +33,7 @@ Here is a list of bundled packages:
 ##Installation
 
 Installing from github, need CMake > 2.6 , preferably > 2.8.3 
-
+<pre><code>
   git clone git://github.com/BIC-MNI/minc-toolkit.git minc-toolkit
   cd minc-toolkit
   git submodule init
@@ -51,7 +51,7 @@ Installing from github, need CMake > 2.6 , preferably > 2.8.3
   .....enter location of all dependencies, if not detected automatically ...
   make 
   make install
-
+</code></pre>
 
 ##Dependencies
 
