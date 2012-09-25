@@ -1,9 +1,7 @@
-MINC - TOOLKIT
+# MINC - TOOLKIT (Medical Imaging NetCDF Toolkit)
 
-Medical Imaging NetCDF Toolkit
+## Introduction
 
-Introduction
-------------
 This metaproject is designed to bundle together various related MINC-based packages which historically have been developed in a semi-independent way.
 
 Here is a list of bundled packages:
@@ -21,8 +19,8 @@ Here is a list of bundled packages:
  * EZminc -  Eazy MINC - higher level C++ interface to minc, includes distortion correction tool, non-local means filter, markov random field tissue classification tool, modified diffeomorphic demons non-linear registration tool
 
 
-Installation
-------------
+##Installation
+
 Installing from github, need CMake > 2.6 , preferably > 2.8.3 
 
   git clone git://github.com/BIC-MNI/minc-toolkit.git minc-toolkit
@@ -44,27 +42,25 @@ Installing from github, need CMake > 2.6 , preferably > 2.8.3
   make install
 
 
-Dependencies
-------------
-Following packages are needed to compile all tools:
- * zlib - http://zlib.net/                                  http://zlib.net/zlib-1.2.6.tar.gz
- * NETCDF - http://www.unidata.ucar.edu/software/netcdf/    ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.0.1.tar.gz
- * HDF5 - http://www.hdfgroup.org/HDF5/                     http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.7/src/hdf5-1.8.7.tar.gz
- * Perl - http://www.perl.org/
+##Dependencies
+
+###Following packages are needed to compile all tools:
+ * Perl  - http://www.perl.org/
  * BISON - http://www.gnu.org/software/bison/
- * FLEX -  http://flex.sf.net/
- * NETPBM - http://netpbm.alioth.debian.org                 http://downloads.sourceforge.net/project/netpbm/super_stable/10.35.84/netpbm-10.35.84.tgz
- * PCRE  -  http://www.pcre.org/                            http://downloads.sourceforge.net/project/pcre/pcre/8.12/pcre-8.12.tar.gz
- * PCRE++ - http://www.daemon.de/PCRE                       http://www.daemon.de/idisk/Apps/pcre++/pcre++-0.9.5.tar.gz
- * GSL    - http://www.gnu.org/software/gsl/
- * FFTW3  - http://www.fftw.org/
- * ITK    - http://www.itk.org/                            (optional)
- * GLUT   - http://freeglut.sourceforge.net/
- * libxi  - 
+ * FLEX  - http://flex.sf.net/
+ * GLUT  - http://freeglut.sourceforge.net/
+ * libxi   
  * libxmu 
+
+###Following packages are optional (i.e thay can be build as part of superbuild)
+ * zlib   - http://zlib.net/                                http://zlib.net/zlib-1.2.6.tar.gz
+ * NETCDF - http://www.unidata.ucar.edu/software/netcdf/    ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.0.1.tar.gz
+ * HDF5   - http://www.hdfgroup.org/HDF5/                   http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.8/src/hdf5-1.8.8.tar.gz
+ * PCRE   - http://www.pcre.org/                            http://downloads.sourceforge.net/project/pcre/pcre/8.12/pcre-8.12.tar.gz
+ * GSL    - http://www.gnu.org/software/gsl/                ftp://ftp.gnu.org/gnu/gsl/gsl-1.15.tar.gz
+ * FFTW3  - http://www.fftw.org/                            http://www.fftw.org/fftw-3.3.2.tar.gz
  
-Installing Dependencies on Ubuntu 10.04
-------------
+##Installing Dependencies on Ubuntu 10.04, 12.04
 
 sudo apt-get install \
  build-essential g++ \
@@ -73,4 +69,3 @@ sudo apt-get install \
  freeglut3 freeglut3-dev \
  libxi6 libxi-dev libxmu6 libxmu-dev libxmu-headers
 
- 
