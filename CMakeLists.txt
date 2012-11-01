@@ -59,8 +59,6 @@ SET(CPACK_SET_DESTDIR    ON)
 SET(CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
 SET(CPACK_STRIP_FILES ON)
 
-
-
 # superbuild options
 OPTION(MT_BUILD_LITE         "Build lite version of minc-toolkit, without ITK or visual tools" OFF)
 OPTION(MT_BUILD_SHARED_LIBS  "Build shared libraries." OFF)
