@@ -2,8 +2,8 @@ macro(build_netcdf install_prefix staging_prefix)
 
 ExternalProject_Add(NETCDF 
   SOURCE_DIR NETCDF
-  URL "ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.2.tar.gz"
-  URL_MD5 "b920a6c3a30e9cd46fe96d9fb65ef17e"
+  URL "ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.2.1.tar.gz"
+  URL_MD5 "a8603acfd6b95bd885ef0d225c16ce9f"
   BUILD_IN_SOURCE 1
   INSTALL_DIR     "${staging_prefix}"
   BUILD_COMMAND   make 
