@@ -33,24 +33,13 @@ Here is a list of bundled packages:
 ##Installation
 
 Installing from github, need CMake > 2.6 , preferably > 2.8.3 
+=======
 <pre><code>
-  git clone git://github.com/BIC-MNI/minc-toolkit.git minc-toolkit
+  git clone --recursive git://github.com/BIC-MNI/minc-toolkit.git minc-toolkit
   cd minc-toolkit
-  git submodule init
-  git submodule update --recursive
-  cd Display
-  git submodule init 
-  git submodule update --recursive
-  cd ../Register
-  git submodule init 
-  git submodule update --recursive
-  cd ../..
-  mkdir minc-toolkit-build
-  cd minc-toolkit-build
-  ccmake ../minc-toolkit
-  .....enter location of all dependencies, if not detected automatically ...
-  make 
-  make install
+  mkdir build && cd build
+  ccmake .. # Enter the location of all dependencies, if not detected automatically ...
+  make && make test && make install
 </code></pre>
 
 ##Dependencies
