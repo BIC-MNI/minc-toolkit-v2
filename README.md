@@ -2,15 +2,17 @@
 
 ## Introduction
 
-This metaproject is designed to bundle together various related MINC-based packages which historically have been developed in a semi-independent way.
+This metaproject bundles multiple MINC-based packages that historically have been developed somewhat independently.
 
 Here is a list of bundled packages:
- * minc - base Medical Imaging NetCDF package, file IO library, low-level image manipulation tools
+ * libminc - base Medical Imaging NetCDF package, file IO library
+ * minc-tools - low-level image manipulation tools
  * bicpl - BIC programming library, adds supports for 3D objects in terms of io-library and low-level tools
- * EBTKS - Everything but the kitchen sink library, higher level C++ library for image manipulation
- * arguments - helper library for parsin command line arguments 
- * oobicpl - Object Oriented BIC programming library, provides higher level C++ interface to bicpl, and some higher level object manipulation tools
- * conglomerate - conglomerate of low-level volume and object manipilation tools
+ * EBTKS - Everything But The Kitchen Sink library, higher level C++ library for image manipulation
+ * arguments - helper library for parsing command line arguments 
+ * oobicpl - Object Oriented BIC programming library, provides a higher level C++ interface to bicpl, 
+      and some higher level object manipulation tools
+ * conglomerate - conglomerate of low-level volume and object manipulation tools
  * inormalize - intensity normalization tools
  * N3 - non-parametric method for correction of intensity non-uniformity in MRI data (http://en.wikibooks.org/wiki/MINC/Tools/N3)
  * classify - Tissue classification tools
