@@ -8,7 +8,7 @@ ExternalProject_Add(PCRE
   INSTALL_DIR     "${staging_prefix}"
   BUILD_COMMAND   make 
   INSTALL_COMMAND make DESTDIR=${staging_prefix} install 
-  CONFIGURE_COMMAND ./configure --prefix=${install_prefix} --with-pic --disable-shared --enable-cpp 
+  CONFIGURE_COMMAND ./configure --prefix=${install_prefix} --with-pic --disable-shared --enable-cpp
 )
 
 SET(PCRE_INCLUDE_DIR  ${staging_prefix}/${install_prefix}/include )
