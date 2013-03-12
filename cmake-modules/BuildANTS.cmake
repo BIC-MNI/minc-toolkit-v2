@@ -29,6 +29,7 @@ macro(build_ANTS ANTS_location install_prefix staging_prefix)
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DLIBMINC_DIR:PATH=${CMAKE_BINARY_DIR}/libminc
         -DMINC4ITK_DIR:PATH=${CMAKE_BINARY_DIR}/minc4itk
+        -DITK_DIR:PATH=${CMAKE_BINARY_DIR}/ITKv3-build
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
         -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
         -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
