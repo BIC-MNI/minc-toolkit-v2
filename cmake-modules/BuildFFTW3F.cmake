@@ -8,7 +8,7 @@ ExternalProject_Add(FFTW3F
         INSTALL_DIR     "${staging_prefix}"
         BUILD_COMMAND   make 
         INSTALL_COMMAND make DESTDIR=${staging_prefix} install 
-        CONFIGURE_COMMAND ./configure --prefix=${install_prefix} --with-pic --disable-shared --enable-float 
+        CONFIGURE_COMMAND ./configure --prefix=${install_prefix} --with-pic --disable-shared --enable-float
 #        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
       )
 
