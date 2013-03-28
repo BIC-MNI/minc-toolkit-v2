@@ -355,13 +355,19 @@ IF(MT_BUILD_VISUAL_TOOLS)
   #build_bicgl( ${CMAKE_CURRENT_SOURCE_DIR}/bicgl ${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
 
   ADD_SUBDIRECTORY(ray_trace)
-  ADD_DEPENDENCIES(ray_trace libbicgl minc2 bicpl)
-
   ADD_SUBDIRECTORY(Display)
-  ADD_DEPENDENCIES(Display libbicgl minc2 bicpl)
-
   ADD_SUBDIRECTORY(Register)
-  ADD_DEPENDENCIES(register libbicgl minc2 bicpl)
+  
+  IF(MT_BUILD_SHARED_LIBS)
+    ADD_DEPENDENCIES(ray_trace bicgl minc2_static bicpl_static)
+    ADD_DEPENDENCIES(Display bicgl minc2_static bicpl_static)
+    ADD_DEPENDENCIES(register bicgl minc2_static bicpl_static)
+  ELSE(MT_BUILD_SHARED_LIBS)
+    ADD_DEPENDENCIES(ray_trace bicgl minc2 bicpl)
+    ADD_DEPENDENCIES(Display bicgl minc2 bicpl)
+    ADD_DEPENDENCIES(register bicgl minc2 bicpl)
+  ENDIF(MT_BUILD_SHARED_LIBS)
+    
 
   IF(X11_FOUND)
     ADD_SUBDIRECTORY(postf)
