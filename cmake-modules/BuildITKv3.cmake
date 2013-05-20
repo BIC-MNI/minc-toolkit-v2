@@ -1,4 +1,6 @@
 macro(build_itkv3 install_prefix staging_prefix)
+  find_package(Threads REQUIRED)
+
   if(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
   else()
@@ -64,7 +66,6 @@ macro(build_itkv3 install_prefix staging_prefix)
   SET(ITK_LIBRARY_DIRS "${CMAKE_CURRENT_BINARY_DIR}/ITKv3-build/bin")
   
   SET(ITK_LIBRARIES  
-          ${CMAKE_THREAD_LIBS_INIT} 
           ITKAlgorithms ITKStatistics 
           ITKNumerics 
           ITKFEM ITKQuadEdgeMesh 
@@ -76,6 +77,7 @@ macro(build_itkv3 install_prefix staging_prefix)
           itkvcl 
           itkv3p_lsqr  itkvnl_algo itkvnl_inst itkvnl itkv3p_netlib 
           itksys itkjpeg8 itkjpeg12 itkjpeg16 itkopenjpeg
+           ${CMAKE_THREAD_LIBS_INIT}
           )
 	
 	IF(UNIX)
