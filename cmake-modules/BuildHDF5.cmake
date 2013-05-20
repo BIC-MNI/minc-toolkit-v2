@@ -4,8 +4,8 @@ get_filename_component(zlib_library_dir ${zlib_library} PATH)
 
 ExternalProject_Add(HDF5
   SOURCE_DIR HDF5
-  URL "http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.10/src/hdf5-1.8.10-patch1.tar.gz"
-  URL_MD5 "2147a289fb33c887464ad2b6c5a8ae4c"
+  URL "http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.11/src/hdf5-1.8.11.tar.gz"
+  URL_MD5 "1a4cc04f7dbe34e072ddcf3325717504"
   BUILD_IN_SOURCE 1
   INSTALL_DIR     "${CMAKE_BINARY_DIR}/external"
   BUILD_COMMAND   make 
