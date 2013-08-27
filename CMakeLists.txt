@@ -424,5 +424,9 @@ INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/minc-toolkit-config.sh ${CMAKE_CURRENT
 # setup additional variables for making Debian package
 INCLUDE(DebianPackageAddons)
 
+# setup additional variables for making RPM package
+INCLUDE(RPMPackageAddons)
+
+
 # according to http://www.cmake.org/pipermail/cmake/2011-November/047137.html it's better to put this in the end
 INCLUDE(CPack)
