@@ -1,9 +1,9 @@
 macro(build_fftw3f install_prefix staging_prefix)
 
-  SET(FFTW3F_CONFIG "--enable-sse --enable-sse2  --with-pic --disable-shared --enable-threads --disable-fortran --enable-single --enable-float")
+  SET(FFTW3F_CONFIG --enable-sse --enable-sse2  --with-pic --disable-shared --enable-threads --disable-fortran --enable-single --enable-float)
   
   IF(NOT APPLE)
-    SET(FFTW3F_CONFIG "${FFTW3F_CONFIG}  --enable-avx ")
+    SET(FFTW3F_CONFIG ${FFTW3F_CONFIG}  --enable-avx )
   ENDIF(NOT APPLE)
 
   ExternalProject_Add(FFTW3F
@@ -14,7 +14,7 @@ macro(build_fftw3f install_prefix staging_prefix)
         INSTALL_DIR     "${staging_prefix}"
         BUILD_COMMAND   make
         INSTALL_COMMAND make DESTDIR=${staging_prefix} install
-        CONFIGURE_COMMAND ./configure --prefix=${install_prefix} ${FFTW3F_CONFIG} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER}
+        CONFIGURE_COMMAND ./configure ${FFTW3F_CONFIG}  --prefix=${install_prefix} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER}
 #        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
       )
 
