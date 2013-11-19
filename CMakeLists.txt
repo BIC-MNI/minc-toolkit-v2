@@ -375,12 +375,12 @@ IF(MT_BUILD_VISUAL_TOOLS)
   
   IF(MT_BUILD_SHARED_LIBS)
     ADD_DEPENDENCIES(ray_trace bicgl minc2_static bicpl_static)
-    ADD_DEPENDENCIES(Display bicgl minc2_static bicpl_static)
-    ADD_DEPENDENCIES(register bicgl minc2_static bicpl_static)
+    ADD_DEPENDENCIES(Display   bicgl minc2_static bicpl_static)
+    ADD_DEPENDENCIES(register  bicgl minc2_static bicpl_static)
   ELSE(MT_BUILD_SHARED_LIBS)
-    ADD_DEPENDENCIES(ray_trace bicgl minc2 bicpl)
-    ADD_DEPENDENCIES(Display bicgl minc2 bicpl)
-    ADD_DEPENDENCIES(register bicgl minc2 bicpl)
+    ADD_DEPENDENCIES(ray_trace bicgl minc2 bicpl minc2_static bicpl_static)
+    ADD_DEPENDENCIES(Display   bicgl minc2 bicpl minc2_static bicpl_static)
+    ADD_DEPENDENCIES(register  bicgl minc2 bicpl minc2_static bicpl_static)
   ENDIF(MT_BUILD_SHARED_LIBS)
     
 
