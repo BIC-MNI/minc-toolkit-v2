@@ -36,8 +36,11 @@ macro(build_C3D C3D_location install_prefix staging_prefix)
         -DMINC4ITK_DIR:PATH=${CMAKE_BINARY_DIR}/minc4itk
         -DITK_DIR:PATH=${ITK_DIR}
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
-        -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
         -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
+        -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
+        -DCMAKE_EXE_LINKER_FLAGS=${CMAKE_EXE_LINKER_FLAGS}
+        -DCMAKE_MODULE_LINKER_FLAGS=${CMAKE_MODULE_LINKER_FLAGS}
+        -DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}
         ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     INSTALL_COMMAND make install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}

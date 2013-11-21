@@ -9,7 +9,7 @@ ExternalProject_Add(PCREPP
   UPDATE_COMMAND  autoreconf -i
   BUILD_COMMAND   make 
   INSTALL_COMMAND make DESTDIR=${staging_prefix} install 
-  CONFIGURE_COMMAND ./configure --prefix=/ --with-pic --disable-shared --with-pcre-include=${pcre_include} --with-pcre-lib=${pcre_lib} --docdir=${CMAKE_BINARY_DIR}/dummy
+  CONFIGURE_COMMAND CFLAGS="${CMAKE_C_FLAGS}" LDFLAGS="${CMAKE_MODULE_LINKER_FLAGS}" CXXFLAGS="${CMAKE_CXX_FLAGS}"  CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER}  ./configure --prefix=/ --with-pic --disable-shared --with-pcre-include=${pcre_include} --with-pcre-lib=${pcre_lib} --docdir=${CMAKE_BINARY_DIR}/dummy
 )
 
 SET(PCREPP_INCLUDE_DIR ${staging_prefix}/include )
