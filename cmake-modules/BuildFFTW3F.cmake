@@ -3,9 +3,13 @@ macro(build_fftw3f install_prefix staging_prefix)
   SET(FFTW3F_CONFIG --enable-sse --enable-sse2  --with-pic --disable-shared --enable-threads --disable-fortran --enable-single --enable-float)
   
   IF(NOT APPLE)
-    SET(FFTW3F_CONFIG ${FFTW3F_CONFIG}  --enable-avx )
+    LIST(APPEND FFTW3F_CONFIG --enable-avx )
   ENDIF(NOT APPLE)
 
+  IF(MT_USE_OPENMP)
+    LIST(APPEND FFTW3F_CONFIG --enable-openmp  )
+  ENDIF(MT_USE_OPENMP)
+  
   ExternalProject_Add(FFTW3F
         SOURCE_DIR FFTW3F
         URL "http://www.fftw.org/fftw-3.3.3.tar.gz"
