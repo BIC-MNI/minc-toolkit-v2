@@ -15,7 +15,7 @@ ExternalProject_Add(ZLIB
   INSTALL_DIR     "${staging_prefix}"
   BUILD_COMMAND   make 
   INSTALL_COMMAND make DESTDIR=${staging_prefix} install
-  CONFIGURE_COMMAND ./configure --prefix=${install_prefix} --static
+  CONFIGURE_COMMAND CFLAGS=-fPIC ./configure --prefix=${install_prefix} --static
 )
 
 
