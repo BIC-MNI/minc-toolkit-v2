@@ -384,11 +384,12 @@ IF(MT_BUILD_VISUAL_TOOLS)
     ADD_DEPENDENCIES(Display   bicgl minc2 bicpl minc2_static bicpl_static)
     ADD_DEPENDENCIES(register  bicgl minc2 bicpl minc2_static bicpl_static)
   ENDIF(MT_BUILD_SHARED_LIBS)
-    
 
   IF(X11_FOUND)
     ADD_SUBDIRECTORY(postf)
     ADD_DEPENDENCIES(postf minc2)
+    ADD_SUBDIRECTORY(xdisp)
+    ADD_DEPENDENCIES(xdisp minc2)
   ENDIF(X11_FOUND)
 ENDIF(MT_BUILD_VISUAL_TOOLS)
 
