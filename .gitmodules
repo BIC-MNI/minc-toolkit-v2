@@ -78,4 +78,4 @@
 	url = git://github.com/BIC-MNI/BEaST_library.git
 [submodule "xdisp"]
 	path = xdisp
-	url = https://github.com/BIC-MNI/xdisp.git
+	url = git://github.com/BIC-MNI/xdisp.git
