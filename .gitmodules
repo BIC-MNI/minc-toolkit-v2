@@ -76,3 +76,6 @@
 [submodule "BEaST_library"]
 	path = BEaST_library
 	url = git://github.com/BIC-MNI/BEaST_library.git
+[submodule "xdisp"]
+	path = xdisp
+	url = git://github.com/BIC-MNI/xdisp.git
