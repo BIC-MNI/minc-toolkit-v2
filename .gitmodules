@@ -49,9 +49,6 @@
 [submodule "bicgl"]
 	path = bicgl
 	url = git://github.com/BIC-MNI/bicgl.git
-[submodule "minc4itk"]
-	path = minc4itk
-	url = git://github.com/BIC-MNI/minc4itk.git
 [submodule "mni-perllib"]
 	path = mni-perllib
 	url = git://github.com/BIC-MNI/mni-perllib.git
