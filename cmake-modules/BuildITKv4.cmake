@@ -53,7 +53,7 @@ macro(build_itkv4 install_prefix staging_prefix)
     INSTALL_COMMAND make install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
   )
-  #FORCE_BUILD_CHECK(ITKv4)
+  #FORCE_BUILD_CHECK(ITKv4  )
   SET(ITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build)
   SET(ITK_USE_FILE  ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build/UseITK.cmake)
   SET(ITK_FOUND ON)
