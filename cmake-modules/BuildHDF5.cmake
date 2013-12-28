@@ -1,18 +1,19 @@
-macro(build_hdf5 install_prefix staging_prefix zlib_include_dir zlib_library)
-
-get_filename_component(zlib_library_dir ${zlib_library} PATH)
+macro(build_hdf5 install_prefix staging_prefix  zlib_include_dir zlib_library)
 
 ExternalProject_Add(HDF5
+  URL "http://www.hdfgroup.org/ftp/HDF5/current/src-old/hdf5-1.8.12.tar.bz2"
+  URL_MD5 "75829af785e54332cdef6ad5a4a96607"
   SOURCE_DIR HDF5
-  URL "http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.11/src/hdf5-1.8.11.tar.gz"
-  URL_MD5 "1a4cc04f7dbe34e072ddcf3325717504"
+  BINARY_DIR HDF5-build
   CMAKE_GENERATOR ${CMAKE_GEN}
   CMAKE_ARGS
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
       -DBUILD_SHARED_LIBS:BOOL=OFF
-      -DBUILD_STATIC_EXECS:BOOL=ON
+      -DBUILD_STATIC_EXECS:BOOL=OFF
       -DCMAKE_SKIP_RPATH:BOOL=ON
       -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
+      -DHDF5_INSTALL_CMAKE_DIR:PATH=${install_prefix}
+      -DHDF5_NO_PACKAGES:BOOL=ON
       -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
       -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
       -DCMAKE_EXE_LINKER_FLAGS=${CMAKE_EXE_LINKER_FLAGS}
@@ -21,10 +22,18 @@ ExternalProject_Add(HDF5
       -DHDF5_BUILD_CPP_LIB:BOOL=ON
       -DHDF5_BUILD_TOOLS:BOOL=ON
       -DHDF5_ENABLE_Z_LIB_SUPPORT=ON
-      -DZLIB_USE_EXTERNAL:BOOL=ON
-      -DZLIB_INCLUDE_DIR:PATH=${zlib_include_dir}
+#      -DZLIB_USE_EXTERNAL:BOOL=ON
+#      -DZLIB_DIR:PATH=${zlib_library_dir}
+      -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
+      -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
+      -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
+      -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
+      -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
+      -DZLIB_INCLUDE_DIRS:STRING=${zlib_include_dir}
+      -DZLIB_LIBRARIES:STRING=${zlib_library}
+      -DZLIB_INCLUDE_DIR:STRING=${zlib_include_dir}
       -DZLIB_LIBRARY:STRING=${zlib_library}
-      -DZLIB_DIR:PATH=${zlib_library_dir}
+#      -DH5_ZLIB_HEADER="zlib.h"
   INSTALL_COMMAND make install DESTDIR=${staging_prefix}
   INSTALL_DIR ${staging_prefix}/${install_prefix}
 )

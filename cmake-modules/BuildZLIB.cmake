@@ -1,12 +1,6 @@
 macro(build_zlib install_prefix staging_prefix)
   
-  
-  #SET(CFLAGS ${CMAKE_C_FLAGS})
-  #LIST(APPEND CFLAGS -fPIC)
-set(ENV{CFLAGS} "${CMAKE_C_FLAGS} -fPIC")
-
 ExternalProject_Add(ZLIB
-  SOURCE_DIR ZLIB
   URL  "http://www.hdfgroup.org/ftp/lib-external/CMake/ZLib.tar.gz"
   URL_MD5 "645f5d0b7434e1f12bd0b2ae2b976f4b"
   UPDATE_COMMAND ""
@@ -22,9 +16,14 @@ ExternalProject_Add(ZLIB
       -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
       -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS} -fPIC
       -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS} -fPIC
-      -DCMAKE_EXE_LINKER_FLAGS=${CMAKE_EXE_LINKER_FLAGS}  -fPIC
-      -DCMAKE_MODULE_LINKER_FLAGS=${CMAKE_MODULE_LINKER_FLAGS}  -fPIC
-      -DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}  -fPIC
+      -DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}  -fPIC
+      -DCMAKE_MODULE_LINKER_FLAGS:STRING=${CMAKE_MODULE_LINKER_FLAGS}  -fPIC
+      -DCMAKE_SHARED_LINKER_FLAGS:STRING=${CMAKE_SHARED_LINKER_FLAGS}  -fPIC
+      -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
+      -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
+      -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
+      -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
+      -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
   INSTALL_COMMAND make install DESTDIR=${staging_prefix}
   INSTALL_DIR ${staging_prefix}/${install_prefix}
 )
@@ -32,6 +31,7 @@ ExternalProject_Add(ZLIB
 SET(ZLIB_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
 SET(ZLIB_LIBRARY     ${staging_prefix}/${install_prefix}/lib/libz.a )
 SET(ZLIB_DIR         ${staging_prefix}/${install_prefix}/share/cmake/ZLIB/ )
+
 SET(ZLIB_FOUND ON)
 
 endmacro(build_zlib)
