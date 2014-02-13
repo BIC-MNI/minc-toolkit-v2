@@ -1,6 +1,5 @@
 macro(build_zlib install_prefix staging_prefix)
   
-  
   #SET(CFLAGS ${CMAKE_C_FLAGS})
   #LIST(APPEND CFLAGS -fPIC)
 set(ENV{CFLAGS} "${CMAKE_C_FLAGS} -fPIC")
