@@ -323,12 +323,6 @@ IF(MT_BUILD_ITK_TOOLS)
   ENDIF(NOT USE_SYSTEM_ITK)
   ADD_DEPENDENCIES(ITKIOMINC ${ITKIOMINC_deps})
 
-  ADD_SUBDIRECTORY(EZminc)
-  SET(minc_image_proc_deps minc2)
-  ADD_DEPENDENCIES(mincnlm minc2)
-  ADD_DEPENDENCIES(mrfseg minc2)
-  ADD_DEPENDENCIES(mrflib minc2)
-
   IF(MT_BUILD_MINC_ANTS)
    INCLUDE(BuildANTS)
    build_ANTS(${CMAKE_SOURCE_DIR}/mincANTS  ${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
@@ -349,16 +343,23 @@ IF(MT_BUILD_ITK_TOOLS)
     ADD_DEPENDENCIES(ITKIOMINC ITKv3)
   ENDIF(NOT USE_SYSTEM_ITK)
 
-  IF(NOT USE_SYSTEM_GSL)
-    SET(minc_image_proc_deps ${minc_image_proc_deps} GSL)
-  ENDIF(NOT USE_SYSTEM_GSL)
-
-  IF(NOT USE_SYSTEM_FFTW3F)
-    SET(minc_image_proc_deps ${minc_image_proc_deps} FFTW3F)
-  ENDIF(NOT USE_SYSTEM_FFTW3F)
-  
-  ADD_DEPENDENCIES(minc_image_proc ${minc_image_proc_deps})
 ENDIF(MT_BUILD_ITK_TOOLS)
+
+SET(minc_image_proc_deps minc2)
+
+IF(NOT USE_SYSTEM_GSL)
+  SET(minc_image_proc_deps ${minc_image_proc_deps} GSL)
+ENDIF(NOT USE_SYSTEM_GSL)
+
+IF(NOT USE_SYSTEM_FFTW3F)
+  SET(minc_image_proc_deps ${minc_image_proc_deps} FFTW3F)
+ENDIF(NOT USE_SYSTEM_FFTW3F)
+
+ADD_SUBDIRECTORY(EZminc)
+ADD_DEPENDENCIES(mincnlm minc2)
+ADD_DEPENDENCIES(mrfseg minc2)
+ADD_DEPENDENCIES(mrflib minc2)
+ADD_DEPENDENCIES(minc_image_proc ${minc_image_proc_deps})
 
 # build tools that require OpenGL and GLUT
 IF(MT_BUILD_VISUAL_TOOLS)
