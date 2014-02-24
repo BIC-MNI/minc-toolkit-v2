@@ -8,7 +8,7 @@ ExternalProject_Add(NETCDF
   INSTALL_DIR     "${staging_prefix}"
   BUILD_COMMAND   make 
   INSTALL_COMMAND make DESTDIR=${staging_prefix} install 
-  CONFIGURE_COMMAND ./configure --prefix=${install_prefix} --with-pic --disable-doxygen --disable-hdf4 --disable-netcdf-4 --disable-shared --disable-dap  --libdir=${install_prefix}/lib${LIB_SUFFIX} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=${CMAKE_C_FLAGS} LDFLAGS=${CMAKE_MODULE_LINKER_FLAGS} CXXFLAGS=${CMAKE_CXX_FLAGS}
+  CONFIGURE_COMMAND ./configure --prefix=${install_prefix} --with-pic --disable-doxygen --disable-hdf4 --disable-netcdf-4 --disable-shared --disable-dap  --libdir=${install_prefix}/lib${LIB_SUFFIX} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER}
 #  INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
 )
 
