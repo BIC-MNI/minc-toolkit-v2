@@ -19,19 +19,22 @@ macro(build_Elastix install_prefix staging_prefix)
   endif()
 
   ExternalProject_Add(Elastix
-  #  GIT_REPOSITORY "https://github.com/vfonov/elastix.git"
-  #  GIT_TAG "de0b7ec7acc0ffd52f59227c11f76a076cfe58ab"
-#    UPDATE_COMMAND ""
-    #DOWNLOAD_DIR Elastix
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/Elastix/src
-    #BINARY_DIR Elastix-build
-    #PATCH_COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/Elastix/src/ ${CMAKE_BINARY_DIR}/Elastix/ # copy files 
+    BINARY_DIR Elastix-build
     LIST_SEPARATOR :::  
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
         -DFFTW3F_FOUND:BOOL=${FFTW3F_FOUND}
         -DFFTW3F_INCLUDE_DIR:PATH=${FFTW3F_INCLUDE_DIR}
         -DFFTW3F_LIBRARY:PATH=${FFTW3F_LIBRARY}
+        -DELASTIX_BUILD_EXECUTABLE:BOOL=ON
+        -DUSE_KNNGraphAlphaMutualInformationMetric:BOOL=OFF
+        -DUSE_SimilarityTransformElastix:BOOL=ON
+        -DUSE_GradientDifferenceMetric:BOOL=ON
+        -DUSE_FixedShrinkingPyramid:BOOL=ON
+        -DUSE_BSplineResampleInterpolatorFloat:BOOL=ON
+        -DUSE_BSplineInterpolatorFloat:BOOL=ON
+        -DUSE_WeightedCombinationTransformElastix:BOOL=ON
         -DFFTW_LIB:FILEPATH=${FFTW3F_LIBRARY}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DITK_DIR:PATH=${ITK_DIR}

@@ -19,8 +19,6 @@ macro(build_EZMINC install_prefix staging_prefix libminc_dir bicpl_dir itk_dir)
   endif()
 
   ExternalProject_Add(EZMINC
-    #URL "${CMAKE_SOURCE_DIR}/EZminc"
-    #UPDATE_COMMAND ""
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/EZminc
     BINARY_DIR EZMINC-build
     LIST_SEPARATOR :::  
