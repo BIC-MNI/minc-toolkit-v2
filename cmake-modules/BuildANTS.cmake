@@ -1,4 +1,4 @@
-macro(build_ANTS install_prefix staging_prefix)
+macro(build_ANTS install_prefix staging_prefix itk_dir)
   if(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
   else()
@@ -19,17 +19,22 @@ macro(build_ANTS install_prefix staging_prefix)
   endif()
 
   ExternalProject_Add(ANTS
-    URL "${ANTS_location}"
-    UPDATE_COMMAND ""
-    SOURCE_DIR ANTS
+    #GIT_REPOSITORY "https://github.com/vfonov/ANTs.git"
+    #GIT_TAG "69d3a5a6c7125ccf07a9e9cf6ef29f0b91e9514f"
+    #UPDATE_COMMAND ""
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/ANTs
     BINARY_DIR ANTS-build
     LIST_SEPARATOR :::  
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DLIBMINC_DIR:PATH=${CMAKE_BINARY_DIR}/libminc
-        -DMINC4ITK_DIR:PATH=${CMAKE_BINARY_DIR}/minc4itk
-        -DITK_DIR:PATH=${ITK_DIR}
+        -DITK_DIR:PATH=${itk_dir}
+        -DUSE_SYSTEM_ITK:BOOL=ON
+        -DRUN_LONG_TESTS:BOOL=OFF
+        -DRUN_SHORT_TESTS:BOOL=OFF
+        -DANTS_SUPERBUILD:BOOL=OFF
+        -DBUILD_TESTING:BOOL=OFF
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
         -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
         -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}

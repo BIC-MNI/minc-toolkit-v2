@@ -19,7 +19,8 @@ macro(build_C3D install_prefix staging_prefix)
   endif()
 
   ExternalProject_Add(C3D
-    URL "${C3D_location}"
+    GIT_REPOSITORY "https://github.com/vfonov/Convert3D.git"
+    GIT_TAG "10e63165703dcf08270004d3cb418732417e5b3d"
     UPDATE_COMMAND ""
     SOURCE_DIR C3D
     BINARY_DIR C3D-build

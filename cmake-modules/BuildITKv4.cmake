@@ -1,4 +1,4 @@
-macro(build_itkv4 install_prefix staging_prefix)
+macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_dir zlib_include_dir zlib_library)
   find_package(Threads REQUIRED)
 
   if(CMAKE_EXTRA_GENERATOR)
@@ -27,10 +27,10 @@ macro(build_itkv4 install_prefix staging_prefix)
   endif(MT_BUILD_SHARED_LIBS) 
 
   ExternalProject_Add(ITKv4
-#    URL "http://downloads.sourceforge.net/project/itk/itk/3.20/InsightToolkit-3.20.1.tar.gz"
-#    URL_MD5 "90342ffa78bd88ae48b3f62866fbf050"
-    GIT_REPOSITORY "https://github.com/vfonov/ITK.git" #"http://itk.org/ITK.git"
-    GIT_TAG "579bed244964119d8a9a65c1f45e91b5d654c4fa"
+    #GIT_REPOSITORY "http://itk.org/ITK.git"
+    #GIT_TAG "421d314ff85ad542ad5c0f3d3c115fa7427b1c64"
+    URL  "http://downloads.sourceforge.net/project/itk/itk/4.5/InsightToolkit-4.5.1.tar.gz"
+    URL_MD5 "a174fd50a5bc986f0944903cfceb3e9b"
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
@@ -49,6 +49,14 @@ macro(build_itkv4 install_prefix staging_prefix)
         -DBUILD_EXAMPLES:BOOL=OFF
         -DBUILD_TESTING:BOOL=OFF
         -DITK_USE_REVIEW:BOOL=ON
+        -DModule_ITKIOMINC:BOOL=ON
+        -DITK_USE_SYSTEM_MINC:BOOL=ON
+        -DITK_USE_SYSTEM_HDF5:BOOL=ON
+        -DITK_USE_SYSTEM_ZLIB:BOOL=ON
+        -DLIBMINC_DIR:PATH=${minc_dir}
+        -DHDF5_DIR:PATH=${hdf_dir}
+        -DZLIB_LIBRARY:PATH=${zlib_library}
+        -DZLIB_INCLUDE_DIR:PATH=${zlib_include_dir}
         -DITK_LEGACY_REMOVE:BOOL=OFF
     INSTALL_COMMAND make install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
@@ -108,9 +116,9 @@ macro(build_itkv4 install_prefix staging_prefix)
           itksys itkjpeg8 itkjpeg12 itkjpeg16 itkopenjpeg
            ${CMAKE_THREAD_LIBS_INIT}
           )
-	
-	IF(UNIX)
-		SET(ITK_LIBRARIES  ${ITK_LIBRARIES} dl)
-	ENDIF(UNIX)
-	
-endmacro(build_itkv3)
+
+  IF(UNIX)
+    SET(ITK_LIBRARIES  ${ITK_LIBRARIES} dl)
+  ENDIF(UNIX)
+
+endmacro(build_itkv4)
