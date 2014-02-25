@@ -26,12 +26,11 @@ ExternalProject_Add(HDF5
       -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
       -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
       -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
-
       -DZLIB_INCLUDE_DIRS:STRING=${zlib_include_dir}
       -DZLIB_LIBRARIES:STRING=${zlib_library}
       -DZLIB_INCLUDE_DIR:STRING=${zlib_include_dir}
       -DZLIB_LIBRARY:STRING=${zlib_library}
-      -DZLIB_DIR:PATH=${zlib_dir}
+#      -DZLIB_DIR:PATH=${zlib_dir}
 #      -DH5_ZLIB_HEADER="zlib.h"
   INSTALL_COMMAND make install DESTDIR=${staging_prefix}
   INSTALL_DIR ${staging_prefix}/${install_prefix}
