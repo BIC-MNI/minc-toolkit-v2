@@ -36,7 +36,7 @@ ExternalProject_Add(HDF5
   INSTALL_DIR ${staging_prefix}/${install_prefix}
 )
 
-SET(HDF5_BIN_DIR ${staging_prefix}/${install_prefix}/bin )
+SET(HDF5_BIN_DIR     ${staging_prefix}/${install_prefix}/bin )
 SET(HDF5_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
 SET(HDF5_LIBRARY_DOR ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX} )
 
