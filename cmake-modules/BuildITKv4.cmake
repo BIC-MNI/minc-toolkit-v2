@@ -62,9 +62,11 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_dir zlib_include_di
     INSTALL_DIR ${staging_prefix}/${install_prefix}
   )
   #FORCE_BUILD_CHECK(ITKv4  )
+  #SET(ITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build)
+  #SET(ITK_USE_FILE  ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build/UseITK.cmake)
+  #SET(ITK_FOUND ON)
+  
   SET(ITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build)
-  SET(ITK_USE_FILE  ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build/UseITK.cmake)
-  SET(ITK_FOUND ON)
   
   SET(ITK_INCLUDE_DIRS 
         ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build
@@ -113,7 +115,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_dir zlib_include_di
           itkgdcm itkpng itktiff itkzlib itkvcl 
           itkvcl 
           itkv3p_lsqr  itkvnl_algo itkvnl_inst itkvnl itkv3p_netlib 
-          itksys itkjpeg8 itkjpeg12 itkjpeg16 itkopenjpeg hdf5 hdf5_cpp
+          itksys itkjpeg8 itkjpeg12 itkjpeg16 itkopenjpeg  hdf5_cpp hdf5
           ${CMAKE_THREAD_LIBS_INIT}
           )
 
