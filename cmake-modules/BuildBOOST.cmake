@@ -1,38 +1,20 @@
 macro(build_BOOST install_prefix staging_prefix)
-  SET(CLANG_ARG)
-  if(CMAKE_COMPILER_IS_CLANGXX)
-    set(CLANG_ARG -DCMAKE_COMPILER_IS_CLANGXX:BOOL=ON)
-  endif()
-  
-  set(CMAKE_OSX_EXTERNAL_PROJECT_ARGS)
-  if(APPLE)
-    list(APPEND CMAKE_OSX_EXTERNAL_PROJECT_ARGS
-      -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
-      -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
-      -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET})
-  endif()
+  message("BOOST: ${install_prefix} ${staging_prefix}")
 
   ExternalProject_Add(BOOST
   URL  "http://sourceforge.net/projects/boost/files/boost/1.54.0/boost_1_54_0.tar.gz"
   URL_MD5 "efbfbff5a85a9330951f243d0a46e4b9"
   UPDATE_COMMAND ""
   SOURCE_DIR BOOST
-  BINARY_DIR BOOST-build
+  #BINARY_DIR BOOST-build
   LIST_SEPARATOR :::  
-  CMAKE_GENERATOR ${CMAKE_GEN}
-  CMAKE_ARGS
-      -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-      -DBUILD_SHARED_LIBS:BOOL=OFF
-      -DCMAKE_SKIP_RPATH:BOOL=ON
-      -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
-      -DCMAKE_CXX_FLAGS:STRING=-fPIC
-      -DCMAKE_C_FLAGS:STRING=-fPIC
-      -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
-      -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
-      {CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
-      {CLANG_ARG}
-  INSTALL_COMMAND make install DESTDIR=${staging_prefix} 
-  INSTALL_DIR ${staging_prefix}/${install_prefix}
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./bootstrap.sh --prefix=${BOOST_INSTALL_DIR}  --without-libraries=atomic,chrono,context,date_time,exception,filesystem,graph,graph_parallel,iostreams,locale,log,math,mpi,program_options,python,random,regex,serialization,signals,test,timer,wave --prefix=${install_prefix}
+  INSTALL_DIR     "${staging_prefix}"
+  BUILD_COMMAND   ./b2 
+  INSTALL_COMMAND ./b2 stage --stagedir=${staging_prefix}
 )
 
-SET(BOOST_DIR ${CMAKE_CURRENT_BINARY_DIR}/BOOST-build)
+SET(BOOST_DIR ${CMAKE_CURRENT_BINARY_DIR}/BOOST)
+
+endmacro(build_BOOST)

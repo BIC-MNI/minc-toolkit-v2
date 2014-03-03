@@ -36,6 +36,7 @@ macro(build_ANTS install_prefix staging_prefix itk_dir boost_dir)
         -DANTS_SUPERBUILD:BOOL=OFF
         -DBUILD_TESTING:BOOL=OFF
         -DBoost_DIR:PATH=${boost_dir}
+        -DBOOST_ROOT:PATH=${boost_dir}
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
         -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
         -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
