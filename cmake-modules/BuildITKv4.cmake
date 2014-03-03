@@ -1,4 +1,4 @@
-macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_dir zlib_include_dir zlib_library)
+macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include_dir hdf_library_dir zlib_include_dir zlib_library)
   find_package(Threads REQUIRED)
 
   if(CMAKE_EXTRA_GENERATOR)
@@ -54,7 +54,13 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_dir zlib_include_di
         -DITK_USE_SYSTEM_HDF5:BOOL=ON
         -DITK_USE_SYSTEM_ZLIB:BOOL=ON
         -DLIBMINC_DIR:PATH=${minc_dir}
-        -DHDF5_DIR:PATH=${hdf_dir}
+        -DHDF5_CXX_COMPILER_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5c++
+        -DHDF5_C_COMPILER_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5cc
+        -DHDF5_CXX_LIBRARY:PATH=${hdf_library_dir}/libhdf5_cpp.a
+        -DHDF5_C_LIBRARY:PATH=${hdf_library_dir}/libhdf5.a
+        -DHDF5_DIFF_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5diff
+#        -DHDF5_DIR:PATH=/home/vfonov/src/build/minc-toolkit-itk4/HDF5-build
+        -DHDF5_Fortran_COMPILER_EXECUTABLE:FILEPATH=''
         -DZLIB_LIBRARY:PATH=${zlib_library}
         -DZLIB_INCLUDE_DIR:PATH=${zlib_include_dir}
         -DITK_LEGACY_REMOVE:BOOL=OFF
