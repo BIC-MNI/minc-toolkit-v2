@@ -63,6 +63,8 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
         -DHDF5_C_INCLUDE_DIR:PATH=${hdf_include_dir}
         -DHDF5_hdf5_LIBRARY:FILEPATH=${hdf_library_dir}/libhdf5.a
         -DHDF5_hdf5_cpp_LIBRARY:FILEPATH=${hdf_library_dir}/libhdf5_cpp.a
+        -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${hdf_library_dir}/libhdf5.a
+        -DHDF5_hdf5_cpp_LIBRARY_RELEASE:FILEPATH=${hdf_library_dir}/libhdf5_cpp.a
 #        -DHDF5_DIR:PATH=/home/vfonov/src/build/minc-toolkit-itk4/HDF5-build
         -DHDF5_Fortran_COMPILER_EXECUTABLE:FILEPATH=''
         -DZLIB_LIBRARY:PATH=${zlib_library}
