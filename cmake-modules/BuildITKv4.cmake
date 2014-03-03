@@ -113,8 +113,8 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_dir zlib_include_di
           itkgdcm itkpng itktiff itkzlib itkvcl 
           itkvcl 
           itkv3p_lsqr  itkvnl_algo itkvnl_inst itkvnl itkv3p_netlib 
-          itksys itkjpeg8 itkjpeg12 itkjpeg16 itkopenjpeg
-           ${CMAKE_THREAD_LIBS_INIT}
+          itksys itkjpeg8 itkjpeg12 itkjpeg16 itkopenjpeg hdf5 hdf5_cpp
+          ${CMAKE_THREAD_LIBS_INIT}
           )
 
   IF(UNIX)
