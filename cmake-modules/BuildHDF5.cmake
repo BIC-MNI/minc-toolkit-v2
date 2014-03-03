@@ -39,7 +39,9 @@ ExternalProject_Add(HDF5
 #SET(HDF5_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
 #SET(HDF5_LIBRARY     ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libhdf5.a )
 #SET(HDF5_DIR         ${staging_prefix}/${install_prefix}/share/cmake/hdf5)
-#SET(HDF5_FOUND ON)
-SET(HDF5_DIR      ${CMAKE_CURRENT_BINARY_DIR}/HDF5-build)
+SET(HDF5_FOUND ON)
+SET(HDF5_DIR         ${CMAKE_CURRENT_BINARY_DIR}/HDF5-build)
+SET(HDF5_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/HDF5/src)
+SET(HDF5_LIBRARY     ${CMAKE_CURRENT_BINARY_DIR}/HDF5-build/bin/libhdf5.a )
 
 endmacro(build_hdf5)
