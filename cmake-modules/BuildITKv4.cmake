@@ -20,8 +20,20 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
     )
   endif()
 	
+  SET(HDF5_LIB_SUFFIX ".a")
+  
   if(MT_BUILD_SHARED_LIBS) 
     SET(ITK_SHARED_LIBRARY "ON")
+    
+    IF(MT_BUILD_SHARED_LIBS)
+      IF(APPLE)
+        SET(HDF5_LIB_SUFFIX ".dylib")
+      ELSE(APPLE)
+        SET(HDF5_LIB_SUFFIX ".so")
+      ENDIF(APPLE)
+    ENDIF(MT_BUILD_SHARED_LIBS)
+    
+    
   else(MT_BUILD_SHARED_LIBS) 
     SET(ITK_SHARED_LIBRARY "OFF")
   endif(MT_BUILD_SHARED_LIBS) 
@@ -56,15 +68,15 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
         -DLIBMINC_DIR:PATH=${minc_dir}
         -DHDF5_CXX_COMPILER_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5c++
         -DHDF5_C_COMPILER_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5cc
-        -DHDF5_CXX_LIBRARY:PATH=${hdf_library_dir}/libhdf5_cpp.a
-        -DHDF5_C_LIBRARY:PATH=${hdf_library_dir}/libhdf5.a
+        -DHDF5_CXX_LIBRARY:PATH=${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX}
+        -DHDF5_C_LIBRARY:PATH=${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX}
         -DHDF5_DIFF_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5diff
         -DHDF5_CXX_INCLUDE_DIR:PATH=${hdf_include_dir}
         -DHDF5_C_INCLUDE_DIR:PATH=${hdf_include_dir}
-        -DHDF5_hdf5_LIBRARY:FILEPATH=${hdf_library_dir}/libhdf5.a
-        -DHDF5_hdf5_cpp_LIBRARY:FILEPATH=${hdf_library_dir}/libhdf5_cpp.a
-        -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${hdf_library_dir}/libhdf5.a
-        -DHDF5_hdf5_cpp_LIBRARY_RELEASE:FILEPATH=${hdf_library_dir}/libhdf5_cpp.a
+        -DHDF5_hdf5_LIBRARY:FILEPATH=${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX}
+        -DHDF5_hdf5_cpp_LIBRARY:FILEPATH=${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX}
+        -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX}
+        -DHDF5_hdf5_cpp_LIBRARY_RELEASE:FILEPATH=${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX}
 #        -DHDF5_DIR:PATH=/home/vfonov/src/build/minc-toolkit-itk4/HDF5-build
         -DHDF5_Fortran_COMPILER_EXECUTABLE:FILEPATH=''
         -DZLIB_LIBRARY:PATH=${zlib_library}
