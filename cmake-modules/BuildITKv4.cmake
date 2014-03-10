@@ -90,6 +90,14 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
   #SET(ITK_USE_FILE  ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build/UseITK.cmake)
   #SET(ITK_FOUND ON)
   
+  # let's patch targets to remoev staging directory
+  file(READ "${staging_prefix}/${install_prefix}/lib/cmake/ITK-4.5/ITKTargets-release.cmake" itk_target)
+  
+  STRING(REPLACE "${SUPERBUILD_STAGING_PREFIX}" "" itk_target "${itk_target}")
+  message("patched ${staging_prefix}/${install_prefix}/lib/cmake/ITK-4.5/ITKTargets-release.cmake ")
+  file(WRITE "${staging_prefix}/${install_prefix}/lib/cmake/ITK-4.5/ITKTargets-release.cmake" "${itk_target}")
+
+  
   SET(ITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build)
   
   SET(ITK_INCLUDE_DIRS 
