@@ -100,7 +100,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
   #SET(ITK_FOUND ON)
   
   # let's patch targets to remove staging directory
-  FOREACH(conf "ITKTargets-release.cmake" "Modules/ITKZLIB.cmake" "Modules/ITKZLIB.cmake" "Modules/ITKMINC.cmake")
+  FOREACH(conf "ITKTargets-release.cmake" "Modules/ITKZLIB.cmake" "Modules/ITKZLIB.cmake" "Modules/ITKMINC.cmake" "Modules/ITKHDF5.cmake")
     patch_itk_config("${staging_prefix}/${install_prefix}/lib/cmake/ITK-4.5/${conf}" "${staging_prefix}")
   ENDFOREACH(conf)
   
