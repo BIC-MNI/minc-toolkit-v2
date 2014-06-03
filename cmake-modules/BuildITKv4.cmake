@@ -50,8 +50,8 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
   ExternalProject_Add(ITKv4
     #GIT_REPOSITORY "http://itk.org/ITK.git"
     #GIT_TAG "421d314ff85ad542ad5c0f3d3c115fa7427b1c64"
-    URL  "http://downloads.sourceforge.net/project/itk/itk/4.5/InsightToolkit-4.5.1.tar.gz"
-    URL_MD5 "a174fd50a5bc986f0944903cfceb3e9b"
+    URL  "http://sourceforge.net/projects/itk/files/itk/4.5/InsightToolkit-4.5.2.tar.gz"
+    URL_MD5 "268aa2dec667211c2e07b6f8111a7ee8"
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
@@ -101,17 +101,21 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
   
   # let's patch targets to remove staging directory
   FOREACH(conf "ITKTargets-release.cmake" "Modules/ITKZLIB.cmake" "Modules/ITKZLIB.cmake" "Modules/ITKMINC.cmake" "Modules/ITKHDF5.cmake")
-    patch_itk_config("${staging_prefix}/${install_prefix}/lib/cmake/ITK-4.5/${conf}" "${staging_prefix}")
+    if (EXISTS "${staging_prefix}/${install_prefix}/lib/cmake/ITK-4.5/${conf}")
+      patch_itk_config("${staging_prefix}/${install_prefix}/lib/cmake/ITK-4.5/${conf}" "${staging_prefix}")
+    endif()
   ENDFOREACH(conf)
   
   # a hack to remove internal minc directories
-  file(READ "${staging_prefix}/${install_prefix}/lib/cmake/ITK-4.5/Modules/ITKMINC.cmake" config_file)
-  STRING(REPLACE ";${minc_dir}/ezminc" "" config_file "${config_file}")
-  STRING(REPLACE "${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build/Modules/ThirdParty/MINC/src;" "" config_file "${config_file}")
-  STRING(REPLACE "${minc_dir}" "${install_prefix}/lib" config_file "${config_file}")
-  STRING(REPLACE "${LIBMINC_INCLUDE_DIRS}" "${install_prefix}/include" config_file "${config_file}")
-  file(WRITE "${staging_prefix}/${install_prefix}/lib/cmake/ITK-4.5/Modules/ITKMINC.cmake" "${config_file}")
-  
+  if (EXISTS "${staging_prefix}/${install_prefix}/lib/cmake/ITK-4.5/Modules/ITKMINC.cmake")
+      
+    file(READ "${staging_prefix}/${install_prefix}/lib/cmake/ITK-4.5/Modules/ITKMINC.cmake" config_file)
+    STRING(REPLACE ";${minc_dir}/ezminc" "" config_file "${config_file}")
+    STRING(REPLACE "${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build/Modules/ThirdParty/MINC/src;" "" config_file "${config_file}")
+    STRING(REPLACE "${minc_dir}" "${install_prefix}/lib" config_file "${config_file}")
+    STRING(REPLACE "${LIBMINC_INCLUDE_DIRS}" "${install_prefix}/include" config_file "${config_file}")
+    file(WRITE "${staging_prefix}/${install_prefix}/lib/cmake/ITK-4.5/Modules/ITKMINC.cmake" "${config_file}")
+  endif()
   
   SET(ITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build)
   

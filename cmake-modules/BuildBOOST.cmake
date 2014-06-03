@@ -1,8 +1,8 @@
 macro(build_BOOST install_prefix staging_prefix)
 
   ExternalProject_Add(BOOST
-  URL  "http://sourceforge.net/projects/boost/files/boost/1.54.0/boost_1_54_0.tar.gz"
-  URL_MD5 "efbfbff5a85a9330951f243d0a46e4b9"
+  URL  "http://sourceforge.net/projects/boost/files/boost/1.55.0/boost_1_55_0.tar.gz"
+  URL_MD5 "93780777cfbf999a600f62883bd54b17"
   UPDATE_COMMAND ""
   SOURCE_DIR BOOST
   LIST_SEPARATOR :::  
