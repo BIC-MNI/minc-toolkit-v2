@@ -12,7 +12,7 @@ endif()
 
 
 ExternalProject_Add(HDF5
-  URL "http://www.hdfgroup.org/ftp/HDF5/current/src-old/hdf5-1.8.12.tar.bz2"
+  URL "http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.12/src/hdf5-1.8.12.tar.bz2"
   URL_MD5 "75829af785e54332cdef6ad5a4a96607"
   SOURCE_DIR HDF5
   BINARY_DIR HDF5-build
