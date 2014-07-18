@@ -282,7 +282,7 @@ ADD_SUBDIRECTORY(N3)
 
 ADD_SUBDIRECTORY(glim_image)
 ADD_SUBDIRECTORY(mni_autoreg)
-ADD_DEPENDENCIES(mni_autoreg minctools)
+ADD_DEPENDENCIES(mni_autoreg mincresample)
 
 ADD_SUBDIRECTORY(inormalize)
 ADD_SUBDIRECTORY(mrisim)
