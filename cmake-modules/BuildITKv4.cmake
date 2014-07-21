@@ -90,6 +90,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
   ExternalProject_Add_Step(ITKv4 PatchInstall 
     COMMAND ${CMAKE_COMMAND} -Dstaging_prefix=${staging_prefix} -Dminc_dir=${minc_dir} -Dinstall_prefix=${install_prefix} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/PatchITKv4.cmake
     COMMENT "Patching ITKv4 Build"
+    DEPENDEES install
     )
   
   # let's patch targets to remove staging directory
