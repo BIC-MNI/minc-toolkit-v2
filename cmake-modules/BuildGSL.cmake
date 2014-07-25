@@ -8,7 +8,7 @@ ExternalProject_Add(GSL
         INSTALL_DIR     "${CMAKE_BINARY_DIR}/external"
         BUILD_COMMAND   make 
         INSTALL_COMMAND make DESTDIR=${CMAKE_BINARY_DIR}/external install 
-        CONFIGURE_COMMAND  ./configure --prefix=${install_prefix} --with-pic --disable-shared --enable-static CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} 
+        CONFIGURE_COMMAND  ./configure --prefix=${install_prefix} --with-pic --disable-shared --enable-static CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER}  CXXFLAGS=${CMAKE_CXX_FLAGS} CFLAGS=${CMAKE_C_FLAGS}
 #        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
       )
 

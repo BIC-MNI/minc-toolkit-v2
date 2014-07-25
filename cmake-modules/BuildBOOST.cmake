@@ -9,7 +9,7 @@ macro(build_BOOST install_prefix staging_prefix)
   SOURCE_DIR BOOST
   LIST_SEPARATOR :::  
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./bootstrap.sh --without-libraries=atomic,chrono,context,date_time,exception,filesystem,graph,graph_parallel,iostreams,locale,log,math,mpi,program_options,python,random,regex,serialization,signals,test,timer,wave --prefix=${install_prefix}
+  CONFIGURE_COMMAND CXXFLAGS=${CMAKE_CXX_FLAGS} CFLAGS=${CMAKE_C_FLAGS} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} ./bootstrap.sh --without-libraries=atomic,chrono,context,date_time,exception,filesystem,graph,graph_parallel,iostreams,locale,log,math,mpi,program_options,python,random,regex,serialization,signals,test,timer,wave --prefix=${install_prefix}
   INSTALL_DIR     "${staging_prefix}"
   BUILD_COMMAND   ./b2 
   INSTALL_COMMAND ./b2 stage --stagedir=${staging_prefix}/${install_prefix}

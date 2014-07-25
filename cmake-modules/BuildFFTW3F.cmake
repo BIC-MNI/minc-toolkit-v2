@@ -18,7 +18,7 @@ macro(build_fftw3f install_prefix staging_prefix)
         INSTALL_DIR     "${staging_prefix}"
         BUILD_COMMAND   make
         INSTALL_COMMAND make DESTDIR=${staging_prefix} install
-        CONFIGURE_COMMAND  ./configure ${FFTW3F_CONFIG}  --prefix=${install_prefix} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER}
+        CONFIGURE_COMMAND  ./configure ${FFTW3F_CONFIG}  --prefix=${install_prefix} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER}  CXXFLAGS=${CMAKE_CXX_FLAGS} CFLAGS=${CMAKE_C_FLAGS}
 #        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
       )
 
