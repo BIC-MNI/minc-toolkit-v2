@@ -1,3 +1,4 @@
+# THIS one is not used anymore
 macro(build_pcrepp install_prefix staging_prefix pcre_include pcre_lib )
 
 ExternalProject_Add(PCREPP
@@ -9,7 +10,7 @@ ExternalProject_Add(PCREPP
   UPDATE_COMMAND  autoreconf -i
   BUILD_COMMAND   make 
   INSTALL_COMMAND make DESTDIR=${staging_prefix} install 
-  CONFIGURE_COMMAND  CXXFLAGS=${CMAKE_CXX_FLAGS} CFLAGS=${CMAKE_C_FLAGS} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER}  ./configure --prefix=/ --with-pic --disable-shared --with-pcre-include=${pcre_include} --with-pcre-lib=${pcre_lib} --docdir=${CMAKE_BINARY_DIR}/dummy 
+  CONFIGURE_COMMAND  ./configure --prefix=/ --with-pic --disable-shared --with-pcre-include=${pcre_include} --with-pcre-lib=${pcre_lib} --docdir=${CMAKE_BINARY_DIR}/dummy 
 )
 
 SET(PCREPP_INCLUDE_DIR ${staging_prefix}/include )

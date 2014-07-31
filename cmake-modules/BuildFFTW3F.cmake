@@ -1,4 +1,12 @@
 macro(build_fftw3f install_prefix staging_prefix)
+  
+  IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
+    SET(EXT_C_FLAGS   ${CMAKE_C_FLAGS}   ${CMAKE_C_FLAGS_RELEASE})
+    SET(EXT_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE})
+  ELSE()
+    SET(EXT_C_FLAGS   ${CMAKE_C_FLAGS}    ${CMAKE_C_FLAGS_DEBUG})
+    SET(EXT_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG})
+  ENDIF()
 
   SET(FFTW3F_CONFIG --enable-sse --enable-sse2  --with-pic --disable-shared --enable-threads --disable-fortran --enable-single --enable-float)
   
@@ -18,7 +26,7 @@ macro(build_fftw3f install_prefix staging_prefix)
         INSTALL_DIR     "${staging_prefix}"
         BUILD_COMMAND   make
         INSTALL_COMMAND make DESTDIR=${staging_prefix} install
-        CONFIGURE_COMMAND  ./configure ${FFTW3F_CONFIG}  --prefix=${install_prefix} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER}  CXXFLAGS=${CMAKE_CXX_FLAGS} CFLAGS=${CMAKE_C_FLAGS}
+        CONFIGURE_COMMAND  ./configure ${FFTW3F_CONFIG}  --prefix=${install_prefix} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} "CXXFLAGS=${EXT_CXX_FLAGS}" "CFLAGS=${EXT_C_FLAGS}"
 #        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
       )
 

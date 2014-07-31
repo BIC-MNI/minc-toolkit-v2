@@ -1,5 +1,13 @@
 macro(build_gsl install_prefix staging_prefix)
 
+IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
+  SET(EXT_C_FLAGS   ${CMAKE_C_FLAGS}   ${CMAKE_C_FLAGS_RELEASE})
+  SET(EXT_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE})
+ELSE()
+  SET(EXT_C_FLAGS   ${CMAKE_C_FLAGS}    ${CMAKE_C_FLAGS_DEBUG})
+  SET(EXT_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG})
+ENDIF()
+
 ExternalProject_Add(GSL
         SOURCE_DIR GSL
         URL "http://mirrors.ibiblio.org/pub/mirrors/gnu/ftp/gnu/gsl/gsl-1.15.tar.gz"
@@ -8,7 +16,7 @@ ExternalProject_Add(GSL
         INSTALL_DIR     "${CMAKE_BINARY_DIR}/external"
         BUILD_COMMAND   make 
         INSTALL_COMMAND make DESTDIR=${CMAKE_BINARY_DIR}/external install 
-        CONFIGURE_COMMAND  ./configure --prefix=${install_prefix} --with-pic --disable-shared --enable-static CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER}  CXXFLAGS=${CMAKE_CXX_FLAGS} CFLAGS=${CMAKE_C_FLAGS}
+        CONFIGURE_COMMAND  ./configure --prefix=${install_prefix} --with-pic --disable-shared --enable-static CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} "CXXFLAGS=${EXT_CXX_FLAGS}" "CFLAGS=${EXT_C_FLAGS}"
 #        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
       )
 
