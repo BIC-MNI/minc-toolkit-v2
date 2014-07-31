@@ -1,11 +1,11 @@
 macro(build_fftw3f install_prefix staging_prefix)
   
   IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
-    SET(EXT_C_FLAGS   ${CMAKE_C_FLAGS}   ${CMAKE_C_FLAGS_RELEASE})
-    SET(EXT_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE})
+    SET(EXT_C_FLAGS   "${CMAKE_C_FLAGS}   ${CMAKE_C_FLAGS_RELEASE}")
+    SET(EXT_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
   ELSE()
-    SET(EXT_C_FLAGS   ${CMAKE_C_FLAGS}    ${CMAKE_C_FLAGS_DEBUG})
-    SET(EXT_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG})
+    SET(EXT_C_FLAGS   "${CMAKE_C_FLAGS}    ${CMAKE_C_FLAGS_DEBUG}")
+    SET(EXT_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}")
   ENDIF()
 
   SET(FFTW3F_CONFIG --enable-sse --enable-sse2  --with-pic --disable-shared --enable-threads --disable-fortran --enable-single --enable-float)
