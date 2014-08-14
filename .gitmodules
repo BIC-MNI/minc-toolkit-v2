@@ -1,75 +1,75 @@
 [submodule "bicpl"]
 	path = bicpl
-	url = git://github.com/BIC-MNI/bicpl.git
+	url = https://github.com/BIC-MNI/bicpl.git
 [submodule "N3"]
 	path = N3
-	url = git://github.com/BIC-MNI/N3.git
+	url = https://github.com/BIC-MNI/N3.git
 [submodule "EBTKS"]
 	path = EBTKS
-	url = git://github.com/BIC-MNI/EBTKS.git
+	url = https://github.com/BIC-MNI/EBTKS.git
 [submodule "mni_autoreg"]
 	path = mni_autoreg
-	url = git://github.com/BIC-MNI/mni_autoreg.git
+	url = https://github.com/BIC-MNI/mni_autoreg.git
 [submodule "classify"]
 	path = classify
-	url = git://github.com/BIC-MNI/classify.git
+	url = https://github.com/BIC-MNI/classify.git
 [submodule "conglomerate"]
 	path = conglomerate
-	url = git://github.com/BIC-MNI/conglomerate.git
+	url = https://github.com/BIC-MNI/conglomerate.git
 [submodule "inormalize"]
 	path = inormalize
-	url = git://github.com/BIC-MNI/inormalize.git
+	url = https://github.com/BIC-MNI/inormalize.git
 [submodule "EZminc"]
 	path = EZminc
-	url = git://github.com/BIC-MNI/EZminc.git
+	url = https://github.com/BIC-MNI/EZminc.git
 [submodule "ray_trace"]
 	path = ray_trace
-	url = git://github.com/BIC-MNI/ray_trace.git
+	url = https://github.com/BIC-MNI/ray_trace.git
 [submodule "glim_image"]
 	path = glim_image
-	url = git://github.com/BIC-MNI/glim_image.git
+	url = https://github.com/BIC-MNI/glim_image.git
 [submodule "oobicpl"]
 	path = oobicpl
-	url = git://github.com/BIC-MNI/oobicpl.git
+	url = https://github.com/BIC-MNI/oobicpl.git
 [submodule "arguments"]
 	path = arguments
-	url = git://github.com/BIC-MNI/arguments.git
+	url = https://github.com/BIC-MNI/arguments.git
 [submodule "Register"]
 	path = Register
-	url = git://github.com/BIC-MNI/Register.git
+	url = https://github.com/BIC-MNI/Register.git
 [submodule "Display"]
 	path = Display
-	url = git://github.com/BIC-MNI/Display.git
+	url = https://github.com/BIC-MNI/Display.git
 [submodule "postf"]
 	path = postf
-	url = git://github.com/BIC-MNI/postf.git
+	url = https://github.com/BIC-MNI/postf.git
 [submodule "mrisim"]
 	path = mrisim
-	url = git://github.com/BIC-MNI/mrisim.git
+	url = https://github.com/BIC-MNI/mrisim.git
 [submodule "bicgl"]
 	path = bicgl
-	url = git://github.com/BIC-MNI/bicgl.git
+	url = https://github.com/BIC-MNI/bicgl.git
 [submodule "mni-perllib"]
 	path = mni-perllib
-	url = git://github.com/BIC-MNI/mni-perllib.git
+	url = https://github.com/BIC-MNI/mni-perllib.git
 [submodule "bic-pipelines"]
 	path = bic-pipelines
-	url = git://github.com/BIC-MNI/bic-pipelines.git
+	url = https://github.com/BIC-MNI/bic-pipelines.git
 [submodule "BEaST"]
 	path = BEaST
-	url = git://github.com/BIC-MNI/BEaST.git
+	url = https://github.com/BIC-MNI/BEaST.git
 [submodule "libminc"]
 	path = libminc
-	url = git://github.com/BIC-MNI/libminc.git
+	url = https://github.com/BIC-MNI/libminc.git
 [submodule "minctools"]
 	path = minctools
-	url = git://github.com/BIC-MNI/minc-tools.git
+	url = https://github.com/BIC-MNI/minc-tools.git
 [submodule "BEaST_library"]
 	path = BEaST_library
-	url = git://github.com/BIC-MNI/BEaST_library.git
+	url = https://github.com/BIC-MNI/BEaST_library.git
 [submodule "xdisp"]
 	path = xdisp
-	url = git://github.com/BIC-MNI/xdisp.git
+	url = https://github.com/BIC-MNI/xdisp.git
 [submodule "Elastix"]
 	path = Elastix
 	url = https://github.com/vfonov/elastix.git
