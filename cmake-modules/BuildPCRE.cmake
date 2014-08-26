@@ -1,6 +1,6 @@
 macro(build_pcre install_prefix staging_prefix)
   
-  IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
+  IF(CMAKE_BUILD_TYPE STREQUAL Release)
     SET(EXT_C_FLAGS   "${CMAKE_C_FLAGS}   ${CMAKE_C_FLAGS_RELEASE}")
     SET(EXT_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
   ELSE()
