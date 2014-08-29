@@ -25,13 +25,13 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
   if(MT_BUILD_SHARED_LIBS) 
     SET(ITK_SHARED_LIBRARY "ON")
     
-    IF(MT_BUILD_SHARED_LIBS)
-      IF(APPLE)
-        SET(HDF5_LIB_SUFFIX ".dylib")
-      ELSE(APPLE)
-        SET(HDF5_LIB_SUFFIX ".so")
-      ENDIF(APPLE)
-    ENDIF(MT_BUILD_SHARED_LIBS)
+    #IF(MT_BUILD_SHARED_LIBS)
+    #  IF(APPLE)
+    #    SET(HDF5_LIB_SUFFIX ".dylib")
+    #  ELSE(APPLE)
+    #    SET(HDF5_LIB_SUFFIX ".so")
+    #  ENDIF(APPLE)
+    #ENDIF(MT_BUILD_SHARED_LIBS)
     
     
   else(MT_BUILD_SHARED_LIBS) 
