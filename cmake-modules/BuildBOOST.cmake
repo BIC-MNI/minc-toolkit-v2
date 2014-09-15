@@ -9,9 +9,8 @@ macro(build_BOOST install_prefix staging_prefix)
   ENDIF()
 
   ExternalProject_Add(BOOST
-    URL  "http://sourceforge.net/projects/boost/files/boost/1.56.0.beta.1/boost-1_56_0_b1.tar.gz"
-    URL_MD5 "b51810be6737e73a4deee70e84895ca7"
-  #  GIT_REPOSITORY "https://github.com/boostorg/boost.git"
+    URL  "http://sourceforge.net/projects/boost/files/boost/1.56.0/boost_1_56_0.tar.gz"
+    URL_MD5 ""
     GIT_TAG "master"
     UPDATE_COMMAND ""
     SOURCE_DIR BOOST
