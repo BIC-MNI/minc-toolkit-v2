@@ -25,13 +25,13 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
   if(MT_BUILD_SHARED_LIBS) 
     SET(ITK_SHARED_LIBRARY "ON")
     
-    #IF(MT_BUILD_SHARED_LIBS)
-    #  IF(APPLE)
-    #    SET(HDF5_LIB_SUFFIX ".dylib")
-    #  ELSE(APPLE)
-    #    SET(HDF5_LIB_SUFFIX ".so")
-    #  ENDIF(APPLE)
-    #ENDIF(MT_BUILD_SHARED_LIBS)
+    IF(MT_BUILD_SHARED_LIBS)
+      IF(APPLE)
+        SET(HDF5_LIB_SUFFIX ".dylib")
+      ELSE(APPLE)
+        SET(HDF5_LIB_SUFFIX ".so")
+      ENDIF(APPLE)
+    ENDIF(MT_BUILD_SHARED_LIBS)
     
     
   else(MT_BUILD_SHARED_LIBS) 
@@ -41,8 +41,10 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
   ExternalProject_Add(ITKv4
     #GIT_REPOSITORY "http://itk.org/ITK.git"
     #GIT_TAG "421d314ff85ad542ad5c0f3d3c115fa7427b1c64"
-    URL  "http://sourceforge.net/projects/itk/files/itk/4.5/InsightToolkit-4.5.2.tar.gz"
-    URL_MD5 "268aa2dec667211c2e07b6f8111a7ee8"
+    #URL  "http://sourceforge.net/projects/itk/files/itk/4.5/InsightToolkit-4.5.2.tar.gz"
+    #URL_MD5 "268aa2dec667211c2e07b6f8111a7ee8"
+    URL  "http://sourceforge.net/projects/itk/files/itk/4.6/InsightToolkit-4.6.0.tar.gz"
+    URL_MD5 ""
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
