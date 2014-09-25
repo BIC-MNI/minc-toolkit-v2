@@ -1,0 +1,26 @@
+From 5ecfff51aa7c72fb95af0c1b0646f500fb1ad251 Mon Sep 17 00:00:00 2001
+From: "Vladimir S. FONOV" <vladimir.fonov@gmail.com>
+Date: Thu, 25 Sep 2014 10:54:31 -0400
+Subject: [PATCH 1/1] BUG: Fixing incorrect MINC style inverse transform
+
+Change-Id: Id3ccb0a9c37d86bbb8ff53c33c64f47256a9c3d8
+---
+ Modules/IO/MINC/include/itkMINCTransformIO.hxx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Modules/IO/MINC/include/itkMINCTransformIO.hxx b/Modules/IO/MINC/include/itkMINCTransformIO.hxx
+index 3321d25..fd04e7c 100644
+--- a/Modules/IO/MINC/include/itkMINCTransformIO.hxx
++++ b/Modules/IO/MINC/include/itkMINCTransformIO.hxx
+@@ -273,7 +273,7 @@ MINCTransformIOTemplate< TInternalComputationValueType >
+       else if( _grid_transform->GetInverseDisplacementField() )
+         {
+         writer->SetInput( _grid_transform->GetModifiableInverseDisplacementField() );
+-        _inverse_grid=false;
++        _inverse_grid=true;
+         }
+       else
+         {
+-- 
+1.9.1
+
