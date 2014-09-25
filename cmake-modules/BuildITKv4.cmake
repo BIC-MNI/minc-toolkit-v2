@@ -84,6 +84,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
         -DZLIB_LIBRARY:PATH=${zlib_library}
         -DZLIB_INCLUDE_DIR:PATH=${zlib_include_dir}
         -DITK_LEGACY_REMOVE:BOOL=OFF
+    PATCH_COMMAND patch -p 1 -d ${CMAKE_CURRENT_BINARY_DIR}/ITKv4 -u -i ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/patch_minc_xfm.patch -s
     INSTALL_COMMAND make install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
     STEP_TARGETS PatchInstall
