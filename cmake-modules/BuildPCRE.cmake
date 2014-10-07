@@ -10,8 +10,8 @@ macro(build_pcre install_prefix staging_prefix)
 
   ExternalProject_Add(PCRE
     SOURCE_DIR PCRE
-    URL "http://downloads.sourceforge.net/project/pcre/pcre/8.12/pcre-8.12.tar.gz"
-    URL_MD5 "fa69e4c5d8971544acd71d1f10d59193"
+    URL "http://sourceforge.net/projects/pcre/files/pcre/8.36/pcre-8.36.tar.gz"
+    URL_MD5 "ff7b4bb14e355f04885cf18ff4125c98"
     BUILD_IN_SOURCE 1
     INSTALL_DIR     "${staging_prefix}"
     BUILD_COMMAND   make 
