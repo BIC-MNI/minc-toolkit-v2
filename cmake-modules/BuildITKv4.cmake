@@ -43,8 +43,8 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
     #GIT_TAG "421d314ff85ad542ad5c0f3d3c115fa7427b1c64"
     #URL  "http://sourceforge.net/projects/itk/files/itk/4.5/InsightToolkit-4.5.2.tar.gz"
     #URL_MD5 "268aa2dec667211c2e07b6f8111a7ee8"
-    URL  "http://sourceforge.net/projects/itk/files/itk/4.6/InsightToolkit-4.6.0.tar.gz"
-    URL_MD5 ""
+    URL  "http://sourceforge.net/projects/itk/files/itk/4.6/InsightToolkit-4.6.1.tar.gz"
+    URL_MD5 "2c84eae50ab2452cdad32aaadced3c37"
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
@@ -84,7 +84,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
         -DZLIB_LIBRARY:PATH=${zlib_library}
         -DZLIB_INCLUDE_DIR:PATH=${zlib_include_dir}
         -DITK_LEGACY_REMOVE:BOOL=OFF
-    PATCH_COMMAND patch -p 1 -d ${CMAKE_CURRENT_BINARY_DIR}/ITKv4 -u -i ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/patch_minc_xfm.patch -s
+#    PATCH_COMMAND patch -p 1 -d ${CMAKE_CURRENT_BINARY_DIR}/ITKv4 -u -i ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/patch_minc_xfm.patch -s
     INSTALL_COMMAND make install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
     STEP_TARGETS PatchInstall
