@@ -20,12 +20,12 @@ macro(build_fftw3f install_prefix staging_prefix)
   
   ExternalProject_Add(FFTW3F
         SOURCE_DIR FFTW3F
-        URL "http://www.fftw.org/fftw-3.3.3.tar.gz"
-        URL_MD5 "0a05ca9c7b3bfddc8278e7c40791a1c2"
+        URL "http://www.fftw.org/fftw-3.3.4.tar.gz"
+        URL_MD5 "2edab8c06b24feeb3b82bbb3ebf3e7b3"
         BUILD_IN_SOURCE 1
         INSTALL_DIR     "${staging_prefix}"
-        BUILD_COMMAND   make
-        INSTALL_COMMAND make DESTDIR=${staging_prefix} install
+        BUILD_COMMAND   $(MAKE)
+        INSTALL_COMMAND $(MAKE) DESTDIR=${staging_prefix} install
         CONFIGURE_COMMAND  ./configure ${FFTW3F_CONFIG}  --prefix=${install_prefix} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} "CXXFLAGS=${EXT_CXX_FLAGS}" "CFLAGS=${EXT_C_FLAGS}"
 #        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
       )

@@ -10,12 +10,12 @@ macro(build_gsl install_prefix staging_prefix)
 
   ExternalProject_Add(GSL
           SOURCE_DIR GSL
-          URL "http://mirrors.ibiblio.org/pub/mirrors/gnu/ftp/gnu/gsl/gsl-1.15.tar.gz"
-          URL_MD5 "494ffefd90eef4ada678c306bab4030b"
+          URL "http://mirrors.ibiblio.org/pub/mirrors/gnu/ftp/gnu/gsl/gsl-1.16.tar.gz"
+          URL_MD5 "e49a664db13d81c968415cd53f62bc8b"
           BUILD_IN_SOURCE 1
           INSTALL_DIR     "${CMAKE_BINARY_DIR}/external"
-          BUILD_COMMAND   make 
-          INSTALL_COMMAND make DESTDIR=${CMAKE_BINARY_DIR}/external install 
+          BUILD_COMMAND   $(MAKE) 
+          INSTALL_COMMAND $(MAKE) DESTDIR=${CMAKE_BINARY_DIR}/external install 
           CONFIGURE_COMMAND  ./configure --prefix=${install_prefix} --with-pic --disable-shared --enable-static CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} "CXXFLAGS=${EXT_CXX_FLAGS}" "CFLAGS=${EXT_C_FLAGS}"
   #        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
         )

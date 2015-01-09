@@ -16,12 +16,11 @@ SET (ZLIB_VERSION_MINOR  8)
   set(CMAKE_OSX_EXTERNAL_PROJECT_ARGS)
   if(APPLE)
     list(APPEND CMAKE_OSX_EXTERNAL_PROJECT_ARGS
-      -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
-      -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
-      -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
+      -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
+      -DCMAKE_OSX_SYSROOT:STRING=${CMAKE_OSX_SYSROOT}
+      -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
     )
   endif()
-
 
 ExternalProject_Add(ZLIB
   URL  "http://zlib.net/zlib-1.2.8.tar.gz"
@@ -42,16 +41,11 @@ ExternalProject_Add(ZLIB
   INSTALL_DIR ${staging_prefix}/${install_prefix}
 )
 
-
-
-
 SET(ZLIB_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
 SET(ZLIB_LIBRARY     ${staging_prefix}/${install_prefix}/lib/libz.a )
 SET(ZLIB_DIR         ${staging_prefix}/${install_prefix}/share/cmake/ZLIB/ )
 SET(ZLIB_FOUND ON)
 
 configure_file(${CMAKE_SOURCE_DIR}/cmake-modules/ZLIB-config.cmake.install.in ${staging_prefix}/${install_prefix}/share/cmake/ZLIB/ZLIBConfig.cmake @ONLY )
-
-
 
 endmacro(build_zlib)
