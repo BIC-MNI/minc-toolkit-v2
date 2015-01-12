@@ -20,7 +20,7 @@ macro(build_ABC install_prefix staging_prefix)
 
   ExternalProject_Add(ABC
     GIT_REPOSITORY "https://github.com/vfonov/abc.git"
-    GIT_TAG "481752bf4488f9fe83b423aedd110385deaf959d"
+    GIT_TAG "53f7b49fce0d2226667f323cffb1f59cee30c2ee"
     UPDATE_COMMAND ""
     SOURCE_DIR ABC
     BINARY_DIR ABC-build
