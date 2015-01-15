@@ -35,7 +35,6 @@ Here is a list of bundled packages:
 ##Installation
 
 Installing from github, need CMake > 2.8.8 
-**Important: set CMAKE_BUILD_TYPE to RELEASE, or face severe speed degradation of some tools ** 
 =======
 <pre><code>
   git clone --recursive git://github.com/BIC-MNI/minc-toolkit.git minc-toolkit
@@ -44,7 +43,10 @@ Installing from github, need CMake > 2.8.8
   ccmake .. # Enter the location of all dependencies, if not detected automatically ..., 
   make && make test && make install
 </code></pre>
-
+Important: **CMAKE_BUILD_TYPE is set to RELEASE by default, if you have older build set it manually or face severe speed degradation of some tools**
+<pre><code>
+  cmake -DCMAKE_BUILD_TYPE:STRING=Release .
+</code></pre>
 ##Dependencies
 
 ###Following packages are needed to compile all tools:
