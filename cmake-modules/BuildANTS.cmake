@@ -1,4 +1,4 @@
-macro(build_ANTS install_prefix staging_prefix itk_dir boost_dir)
+macro(build_ANTS install_prefix staging_prefix itk_dir ) #boost_dir
   if(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
   else()
@@ -35,8 +35,8 @@ macro(build_ANTS install_prefix staging_prefix itk_dir boost_dir)
         -DRUN_SHORT_TESTS:BOOL=OFF
         -DANTS_SUPERBUILD:BOOL=OFF
         -DBUILD_TESTING:BOOL=OFF
-        -DBoost_DIR:PATH=${boost_dir}
-        -DBOOST_ROOT:PATH=${boost_dir}
+#        -DBoost_DIR:PATH=${boost_dir}
+#        -DBOOST_ROOT:PATH=${boost_dir}
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
         -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
         -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}

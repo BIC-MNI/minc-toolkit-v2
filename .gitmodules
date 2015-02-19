@@ -79,3 +79,6 @@
 [submodule "minc-widgets"]
 	path = minc-widgets
 	url = https://github.com/BIC-MNI/minc-widgets.git
+[submodule "ILT"]
+	path = ILT
+	url = https://github.com/BIC-MNI/ILT.git
