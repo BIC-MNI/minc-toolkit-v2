@@ -19,10 +19,10 @@ macro(build_pcre install_prefix staging_prefix)
     CONFIGURE_COMMAND  ./configure --prefix=${install_prefix} --with-pic --disable-shared --enable-cpp CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} "CXXFLAGS=${EXT_CXX_FLAGS}" "CFLAGS=${EXT_C_FLAGS}"
   )
 
-  SET(PCRE_INCLUDE_DIR  ${staging_prefix}/${install_prefix}/include )
-  SET(PCRE_LIBRARY      ${staging_prefix}/${install_prefix}/lib/libpcre.a )
-  SET(PCRECPP_LIBRARY   ${staging_prefix}/${install_prefix}/lib/libpcrecpp.a )
-  SET(PCRE_FOUND ON)
+SET(PCRE_INCLUDE_DIR  ${staging_prefix}/${install_prefix}/include )
+SET(PCRE_LIBRARY      ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libpcre.a )
+SET(PCRECPP_LIBRARY   ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libpcrecpp.a )
+SET(PCRE_FOUND ON)
  
 
 endmacro(build_pcre)
