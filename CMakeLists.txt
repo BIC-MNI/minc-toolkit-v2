@@ -2,12 +2,15 @@ project(minc-toolkit)
 enable_language(C)
 enable_language(CXX)
 
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 2.8)
 
 IF(COMMAND CMAKE_POLICY)
-  CMAKE_POLICY(VERSION 3.1)
-  CMAKE_POLICY(SET CMP0026 OLD)# disable warnings about missing dependencies
-  CMAKE_POLICY(SET CMP0046 OLD)# disable warnings about missing dependencies
+  IF(POLICY CMP0026)
+      CMAKE_POLICY(SET CMP0026 OLD)
+  ENDIF(POLICY CMP0026)
+  IF(POLICY CMP0046)
+      CMAKE_POLICY(SET CMP0046 OLD)
+  ENDIF(POLICY CMP0046)
 ENDIF(COMMAND CMAKE_POLICY)
 
 SET(MINC_TOOLKIT_PACKAGE_VERSION_MAJOR 1)
