@@ -16,8 +16,8 @@ macro(build_pcrepp install_prefix staging_prefix pcre_include pcre_lib )
       BUILD_IN_SOURCE 1
       INSTALL_DIR     "${staging_prefix}"
       UPDATE_COMMAND  autoreconf -i
-      BUILD_COMMAND   make 
-      INSTALL_COMMAND make DESTDIR=${staging_prefix} install 
+      BUILD_COMMAND   $(MAKE)
+      INSTALL_COMMAND $(MAKE) DESTDIR=${staging_prefix} install 
       CONFIGURE_COMMAND  ./configure --prefix=/ --with-pic --disable-shared --with-pcre-include=${pcre_include} --with-pcre-lib=${pcre_lib} --docdir=${CMAKE_BINARY_DIR}/dummy CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} "CXXFLAGS=${EXT_CXX_FLAGS}" "CFLAGS=${EXT_C_FLAGS}"
     )
 

@@ -39,7 +39,7 @@ macro(build_ABC install_prefix staging_prefix)
         -DCOMPILE_SLICER4COMMANDLINE:BOOL=OFF
         -DCOMPILE_STANDALONEGUI:BOOL=OFF
         ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
-    INSTALL_COMMAND make install DESTDIR=${staging_prefix}
+    INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
   )
 endmacro(build_ABC)
