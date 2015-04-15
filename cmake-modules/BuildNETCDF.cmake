@@ -18,8 +18,8 @@ macro(build_netcdf install_prefix staging_prefix)
   endif()
 
   ExternalProject_Add(NETCDF 
-    URL "ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.3.2.tar.gz"
-    URL_MD5 "2fd2365e1fe9685368cd6ab0ada532a0"
+    URL "ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.3.3.1.tar.gz"
+    URL_MD5 "5c9dad3705a3408d27f696e5b31fb88c"
   SOURCE_DIR NETCDF
   BINARY_DIR NETCDF-build
   LIST_SEPARATOR :::
