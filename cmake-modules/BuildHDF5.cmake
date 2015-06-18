@@ -52,7 +52,7 @@ ExternalProject_Add(HDF5
       -DZLIB_LIBRARY:STRING=${zlib_library}
 #      -DZLIB_DIR:PATH=${zlib_dir}
 #      -DH5_ZLIB_HEADER="zlib.h"
-  INSTALL_COMMAND make install DESTDIR=${staging_prefix}
+  INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
   INSTALL_DIR ${staging_prefix}/${install_prefix}
 #  TEST_COMMAND make test
 )

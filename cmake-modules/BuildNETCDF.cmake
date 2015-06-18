@@ -50,7 +50,7 @@ macro(build_netcdf install_prefix staging_prefix)
       -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
       -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
       -DCMAKE_INSTALL_LIBDIR:PATH=${install_prefix}/lib${LIB_SUFFIX} # DISABLING Multiarch support for now ?
-  INSTALL_COMMAND make install DESTDIR=${staging_prefix}
+  INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
   INSTALL_DIR ${staging_prefix}/${install_prefix}
   )
 

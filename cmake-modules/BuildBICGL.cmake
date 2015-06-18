@@ -30,7 +30,7 @@ macro(build_bicgl bicgl_location install_prefix staging_prefix)
         -DCMAKE_C_COMPILER:FILEPATH=${BICGL_C_COMPILER}
         -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
         ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
-    INSTALL_COMMAND make install DESTDIR=${staging_prefix}
+    INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
   )
   

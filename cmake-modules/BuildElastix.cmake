@@ -51,7 +51,7 @@ macro(build_Elastix install_prefix staging_prefix)
         -DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}
         -DELASTIX_HELP_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/Elastix-build/help
         ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
-    INSTALL_COMMAND make install DESTDIR=${staging_prefix}
+    INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
   )
 endmacro(build_Elastix)

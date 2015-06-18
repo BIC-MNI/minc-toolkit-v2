@@ -47,7 +47,7 @@ macro(build_EZMINC install_prefix staging_prefix libminc_dir bicpl_dir itk_dir)
         -DGSL_INCLUDE_DIR:PATH=${GSL_INCLUDE_DIR}
         -DGSL_LIBRARY:FILEPATH=${GSL_LIBRARY}
         ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
-    INSTALL_COMMAND make install DESTDIR=${staging_prefix}
+    INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
   )
 endmacro(build_EZMINC)
