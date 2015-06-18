@@ -18,8 +18,8 @@ macro(build_hdf5 install_prefix staging_prefix  zlib_include_dir zlib_library zl
 set_property(DIRECTORY PROPERTY EP_STEP_TARGETS configure build test)
 
 ExternalProject_Add(HDF5
-  URL "http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.14/src/hdf5-1.8.14.tar.gz"
-  URL_MD5 "a482686e733514a51cde12d6fe5c5d95"
+  URL "https://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.15-patch1/src/hdf5-1.8.15-patch1.tar.bz2"
+  URL_MD5 "3c0d7a8c38d1abc7b40fc12c1d5f2bb8"
   SOURCE_DIR HDF5
   BINARY_DIR HDF5-build
   CMAKE_GENERATOR ${CMAKE_GEN}
