@@ -2,7 +2,7 @@ project(minc-toolkit)
 enable_language(C)
 enable_language(CXX)
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 
 IF(COMMAND CMAKE_POLICY)
   IF(POLICY CMP0026)
