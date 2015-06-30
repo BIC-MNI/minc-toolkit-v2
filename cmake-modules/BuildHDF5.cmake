@@ -58,12 +58,27 @@ ExternalProject_Add(HDF5
 )
 
 SET(HDF5_LIB_SUFFIX ".a")
+
 IF(MT_BUILD_SHARED_LIBS)
   IF(APPLE)
-    SET(HDF5_LIB_SUFFIX ".dylib")
+    IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
+      SET(HDF5_LIB_SUFFIX ".dylib")
+    ELSE(${CMAKE_BUILD_TYPE} STREQUAL Release)
+      SET(HDF5_LIB_SUFFIX "_debug.dylib")
+    ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release)
   ELSE(APPLE)
-    SET(HDF5_LIB_SUFFIX ".so")
+    IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
+      SET(HDF5_LIB_SUFFIX ".so")
+    ELSE(${CMAKE_BUILD_TYPE} STREQUAL Release)
+      SET(HDF5_LIB_SUFFIX "_debug.so")
+    ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release)
   ENDIF(APPLE)
+ELSE(MT_BUILD_SHARED_LIBS)
+  IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
+    SET(HDF5_LIB_SUFFIX ".a")
+  ELSE(${CMAKE_BUILD_TYPE} STREQUAL Release)
+    SET(HDF5_LIB_SUFFIX "_debug.a")
+  ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release)
 ENDIF(MT_BUILD_SHARED_LIBS)
 
 SET(HDF5_BIN_DIR     ${staging_prefix}/${install_prefix}/bin )
@@ -73,5 +88,4 @@ SET(HDF5_LIBRARY     ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libhdf
 
 SET(HDF5_DIR         ${staging_prefix}/${install_prefix}/share/cmake/hdf5)
 SET(HDF5_FOUND ON)
-
 endmacro(build_hdf5)
