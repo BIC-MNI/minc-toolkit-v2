@@ -1,0 +1,29 @@
+From 3b7d4fde0d71e0bb01c3a5f5c64f0ff09a6962f8 Mon Sep 17 00:00:00 2001
+From: "Vladimir S. FONOV" <vladimir.fonov@gmail.com>
+Date: Fri, 3 Jul 2015 17:51:46 -0400
+Subject: [PATCH] BUG: Missing ITKIOMINC_EXPORT on __Private()
+
+A shared library export was missing for the
+MINCTransformIOFactoryRegister__Private function.
+
+Change-Id: Ica690c14edb63f837c8de99babf4452708d9e715
+---
+ Modules/IO/MINC/src/itkMINCTransformIOFactory.cxx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Modules/IO/MINC/src/itkMINCTransformIOFactory.cxx b/Modules/IO/MINC/src/itkMINCTransformIOFactory.cxx
+index a1b0406..cb1348b 100644
+--- a/Modules/IO/MINC/src/itkMINCTransformIOFactory.cxx
++++ b/Modules/IO/MINC/src/itkMINCTransformIOFactory.cxx
+@@ -61,7 +61,7 @@ namespace itk
+   // DO NOT CALL DIRECTLY.
+   static bool MINCTransformIOFactoryHasBeenRegistered;
+ 
+-  void MINCTransformIOFactoryRegister__Private(void)
++  void ITKIOMINC_EXPORT MINCTransformIOFactoryRegister__Private(void)
+   {
+     if( ! MINCTransformIOFactoryHasBeenRegistered )
+     {
+-- 
+1.9.1
+
