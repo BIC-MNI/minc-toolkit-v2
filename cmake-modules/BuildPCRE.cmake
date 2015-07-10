@@ -1,27 +1,57 @@
 macro(build_pcre install_prefix staging_prefix)
   
-  IF(CMAKE_BUILD_TYPE STREQUAL Release)
-    SET(EXT_C_FLAGS   "${CMAKE_C_FLAGS}   ${CMAKE_C_FLAGS_RELEASE}")
-    SET(EXT_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
-  ELSE()
-    SET(EXT_C_FLAGS   "${CMAKE_C_FLAGS}    ${CMAKE_C_FLAGS_DEBUG}")
-    SET(EXT_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}")
-  ENDIF()
+  if(CMAKE_EXTRA_GENERATOR)
+    set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
+  else()
+    set(CMAKE_GEN "${CMAKE_GENERATOR}")
+  endif()
+  
+  set(CMAKE_OSX_EXTERNAL_PROJECT_ARGS)
+  if(APPLE)
+    list(APPEND CMAKE_OSX_EXTERNAL_PROJECT_ARGS
+      -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
+      -DCMAKE_OSX_SYSROOT:STRING=${CMAKE_OSX_SYSROOT}
+      -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
+    )
+  endif()
 
   ExternalProject_Add(PCRE
     SOURCE_DIR PCRE
-    URL "http://sourceforge.net/projects/pcre/files/pcre/8.36/pcre-8.36.tar.gz"
-    URL_MD5 "ff7b4bb14e355f04885cf18ff4125c98"
-    BUILD_IN_SOURCE 1
-    INSTALL_DIR     "${staging_prefix}"
-    BUILD_COMMAND   $(MAKE)
-    INSTALL_COMMAND $(MAKE) DESTDIR=${staging_prefix} install 
-    CONFIGURE_COMMAND  ./configure --prefix=${install_prefix} --with-pic --disable-shared --enable-cpp CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} "CXXFLAGS=${EXT_CXX_FLAGS}" "CFLAGS=${EXT_C_FLAGS}"
+    BINARY_DIR PCRE-build
+    URL "http://sourceforge.net/projects/pcre/files/pcre/8.37/pcre-8.37.tar.bz2"
+    URL_MD5 "ed91be292cb01d21bc7e526816c26981"
+    CMAKE_GENERATOR ${CMAKE_GEN}
+    CMAKE_ARGS
+        -DBUILD_TESTING:BOOL=OFF #${BUILD_TESTING}
+        -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+        -DBUILD_SHARED_LIBS:BOOL=OFF
+        -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
+        -DPCRE_BUILD_PCRE16:BOOL=OFF
+        -DPCRE_BUILD_PCRE32:BOOL=OFF
+        -DPCRE_BUILD_PCRE8:BOOL=ON
+        -DPCRE_BUILD_PCRECPP:BOOL=ON
+        -DPCRE_SHOW_REPORT:BOOL=OFF
+        -DPCRE_SUPPORT_LIBBZ2:BOOL=OFF
+        -DPCRE_SUPPORT_LIBREADLINE:BOOL=OFF
+        -DPCRE_SUPPORT_LIBZ:BOOL=OFF
+        -DPCRE_SUPPORT_UTF:BOOL=OFF
+        -DPCRE_BUILD_TESTS:BOOL=OFF
+        ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
+        -DCMAKE_CXX_FLAGS:STRING=-fPIC ${CMAKE_CXX_FLAGS}
+        -DCMAKE_C_FLAGS:STRING=-fPIC ${CMAKE_C_FLAGS}
+        -DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
+        -DCMAKE_MODULE_LINKER_FLAGS:STRING=${CMAKE_MODULE_LINKER_FLAGS}
+        -DCMAKE_SHARED_LINKER_FLAGS:STRING=${CMAKE_SHARED_LINKER_FLAGS}
+        -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
+        -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
+    INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
+    INSTALL_DIR ${staging_prefix}/${install_prefix}
   )
+SET(PCRE_LIB_SUFFIX ".a")
 
 SET(PCRE_INCLUDE_DIR  ${staging_prefix}/${install_prefix}/include )
-SET(PCRE_LIBRARY      ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libpcre.a )
-SET(PCRECPP_LIBRARY   ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libpcrecpp.a )
+SET(PCRE_LIBRARY      ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libpcre${PCRE_LIB_SUFFIX} )
+SET(PCRECPP_LIBRARY   ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libpcrecpp${PCRE_LIB_SUFFIX} )
 SET(PCRE_FOUND ON)
  
 
