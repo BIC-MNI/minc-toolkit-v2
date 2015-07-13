@@ -35,7 +35,7 @@ ExternalProject_Add(ZLIB
       -DBUILD_SHARED_LIBS:BOOL=OFF
       -DCMAKE_SKIP_RPATH:BOOL=ON
       -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
-      -DCMAKE_C_FLAGS:STRING=-fPIC ${CMAKE_C_FLAGS}
+      "-DCMAKE_C_FLAGS:STRING=-fPIC ${CMAKE_C_FLAGS}"
       -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
   INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix} 
   INSTALL_DIR ${staging_prefix}/${install_prefix}
