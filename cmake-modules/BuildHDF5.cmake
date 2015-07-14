@@ -22,11 +22,11 @@ macro(build_hdf5 install_prefix staging_prefix  zlib_include_dir zlib_library zl
   SET(HDF_CMAKE_C_FLAGS_RELEASE   ${CMAKE_C_FLAGS_RELEASE})
   
   SET(HDF_CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-  SET(HDF_CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
+  SET(HDF_CMAKE_C_FLAGS_DEBUG   ${CMAKE_C_FLAGS_DEBUG})
   
   SET(HDF_CMAKE_CXX_FLAGS "-fPIC ${CMAKE_CXX_FLAGS}")
   SET(HDF_CMAKE_C_FLAGS   "-fPIC ${CMAKE_C_FLAGS}")
-
+  
 ExternalProject_Add(HDF5
   URL "https://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.15-patch1/src/hdf5-1.8.15-patch1.tar.bz2"
   URL_MD5 "3c0d7a8c38d1abc7b40fc12c1d5f2bb8"
