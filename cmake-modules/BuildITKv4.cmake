@@ -57,7 +57,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
     #GIT_TAG "421d314ff85ad542ad5c0f3d3c115fa7427b1c64"
     URL "http://downloads.sourceforge.net/project/itk/itk/4.8/InsightToolkit-4.8.0.tar.gz"
     URL_MD5 "2d62f628d9e96cc790fa37947a0f9bc3"
-    PATCH_COMMAND patch -p 1 -d ${CMAKE_CURRENT_BINARY_DIR}/ITKv4 -u -i ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/0001-BUG-Missing-ITKIOMINC_EXPORT-on-__Private.patch -s && patch -p 1 -d ${CMAKE_CURRENT_BINARY_DIR}/ITKv4 -u -i ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/0001-COMP-Fixes-issue-when-MINCTransformation-module-is-n.patch -s
+    PATCH_COMMAND patch -p 1 -d ${CMAKE_CURRENT_BINARY_DIR}/ITKv4 -u -i ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/0001-BUG-Missing-ITKIOMINC_EXPORT-on-__Private.patch -s
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
