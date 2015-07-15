@@ -5,11 +5,11 @@ macro(build_Elastix install_prefix staging_prefix)
     set(CMAKE_GEN "${CMAKE_GENERATOR}")
   endif()
   
-  set(CMAKE_OSX_EXTERNAL_PROJECT_ARGS)
+  set(CMAKE_EXTERNAL_PROJECT_ARGS)
   if(APPLE)
     SET(ITK_CXX_COMPILER "${CMAKE_CXX_COMPILER}" CACHE FILEPATH "C++ Compiler for ITK")
     SET(ITK_C_COMPILER "${CMAKE_C_COMPILER}" CACHE FILEPATH "C Compiler for ITK")
-    list(APPEND CMAKE_OSX_EXTERNAL_PROJECT_ARGS
+    list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
       -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
       -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
       -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
@@ -17,6 +17,14 @@ macro(build_Elastix install_prefix staging_prefix)
       -DCMAKE_CXX_COMPILER:FILEPATH=${ITK_CXX_COMPILER}
     )
   endif()
+  
+  IF(NOT MT_USE_OPENMP)
+    list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
+      -DOpenMP_CXX_FLAGS:STRING=
+      -DOpenMP_C_FLAGS:STRING=
+    )
+  ENDIF(NOT MT_USE_OPENMP)
+  
 
   ExternalProject_Add(Elastix
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/Elastix/src
@@ -50,7 +58,7 @@ macro(build_Elastix install_prefix staging_prefix)
         -DCMAKE_MODULE_LINKER_FLAGS=${CMAKE_MODULE_LINKER_FLAGS}
         -DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}
         -DELASTIX_HELP_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/Elastix-build/help
-        ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
+        ${CMAKE_EXTERNAL_PROJECT_ARGS}
     INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
   )
