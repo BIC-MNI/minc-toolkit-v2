@@ -82,3 +82,6 @@
 [submodule "ILT"]
 	path = ILT
 	url = https://github.com/BIC-MNI/ILT.git
+[submodule "patch_morphology"]
+	path = patch_morphology
+	url = https://github.com/vfonov/patch_morphology.git
