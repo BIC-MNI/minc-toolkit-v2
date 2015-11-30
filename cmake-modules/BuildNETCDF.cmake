@@ -38,6 +38,8 @@ macro(build_netcdf install_prefix staging_prefix)
       -DENABLE_DAP:BOOL=OFF
       -DENABLE_LARGE_FILE_SUPPORT:BOOL=ON
       -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
+      -DMACOSX_RPATH:BOOL=ON
+      -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
       -DENABLE_NETCDF4:BOOL=OFF
       -DENABLE_NETCDF_4:BOOL=OFF
       -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}

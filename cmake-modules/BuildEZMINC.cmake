@@ -46,6 +46,10 @@ macro(build_EZMINC install_prefix staging_prefix libminc_dir bicpl_dir itk_dir)
         -DGSL_CBLAS_LIBRARY:FILEPATH=${GSL_CBLAS_LIBRARY}
         -DGSL_INCLUDE_DIR:PATH=${GSL_INCLUDE_DIR}
         -DGSL_LIBRARY:FILEPATH=${GSL_LIBRARY}
+        -DCMAKE_SKIP_RPATH:BOOL=OFF
+        -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
+        -DMACOSX_RPATH:BOOL=ON
+        -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
         ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
