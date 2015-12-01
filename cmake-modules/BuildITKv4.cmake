@@ -82,6 +82,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
         -DITK_USE_SYSTEM_MINC:BOOL=ON
         -DITK_USE_SYSTEM_HDF5:BOOL=ON
         -DITK_USE_SYSTEM_ZLIB:BOOL=ON
+        -DHAVE_ZLIB:BOOL=ON
         -DITK_USE_FFTWD:BOOL=ON
         -DITK_USE_FFTWF:BOOL=ON
         -DITK_USE_SYSTEM_FFTW:BOOL=ON
