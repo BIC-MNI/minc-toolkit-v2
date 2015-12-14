@@ -34,6 +34,10 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
         -DCMAKE_SHARED_LINKER_FLAGS:STRING=${CMAKE_SHARED_LINKER_FLAGS}
         -DPATCH_MORPHOLOGY_BUILD_LEGACY:BOOL=ON
         -DLIBMINC_DIR:PATH=${CMAKE_BINARY_DIR}/libminc
+        -DCMAKE_SKIP_RPATH:BOOL=OFF
+        -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
+        -DMACOSX_RPATH:BOOL=ON
+        -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
         ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}

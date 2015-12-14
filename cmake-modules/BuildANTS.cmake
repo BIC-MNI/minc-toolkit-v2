@@ -38,6 +38,10 @@ macro(build_ANTS install_prefix staging_prefix itk_dir ) #boost_dir
 #        -DBoost_DIR:PATH=${boost_dir}
 #        -DBOOST_ROOT:PATH=${boost_dir}
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
+        -DCMAKE_SKIP_RPATH:BOOL=OFF
+        -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
+        -DMACOSX_RPATH:BOOL=ON
+        -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
         "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
         "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}"
         -DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
