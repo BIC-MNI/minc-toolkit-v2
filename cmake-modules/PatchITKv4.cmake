@@ -9,7 +9,7 @@ macro(patch_itk_config file to_remove)
 endmacro(patch_itk_config)
 
 
-FOREACH(conf "ITKTargets-release.cmake" "Modules/ITKZLIB.cmake" "Modules/ITKZLIB.cmake" "Modules/ITKMINC.cmake" "Modules/ITKHDF5.cmake")
+FOREACH(conf "ITKTargets-release.cmake" "Modules/ITKZLIB.cmake" "Modules/ITKZLIB.cmake" "Modules/ITKMINC.cmake" "Modules/ITKHDF5.cmake" "Modules/ITKIOTransformMINC.cmake")
   if (EXISTS "${staging_prefix}/${install_prefix}/lib/cmake/ITK-4.9/${conf}")
     patch_itk_config("${staging_prefix}/${install_prefix}/lib/cmake/ITK-4.9/${conf}" "${staging_prefix}")
   endif()
