@@ -6,7 +6,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
   else()
     set(CMAKE_GEN "${CMAKE_GENERATOR}")
   endif()
-  
+
   set(CMAKE_OSX_EXTERNAL_PROJECT_ARGS)
   if(APPLE)
     SET(ITK_CXX_COMPILER "${CMAKE_CXX_COMPILER}" CACHE FILEPATH "C++ Compiler for ITK")
@@ -19,35 +19,35 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
       -DCMAKE_CXX_COMPILER:FILEPATH=${ITK_CXX_COMPILER}
     )
   endif()
-	
+
   SET(HDF5_LIB_SUFFIX ".a")
-  
   IF(MT_BUILD_SHARED_LIBS) 
     SET(ITK_SHARED_LIBRARY "ON")
-    
     IF(MT_BUILD_SHARED_LIBS)
       IF(APPLE)
-        IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
-          SET(HDF5_LIB_SUFFIX ".dylib")
-        ELSE(${CMAKE_BUILD_TYPE} STREQUAL Release)
-          SET(HDF5_LIB_SUFFIX "_debug.dylib")
-        ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release)
+        SET(HDF5_LIB_SUFFIX ".dylib")
       ELSE(APPLE)
-        IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
           SET(HDF5_LIB_SUFFIX ".so")
-        ELSE(${CMAKE_BUILD_TYPE} STREQUAL Release)
-          SET(HDF5_LIB_SUFFIX "_debug.so")
-        ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release)
       ENDIF(APPLE)
   ELSE(MT_BUILD_SHARED_LIBS)
-    IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
       SET(HDF5_LIB_SUFFIX ".a")
-    ELSE(${CMAKE_BUILD_TYPE} STREQUAL Release)
-      SET(HDF5_LIB_SUFFIX "_debug.a")
-    ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release)
   ENDIF(MT_BUILD_SHARED_LIBS)
-    
-    
+  
+  IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
+    message("Using release version of HDF5")
+    SET(HDF5_LIBRARY ${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX})
+    SET(HDF5_CPP_LIBRARY ${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX})
+    SET(HDF5_HL_LIBRARY ${hdf_library_dir}/libhdf5_hl${HDF5_LIB_SUFFIX})
+    SET(HDF5_HL_CPP_LIBRARY ${hdf_library_dir}/libhdf5_hl_cpp${HDF5_LIB_SUFFIX})
+  ELSE()
+    message("Using debug version of HDF5")
+    SET(HDF5_LIBRARY ${hdf_library_dir}/libhdf5_debug${HDF5_LIB_SUFFIX})
+    SET(HDF5_CPP_LIBRARY ${hdf_library_dir}/libhdf5_cpp_debug${HDF5_LIB_SUFFIX})
+    SET(HDF5_HL_LIBRARY ${hdf_library_dir}/libhdf5_hl_debug${HDF5_LIB_SUFFIX})
+    SET(HDF5_HL_CPP_LIBRARY ${hdf_library_dir}/libhdf5_hl_cpp_debug${HDF5_LIB_SUFFIX})
+  ENDIF()
+  
+
   else(MT_BUILD_SHARED_LIBS) 
     SET(ITK_SHARED_LIBRARY "OFF")
   endif(MT_BUILD_SHARED_LIBS) 
@@ -94,15 +94,15 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
         -DLIBMINC_DIR:PATH=${minc_dir}
         -DHDF5_CXX_COMPILER_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5c++
         -DHDF5_C_COMPILER_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5cc
-        -DHDF5_CXX_LIBRARY:PATH=${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX}
-        -DHDF5_C_LIBRARY:PATH=${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX}
         -DHDF5_DIFF_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5diff
         -DHDF5_CXX_INCLUDE_DIR:PATH=${hdf_include_dir}
         -DHDF5_C_INCLUDE_DIR:PATH=${hdf_include_dir}
-        -DHDF5_hdf5_LIBRARY:FILEPATH=${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX}
-        -DHDF5_hdf5_cpp_LIBRARY:FILEPATH=${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX}
-        -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX}
-        -DHDF5_hdf5_cpp_LIBRARY_RELEASE:FILEPATH=${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX}
+        -DHDF5_hdf5_LIBRARY:FILEPATH=${HDF5_LIBRARY}
+        -DHDF5_hdf5_cpp_LIBRARY:FILEPATH=${HDF5_CPP_LIBRARY}
+#        -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX}
+#        -DHDF5_hdf5_cpp_LIBRARY_RELEASE:FILEPATH=${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX}
+#        -DHDF5_hdf5_LIBRARY_DEBUG:FILEPATH=${hdf_library_dir}/libhdf5_debug${HDF5_LIB_SUFFIX}
+#        -DHDF5_hdf5_cpp_LIBRARY_DEBUG:FILEPATH=${hdf_library_dir}/libhdf5_cpp_debug${HDF5_LIB_SUFFIX}
 #        -DHDF5_DIR:PATH=/home/vfonov/src/build/minc-toolkit-itk4/HDF5-build
         -DHDF5_Fortran_COMPILER_EXECUTABLE:FILEPATH=''
         -DZLIB_LIBRARY:PATH=${zlib_library}
