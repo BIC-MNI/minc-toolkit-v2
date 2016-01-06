@@ -58,6 +58,10 @@ macro(build_Elastix install_prefix staging_prefix)
         -DCMAKE_MODULE_LINKER_FLAGS=${CMAKE_MODULE_LINKER_FLAGS}
         -DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}
         -DELASTIX_HELP_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/Elastix-build/help
+        -DCMAKE_SKIP_RPATH:BOOL=OFF
+        -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
+        -DMACOSX_RPATH:BOOL=ON
+        -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
         ${CMAKE_EXTERNAL_PROJECT_ARGS}
     INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
