@@ -56,8 +56,8 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
     #GIT_REPOSITORY "http://itk.org/ITK.git"
     #GIT_TAG "421d314ff85ad542ad5c0f3d3c115fa7427b1c64"
     
-    URL "https://github.com/InsightSoftwareConsortium/ITK/archive/v4.9rc02.tar.gz"
-    URL_MD5 "097d6035089d4fa59c9be74a1a701895"
+    URL "https://github.com/InsightSoftwareConsortium/ITK/archive/v4.9.0.tar.gz"
+    URL_MD5 "5a3f39723c132e752acc2f8c82f4c06b"
     PATCH_COMMAND patch -p 1 -d ${CMAKE_CURRENT_BINARY_DIR}/ITKv4 -u -i ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/ITK-4.9-ants-mask-fix.patch
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
