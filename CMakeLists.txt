@@ -1,4 +1,4 @@
-project(minc-toolkit)
+project(minc-toolkit-v2)
 enable_language(C)
 enable_language(CXX)
 
