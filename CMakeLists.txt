@@ -1,4 +1,4 @@
-project(minc-toolkit)
+project(minc-toolkit-v2)
 enable_language(C)
 enable_language(CXX)
 
@@ -285,6 +285,10 @@ ENDIF(NOT USE_SYSTEM_NETCDF)
 IF(NOT USE_SYSTEM_HDF5)
   SET(MINC2_deps ${MINC2_deps} HDF5)
 ENDIF(NOT USE_SYSTEM_HDF5)
+
+IF(NOT USE_SYSTEM_NIFTI)
+  SET(MINC2_deps ${MINC2_deps} NIFTI)
+ENDIF(NOT USE_SYSTEM_NIFTI)
 
 ADD_DEPENDENCIES(minc2 ${MINC2_deps})
 
