@@ -17,6 +17,7 @@ macro(build_gifti install_prefix staging_prefix)
 ExternalProject_Add(GIFTI
   SOURCE_DIR GIFTI
   BINARY_DIR GIFTI-build
+  # TODO: update to proper URL
   URL "file:///home/rvincent/Dropbox/MCIN/gifticlib-1.0.10-Source.tar.gz"
   URL_MD5 ""
   CMAKE_GENERATOR ${CMAKE_GEN}
