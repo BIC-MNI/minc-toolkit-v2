@@ -86,7 +86,8 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
 OPTION(MT_BUILD_LITE         "Build lite version of minc-toolkit, without ITK or visual tools" OFF)
 OPTION(MT_BUILD_SHARED_LIBS  "Build shared libraries." OFF)
 OPTION(USE_SYSTEM_ZLIB       "Use System ZLIB "       OFF)
-OPTION(USE_SYSTEM_NIFTI      "Use System NIFTI "       OFF)
+#OPTION(USE_SYSTEM_NIFTI      "Use System NIFTI "       OFF)
+#OPTION(USE_SYSTEM_GIFTI      "Use System GIfTI"       OFF)
 OPTION(USE_SYSTEM_NETCDF     "Use System NETCDF > 3.6.3" OFF)
 OPTION(USE_SYSTEM_HDF5       "Use System HDF5 > 1.8"     OFF)
 OPTION(USE_SYSTEM_PCRE       "Use System PCRE "        OFF)
@@ -182,6 +183,18 @@ ELSE(USE_SYSTEM_NIFTI)
     add_dependencies(NIFTI ZLIB)
   ENDIF(NOT USE_SYSTEM_ZLIB)
 ENDIF(USE_SYSTEM_NIFTI)
+
+
+IF(USE_SYSTEM_GIFTI)
+  FIND_PACKAGE( GIFTI OPTIONAL )
+ELSE(USE_SYSTEM_GIFTI)
+  INCLUDE(BuildGIFTI)
+  build_gifti( ${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
+  IF(NOT USE_SYSTEM_NIFTI)
+    add_dependencies(GIFTI NIFTI)
+  ENDIF(NOT USE_SYSTEM_NIFTI)
+ENDIF(USE_SYSTEM_GIFTI)
+
 
 
 #required for some minc tools
