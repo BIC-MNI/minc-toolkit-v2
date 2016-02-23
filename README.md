@@ -34,16 +34,40 @@ Here is a list of bundled packages:
 
 ##Installation
 
-Installing from github, need CMake > 2.8.8 
+Installing from github, need CMake >= 3.1 
 =======
 <pre><code>
-  git clone --recursive git://github.com/BIC-MNI/minc-toolkit.git minc-toolkit
-  cd minc-toolkit
+  git clone --recursive https://github.com/BIC-MNI/minc-toolkit-v2.git minc-toolkit-v2
+  cd minc-toolkit-v2
   mkdir build && cd build
-  ccmake .. # Enter the location of all dependencies, if not detected automatically ..., 
+  ccmake .. # Enter configuration details, recommend not to use any system-provided libraries that are included in minc-toolkit-v2
+  # example configuration for linux to build all the tools and install them into /opt/minc-itk4 :
+    CMAKE_BUILD_TYPE:STRING=Release
+    CMAKE_INSTALL_PREFIX:PATH=/opt/minc-itk4
+    MT_BUILD_ABC:BOOL=ON
+    MT_BUILD_ANTS:BOOL=ON
+    MT_BUILD_C3D:BOOL=ON
+    MT_BUILD_ELASTIX:BOOL=ON
+    MT_BUILD_IM:BOOL=OFF
+    MT_BUILD_ITK_TOOLS:BOOL=ON
+    MT_BUILD_LITE:BOOL=OFF
+    MT_BUILD_SHARED_LIBS:BOOL=ON
+    MT_BUILD_VISUAL_TOOLS:BOOL=ON
+    MT_USE_OPENMP:BOOL=ON
+    USE_SYSTEM_FFTW3D:BOOL=OFF
+    USE_SYSTEM_FFTW3F:BOOL=OFF
+    USE_SYSTEM_GLUT:BOOL=OFF
+    USE_SYSTEM_GSL:BOOL=OFF
+    USE_SYSTEM_HDF5:BOOL=OFF
+    USE_SYSTEM_ITK:BOOL=OFF
+    USE_SYSTEM_NETCDF:BOOL=OFF
+    USE_SYSTEM_NIFTI:BOOL=OFF
+    USE_SYSTEM_PCRE:BOOL=OFF
+    USE_SYSTEM_ZLIB:BOOL=OFF
+  #
   make && make test && make install
 </code></pre>
-Important: **CMAKE_BUILD_TYPE is set to RELEASE by default, if you have older build set it manually or face severe speed degradation of some tools**
+Important: **CMAKE_BUILD_TYPE is set to Release by default, if you have older build set it manually or face severe speed degradation of some tools**
 <pre><code>
   cmake -DCMAKE_BUILD_TYPE:STRING=Release .
 </code></pre>
@@ -53,24 +77,23 @@ Important: **CMAKE_BUILD_TYPE is set to RELEASE by default, if you have older bu
  * Perl  - http://www.perl.org/
  * BISON - http://www.gnu.org/software/bison/
  * FLEX  - http://flex.sf.net/
- * GLUT  - http://freeglut.sourceforge.net/
- * libxi   
- * libxmu 
+ * libxi
+ * libxmu
 
-###Following packages are optional (i.e thay can be build as part of superbuild)
- * zlib   - http://zlib.net/                                http://zlib.net/zlib-1.2.6.tar.gz
- * NETCDF - http://www.unidata.ucar.edu/software/netcdf/    ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.0.1.tar.gz
- * HDF5   - http://www.hdfgroup.org/HDF5/                   http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.8/src/hdf5-1.8.8.tar.gz
- * PCRE   - http://www.pcre.org/                            http://downloads.sourceforge.net/project/pcre/pcre/8.12/pcre-8.12.tar.gz
- * GSL    - http://www.gnu.org/software/gsl/                ftp://ftp.gnu.org/gnu/gsl/gsl-1.15.tar.gz
- * FFTW3  - http://www.fftw.org/                            http://www.fftw.org/fftw-3.3.2.tar.gz
- 
-##Installing Dependencies on Ubuntu 10.04, 12.04
+###Following packages are included :
+ * zlib   - http://zlib.net/
+ * NETCDF - http://www.unidata.ucar.edu/software/netcdf/
+ * HDF5   - http://www.hdfgroup.org/HDF5/
+ * PCRE   - http://www.pcre.org/
+ * GSL    - http://www.gnu.org/software/gsl/
+ * FFTW3  - http://www.fftw.org/
+ * ITK 4.9- http://www.itk.org/
+ * NIFTI  - http://niftilib.sourceforge.net/
+##Installing Dependencies on Ubuntu:
 <pre><code>
 sudo apt-get install \
  build-essential g++ \
  cmake cmake-curses-gui \
  bison flex \
- freeglut3 freeglut3-dev \
  libxi6 libxi-dev libxmu6 libxmu-dev libxmu-headers
 </code></pre>
