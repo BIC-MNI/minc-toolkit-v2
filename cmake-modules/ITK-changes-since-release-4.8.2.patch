@@ -1,0 +1,3734 @@
+From bbaf2bc0a6bac795d2d79d018e819fa767b6241d Mon Sep 17 00:00:00 2001
+From: "Vladimir S. FONOV" <vladimir.fonov@gmail.com>
+Date: Thu, 16 Jul 2015 14:24:46 -0400
+Subject: [PATCH 1/4] COMP: Splitting up IOMINC module into two parts: MINC and
+ Transform
+
+This is to address problem when compiling ITKv4
+with older version of gcc (4.4). When MINC IO works, but
+IOTransformMINC does not get registered inside ITK hierarchy for some
+strange reason. Happens on Debian 6, Ubuntu 10.04 (gcc 4.4), but not on
+CentOS 6.
+With this change the ITKIOTransformMINC goes into a separate module
+named ITKIOTransformMINC  which doesn't have ENABLED_SHARED flag set,
+similar to other IOTransform modules.
+
+Change-Id: I676e5927a2b3a0c33a84d81527381b074ad50787
+---
+ Modules/IO/MINC/include/itkMINCTransformAdapter.h  | 325 --------------
+ Modules/IO/MINC/include/itkMINCTransformIO.h       | 103 -----
+ Modules/IO/MINC/include/itkMINCTransformIO.hxx     | 362 ---------------
+ .../IO/MINC/include/itkMINCTransformIOFactory.h    |  72 ---
+ Modules/IO/MINC/src/CMakeLists.txt                 |   1 -
+ Modules/IO/MINC/src/itkMINCTransformIOFactory.cxx  |  75 ----
+ Modules/IO/MINC/test/CMakeLists.txt                |  14 -
+ Modules/IO/MINC/test/itkIOTransformMINCTest.cxx    | 486 ---------------------
+ .../IO/MINC/test/itkMINCTransformAdapterTest.cxx   | 244 -----------
+ Modules/IO/TransformMINC/CMakeLists.txt            |  12 +
+ Modules/IO/TransformMINC/README                    |   5 +
+ .../include/itkMINCTransformAdapter.h              | 325 ++++++++++++++
+ .../IO/TransformMINC/include/itkMINCTransformIO.h  | 103 +++++
+ .../TransformMINC/include/itkMINCTransformIO.hxx   | 362 +++++++++++++++
+ .../include/itkMINCTransformIOFactory.h            |  71 +++
+ Modules/IO/TransformMINC/itk-module.cmake          |  16 +
+ Modules/IO/TransformMINC/src/CMakeLists.txt        |   9 +
+ .../src/itkMINCTransformIOFactory.cxx              |  75 ++++
+ Modules/IO/TransformMINC/test/CMakeLists.txt       |  23 +
+ Modules/IO/TransformMINC/test/README               |   1 +
+ .../TransformMINC/test/itkIOTransformMINCTest.cxx  | 486 +++++++++++++++++++++
+ .../test/itkMINCTransformAdapterTest.cxx           | 244 +++++++++++
+ 22 files changed, 1732 insertions(+), 1682 deletions(-)
+ delete mode 100644 Modules/IO/MINC/include/itkMINCTransformAdapter.h
+ delete mode 100644 Modules/IO/MINC/include/itkMINCTransformIO.h
+ delete mode 100644 Modules/IO/MINC/include/itkMINCTransformIO.hxx
+ delete mode 100644 Modules/IO/MINC/include/itkMINCTransformIOFactory.h
+ delete mode 100644 Modules/IO/MINC/src/itkMINCTransformIOFactory.cxx
+ delete mode 100644 Modules/IO/MINC/test/itkIOTransformMINCTest.cxx
+ delete mode 100644 Modules/IO/MINC/test/itkMINCTransformAdapterTest.cxx
+ create mode 100644 Modules/IO/TransformMINC/CMakeLists.txt
+ create mode 100644 Modules/IO/TransformMINC/README
+ create mode 100644 Modules/IO/TransformMINC/include/itkMINCTransformAdapter.h
+ create mode 100644 Modules/IO/TransformMINC/include/itkMINCTransformIO.h
+ create mode 100644 Modules/IO/TransformMINC/include/itkMINCTransformIO.hxx
+ create mode 100644 Modules/IO/TransformMINC/include/itkMINCTransformIOFactory.h
+ create mode 100644 Modules/IO/TransformMINC/itk-module.cmake
+ create mode 100644 Modules/IO/TransformMINC/src/CMakeLists.txt
+ create mode 100644 Modules/IO/TransformMINC/src/itkMINCTransformIOFactory.cxx
+ create mode 100644 Modules/IO/TransformMINC/test/CMakeLists.txt
+ create mode 100644 Modules/IO/TransformMINC/test/README
+ create mode 100644 Modules/IO/TransformMINC/test/itkIOTransformMINCTest.cxx
+ create mode 100644 Modules/IO/TransformMINC/test/itkMINCTransformAdapterTest.cxx
+
+diff --git a/Modules/IO/MINC/include/itkMINCTransformAdapter.h b/Modules/IO/MINC/include/itkMINCTransformAdapter.h
+deleted file mode 100644
+index 4c4bf1b..0000000
+--- a/Modules/IO/MINC/include/itkMINCTransformAdapter.h
++++ /dev/null
+@@ -1,325 +0,0 @@
+-/*=========================================================================
+- *
+- *  Copyright Insight Software Consortium
+- *
+- *  Licensed under the Apache License, Version 2.0 (the "License");
+- *  you may not use this file except in compliance with the License.
+- *  You may obtain a copy of the License at
+- *
+- *         http://www.apache.org/licenses/LICENSE-2.0.txt
+- *
+- *  Unless required by applicable law or agreed to in writing, software
+- *  distributed under the License is distributed on an "AS IS" BASIS,
+- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- *  See the License for the specific language governing permissions and
+- *  limitations under the License.
+- *
+- *=========================================================================*/
+-#ifndef itkMINCTransformAdapter_h
+-#define itkMINCTransformAdapter_h
+-
+-#include "itkObject.h"
+-#include "itkPoint.h"
+-#include "itkVector.h"
+-#include "itkCovariantVector.h"
+-#include "vnl/vnl_matrix_fixed.h"
+-#include "vnl/vnl_vector_fixed.h"
+-#include "vnl/vnl_det.h"
+-#include "vnl/vnl_vector_fixed_ref.h"
+-#include "vnl/vnl_vector.h"
+-#include "itkTransform.h"
+-#include "itkObjectFactory.h"
+-
+-//minc header
+-#include "itk_minc2.h"
+-
+-namespace itk
+-{
+-
+-/** \class MINCTransformAdapter
+-  * \ingroup  ITKIOMINC
+-  * \brief ITK wrapper around MINC general transform functions, supports all the transformations that MINC XFM supports
+-  *
+-  * \author Vladimir S. FONOV
+-  *         Brain Imaging Center, Montreal Neurological Institute, McGill University, Montreal Canada 2012
+-  * \ingroup ITKIOMINC
+-  */
+-template<typename TParametersValueType=double, unsigned int NInputDimensions=3,unsigned int NOutputDimensions=3>
+-  class MINCTransformAdapter : public Transform<TParametersValueType, NInputDimensions, NOutputDimensions>
+-{
+-public:
+-  /** Standard class typedefs. */
+-  typedef MINCTransformAdapter  Self;
+-
+-  typedef Transform<TParametersValueType, NInputDimensions, NOutputDimensions> Superclass;
+-
+-  typedef SmartPointer<Self>        Pointer;
+-  typedef SmartPointer<const Self>  ConstPointer;
+-
+-  typedef typename Superclass::NumberOfParametersType  NumberOfParametersType;
+-
+-  /** New method for creating an object using a factory. */
+-  itkNewMacro(Self);
+-
+-  /** Run-time type information (and related methods). */
+-  itkTypeMacro( MINCTransformAdapter, Transform );
+-
+-  /** Dimension of the domain space. */
+-  itkStaticConstMacro(InputSpaceDimension, unsigned int, NInputDimensions);
+-  itkStaticConstMacro(OutputSpaceDimension, unsigned int, NOutputDimensions);
+-
+-  /** Type of the input parameters. */
+-  typedef  double ScalarType;
+-
+-  /** Type of the input parameters. */
+-  typedef typename Superclass::ParametersType      ParametersType;
+-  typedef typename Superclass::FixedParametersType FixedParametersType;
+-
+-  /** Type of the Jacobian matrix. */
+-  typedef typename Superclass::JacobianType  JacobianType;
+-
+-  /** Standard vector type for this class. */
+-  typedef Vector<TParametersValueType, itkGetStaticConstMacro(InputSpaceDimension)>  InputVectorType;
+-  typedef Vector<TParametersValueType, itkGetStaticConstMacro(OutputSpaceDimension)> OutputVectorType;
+-
+-  /** Standard variable length vector type for this class
+-  *  this provides an interface for the VectorImage class */
+-  typedef VariableLengthVector<TParametersValueType> InputVectorPixelType;
+-  typedef VariableLengthVector<TParametersValueType> OutputVectorPixelType;
+-
+-  /** Standard covariant vector type for this class */
+-  typedef CovariantVector<TParametersValueType, itkGetStaticConstMacro(InputSpaceDimension)>  InputCovariantVectorType;
+-
+-  typedef CovariantVector<TParametersValueType, itkGetStaticConstMacro(OutputSpaceDimension)> OutputCovariantVectorType;
+-
+-  /** Standard coordinate point type for this class */
+-  typedef Point<TParametersValueType,NInputDimensions > InputPointType;
+-  typedef Point<TParametersValueType,NInputDimensions > OutputPointType;
+-
+-  /** Standard vnl_vector type for this class. */
+-  typedef vnl_vector_fixed<TParametersValueType, NInputDimensions>  InputVnlVectorType;
+-  typedef vnl_vector_fixed<TParametersValueType, NOutputDimensions> OutputVnlVectorType;
+-
+-  /**  Method to transform a point. */
+-  virtual OutputPointType TransformPoint(const InputPointType  &point ) const ITK_OVERRIDE
+-  {
+-    if(!m_Initialized)
+-      {
+-      return point;
+-      }
+-
+-    if(m_Invert && !m_Initialized_invert)
+-      {
+-      return point;
+-      }
+-
+-    OutputPointType pnt;
+-    //works only for 3D->3D transforms
+-    general_transform_point((m_Invert ? &m_Xfm_inv : &m_Xfm), point[0], point[1], point[2], &pnt[0], &pnt[1], &pnt[2]);
+-
+-    return pnt;
+-  }
+-
+-  //! use finate element difference to estimate local jacobian
+-  void estimate_local_jacobian(const InputPointType  &orig, vnl_matrix_fixed< double, 3, 3 > &m)
+-  {
+-    double u1,v1,w1;
+-    double u2,v2,w2;
+-    const double delta=1e-4;
+-
+-    general_transform_point((m_Invert ? &m_Xfm_inv : &m_Xfm) , orig[0]-delta, orig[1], orig[2],&u1, &v1, &w1);
+-    general_transform_point((m_Invert ? &m_Xfm_inv : &m_Xfm) , orig[0]+delta, orig[1], orig[2],&u2, &v2, &w2);
+-    m(0,0)=(u2-u1)/(2*delta);
+-    m(0,1)=(v2-v1)/(2*delta);
+-    m(0,2)=(w2-w1)/(2*delta);
+-
+-    general_transform_point((m_Invert ? &m_Xfm_inv : &m_Xfm) , orig[0], orig[1]-delta, orig[2],&u1, &v1, &w1);
+-    general_transform_point((m_Invert ? &m_Xfm_inv : &m_Xfm) , orig[0], orig[1]+delta, orig[2],&u2, &v2, &w2);
+-    m(1,0)=(u2-u1)/(2*delta);
+-    m(1,1)=(v2-v1)/(2*delta);
+-    m(1,2)=(w2-w1)/(2*delta);
+-
+-    general_transform_point((m_Invert ? &m_Xfm_inv : &m_Xfm), orig[0], orig[1], orig[2]-delta,&u1, &v1, &w1);
+-    general_transform_point((m_Invert ? &m_Xfm_inv : &m_Xfm), orig[0], orig[1], orig[2]+delta,&u2, &v2, &w2);
+-    m(2,0)=(u2-u1)/(2*delta);
+-    m(2,1)=(v2-v1)/(2*delta);
+-    m(2,2)=(w2-w1)/(2*delta);
+-  }
+-
+-  /**  Method to transform a vector. */
+-  OutputVectorType TransformVector( const InputVectorType& vector, const InputPointType &  ) const ITK_OVERRIDE
+-  {
+-    itkExceptionMacro( << "Not Implemented" );
+-    return vector;
+-  }
+-
+-  /**  Method to transform a vector. */
+-  OutputVnlVectorType TransformVector( const InputVnlVectorType& vector, const InputPointType & ) const ITK_OVERRIDE
+-  {
+-    itkExceptionMacro( << "Not Implemented" );
+-    return vector;
+-  }
+-
+-  /**  Method to transform a vector. */
+-  OutputVectorType TransformVector( const InputVectorType& vector) const ITK_OVERRIDE
+-  {
+-    return Superclass::TransformVector(vector);
+-  }
+-
+-  /**  Method to transform a vector. */
+-  OutputVnlVectorType TransformVector( const InputVnlVectorType& vector) const ITK_OVERRIDE
+-  {
+-    return Superclass::TransformVector(vector);
+-  }
+-
+-  /**  Method to transform a vector. */
+-  OutputVectorPixelType TransformVector( const InputVectorPixelType& vector) const ITK_OVERRIDE
+-  {
+-    return Superclass::TransformVector(vector);
+-  }
+-
+-  /**  Method to transform a vector. */
+-  OutputVectorPixelType TransformVector(
+-    const InputVectorPixelType& vector,
+-    const InputPointType & ) const ITK_OVERRIDE
+-  {
+-    itkExceptionMacro( << "Not Implemented" );
+-    return vector;
+-  }
+-
+-  /**  Method to transform a CovariantVector. */
+-  virtual OutputCovariantVectorType TransformCovariantVector(
+-    const InputCovariantVectorType &vector
+-  , const InputPointType & ) const ITK_OVERRIDE
+-  {
+-    itkExceptionMacro( << "Not Implemented" );
+-    return vector;
+-  }
+-
+-/**  Method to transform a CovariantVector. */
+-  virtual OutputCovariantVectorType TransformCovariantVector(
+-    const InputCovariantVectorType &vector) const ITK_OVERRIDE
+-  {
+-    return Superclass::TransformCovariantVector(vector);
+-  }
+-
+-/**  Method to transform a CovariantVector. */
+-  virtual OutputVectorPixelType TransformCovariantVector(
+-    const InputVectorPixelType &vector) const ITK_OVERRIDE
+-  {
+-    return Superclass::TransformCovariantVector(vector);
+-  }
+-
+-  /**  Method to transform a CovariantVector. */
+-  virtual OutputVectorPixelType TransformCovariantVector(
+-    const InputVectorPixelType &vector, const InputPointType & ) const ITK_OVERRIDE
+-  {
+-    itkExceptionMacro( << "Not Implemented" );
+-    return vector;
+-  }
+-
+-  /** Set the transformation to an Identity
+-    */
+-  virtual void SetIdentity( void )
+-  {
+-    cleanup();
+-  }
+-
+-  virtual void SetFixedParameters(const FixedParametersType &) ITK_OVERRIDE
+-  {
+-    itkExceptionMacro( << "Not Implemented" );
+-  }
+-
+-  virtual void ComputeJacobianWithRespectToParameters(
+-              const InputPointType &,
+-              JacobianType &) const ITK_OVERRIDE
+-  {
+-    itkExceptionMacro( << "Not Implemented" );
+-  }
+-
+-  virtual NumberOfParametersType GetNumberOfParameters(void) const ITK_OVERRIDE
+-  {
+-    //this transform is defined by XFM file
+-    itkExceptionMacro( << "Not Defined" );
+-    return 0;
+-  }
+-
+-  /** Set the Transformation Parameters
+-    * and update the internal transformation. */
+-  virtual void  SetParameters(const ParametersType &) ITK_OVERRIDE
+-  {
+-    itkExceptionMacro( << "Not Implemented" );
+-  }
+-
+-  virtual const ParametersType & GetParameters(void) const ITK_OVERRIDE
+-  {
+-    itkExceptionMacro( << "Not Implemented" );
+-    return m_Parameters;
+-  }
+-
+-  void OpenXfm(const char *xfm)
+-  {
+-    cleanup();
+-    if(input_transform_file((char*)xfm, &m_Xfm) != VIO_OK)
+-      itkExceptionMacro( << "Error reading XFM:" << xfm );
+-    m_Initialized=true;
+-  }
+-
+-  void Invert(void)
+-  {
+-    if(!m_Initialized)
+-      itkExceptionMacro( << "XFM not initialized" );
+-    if(!m_Initialized_invert)
+-      {
+-      create_inverse_general_transform(&m_Xfm,&m_Xfm_inv);
+-      m_Initialized_invert=true;
+-      }
+-    m_Invert= !m_Invert;
+-  }
+-
+-protected:
+-  MINCTransformAdapter():
+-    Transform<TParametersValueType, NInputDimensions, NOutputDimensions>(0),
+-    m_Invert(false),
+-    m_Initialized(false),
+-    m_Initialized_invert(false)
+-  {
+-    if(NInputDimensions!=3 || NOutputDimensions!=3)
+-      itkExceptionMacro(<< "Sorry, only 3D to 3d minc xfm transform is currently implemented");
+-  }
+-
+-  virtual ~MINCTransformAdapter()
+-  {
+-    cleanup();
+-  }
+-
+-  void cleanup(void)
+-  {
+-    if(m_Initialized)
+-      {
+-      delete_general_transform(&m_Xfm);
+-      }
+-    if(m_Initialized_invert)
+-      {
+-      delete_general_transform(&m_Xfm_inv);
+-      }
+-    m_Initialized=false;
+-    m_Initialized_invert=false;
+-  }
+-
+-  ParametersType m_Parameters;
+-
+-  mutable VIO_General_transform m_Xfm;
+-  mutable VIO_General_transform m_Xfm_inv;
+-
+-  bool m_Invert;
+-  bool m_Initialized;
+-  bool m_Initialized_invert;
+-
+-private:
+-  MINCTransformAdapter ( const Self & ); //purposely not implemented
+-  void operator= ( const Self & ); //purposely not implemented
+-};
+-
+-}
+-#endif //itkMINCTransformAdapter_h
+diff --git a/Modules/IO/MINC/include/itkMINCTransformIO.h b/Modules/IO/MINC/include/itkMINCTransformIO.h
+deleted file mode 100644
+index 5888cfe..0000000
+--- a/Modules/IO/MINC/include/itkMINCTransformIO.h
++++ /dev/null
+@@ -1,103 +0,0 @@
+-/*=========================================================================
+- *
+- *  Copyright Insight Software Consortium
+- *
+- *  Licensed under the Apache License, Version 2.0 (the "License");
+- *  you may not use this file except in compliance with the License.
+- *  You may obtain a copy of the License at
+- *
+- *         http://www.apache.org/licenses/LICENSE-2.0.txt
+- *
+- *  Unless required by applicable law or agreed to in writing, software
+- *  distributed under the License is distributed on an "AS IS" BASIS,
+- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- *  See the License for the specific language governing permissions and
+- *  limitations under the License.
+- *
+- *=========================================================================*/
+-#ifndef itkMINCTransformIO_h
+-#define itkMINCTransformIO_h
+-
+-#include "itkTransformIOBase.h"
+-
+-#include <string>
+-#include <vector>
+-#include <itk_minc2.h>
+-#include "itkMatrixOffsetTransformBase.h"
+-
+-namespace itk
+-{
+-
+-/** \class MINCTransformIOTemplate
+- *
+-* \brief Read and write transforms in Minc XFM Format
+-*
+-* \author Vladimir S. FONOV
+-*         Brain Imaging Center, Montreal Neurological Institute, McGill University, Montreal Canada 2012
+-*
+-* \ingroup ITKIOMINC
+-*/
+-template<typename TParametersValueType>
+-class MINCTransformIOTemplate: public TransformIOBaseTemplate<TParametersValueType>
+-{
+-public:
+-  typedef MINCTransformIOTemplate                         Self;
+-  typedef TransformIOBaseTemplate< TParametersValueType > Superclass;
+-  typedef SmartPointer<Self>                              Pointer;
+-  typedef SmartPointer<const Self>                        ConstPointer;
+-
+-  typedef typename Superclass::TransformType          TransformType;
+-  typedef typename Superclass::TransformPointer       TransformPointer;
+-  typedef typename Superclass::TransformListType      TransformListType;
+-  typedef typename Superclass::ConstTransformListType ConstTransformListType;
+-  typedef typename TransformType::ParametersType      ParametersType;
+-
+-  typedef MatrixOffsetTransformBase<TParametersValueType, 3, 3> MatrixOffsetTransformBaseType;
+-
+-  typedef typename MatrixOffsetTransformBaseType::MatrixType    MatrixType;
+-  typedef typename MatrixOffsetTransformBaseType::OffsetType    OffsetType;
+-
+-  /** Run-time type information (and related methods). */
+-  itkTypeMacro( MINCTransformIOTemplate, TransformIOBaseTemplate );
+-  itkNewMacro( Self );
+-
+-  /** Determine the file type. Returns true if this ImageIO can read the
+-  * file specified. */
+-  virtual bool CanReadFile( const char * fileName ) ITK_OVERRIDE;
+-
+-  /** Determine the file type. Returns true if this ImageIO can write the
+-  * file specified. */
+-  virtual bool CanWriteFile( const char * fileName ) ITK_OVERRIDE;
+-
+-  /** Reads the data from disk into the memory buffer provided. */
+-  virtual void Read() ITK_OVERRIDE;
+-
+-  virtual void Write() ITK_OVERRIDE;
+-
+-protected:
+-  MINCTransformIOTemplate();
+-  virtual ~MINCTransformIOTemplate();
+-
+-  VIO_General_transform m_XFM;
+-  bool                  m_XFM_initialized;
+-
+-private:
+-  void _cleanup();
+-  void WriteOneTransform(const int transformIndex,
+-                         const TransformType *transform,
+-                         std::vector<VIO_General_transform> &_xfm,
+-                         const char * xfm_file_base,int & serial);
+-
+-  void ReadOneTransform(VIO_General_transform *xfm);
+-};
+-
+-/** This helps to meet backward compatibility */
+-typedef MINCTransformIOTemplate<double> MINCTransformIO;
+-
+-} // end namespace itk
+-
+-#ifndef ITK_MANUAL_INSTANTIATION
+-#include "itkMINCTransformIO.hxx"
+-#endif
+-
+-#endif // itkMINCTransformIO_h
+diff --git a/Modules/IO/MINC/include/itkMINCTransformIO.hxx b/Modules/IO/MINC/include/itkMINCTransformIO.hxx
+deleted file mode 100644
+index e30a9df..0000000
+--- a/Modules/IO/MINC/include/itkMINCTransformIO.hxx
++++ /dev/null
+@@ -1,362 +0,0 @@
+-/*=========================================================================
+- *
+- *  Copyright Insight Software Consortium
+- *
+- *  Licensed under the Apache License, Version 2.0 (the "License");
+- *  you may not use this file except in compliance with the License.
+- *  You may obtain a copy of the License at
+- *
+- *         http://www.apache.org/licenses/LICENSE-2.0.txt
+- *
+- *  Unless required by applicable law or agreed to in writing, software
+- *  distributed under the License is distributed on an "AS IS" BASIS,
+- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- *  See the License for the specific language governing permissions and
+- *  limitations under the License.
+- *
+- *=========================================================================*/
+-#ifndef itkMINCTransformIO_hxx
+-#define itkMINCTransformIO_hxx
+-
+-#include "itksys/SystemTools.hxx"
+-#include "itksys/SystemInformation.hxx"
+-#include "itkCompositeTransform.h"
+-#include "itkCompositeTransformIOHelper.h"
+-#include "itkVersion.h"
+-#include "itkMINCTransformIO.h"
+-#include "itkMINCImageIO.h"
+-#include "itkMINCImageIOFactory.h"
+-#include "itkImageFileReader.h"
+-#include "itkImageFileWriter.h"
+-#include "itkAffineTransform.h"
+-#include "itkImage.h"
+-#include "itkVector.h"
+-#include "itkDisplacementFieldTransform.h"
+-#include "itkMetaDataObject.h"
+-
+-namespace itk
+-{
+-
+-template<typename TParametersValueType>
+-MINCTransformIOTemplate<TParametersValueType>
+-::MINCTransformIOTemplate()
+-{
+-  m_XFM_initialized=false;
+-}
+-
+-template<typename TParametersValueType>
+-MINCTransformIOTemplate<TParametersValueType>
+-::~MINCTransformIOTemplate()
+-{
+-  _cleanup();
+-}
+-
+-template<typename TParametersValueType>
+-void
+-MINCTransformIOTemplate<TParametersValueType>
+-::_cleanup(void)
+-{
+-  if(m_XFM_initialized)
+-      delete_general_transform(&m_XFM);
+-  m_XFM_initialized=false;
+-}
+-
+-template<typename TParametersValueType>
+-bool
+-MINCTransformIOTemplate<TParametersValueType>
+-::CanReadFile(const char *fileName)
+-{
+-  std::string ext(itksys::SystemTools::GetFilenameLastExtension(fileName));
+-  return (ext == ".xfm" || ext==".XFM");
+-}
+-
+-template<typename TParametersValueType>
+-bool
+-MINCTransformIOTemplate<TParametersValueType>
+-::CanWriteFile(const char *fileName)
+-{
+-  std::string ext(itksys::SystemTools::GetFilenameLastExtension(fileName));
+-  return (ext == ".xfm" || ext==".XFM");
+-}
+-
+-template<typename TParametersValueType>
+-void
+-MINCTransformIOTemplate<TParametersValueType>
+-::ReadOneTransform(VIO_General_transform *xfm)
+-{
+-  const std::string typeNameString = Superclass::GetTypeNameString();
+-  switch(get_transform_type(xfm))
+-  {
+-    case LINEAR:
+-      {
+-      VIO_Transform *lin=get_linear_transform_ptr(xfm);
+-
+-      TransformPointer transform;
+-      std::string transformTypeName = "AffineTransform_";
+-      transformTypeName += typeNameString;
+-      transformTypeName += "_3_3";
+-      this->CreateTransform(transform, transformTypeName);
+-      ParametersType parameterArray;
+-      parameterArray.SetSize(12);
+-
+-      for(int j = 0; j < 3; ++j)
+-        {
+-        for(int i = 0; i < 3; ++i)
+-          {
+-          parameterArray.SetElement(i+j*3, Transform_elem(*lin,j,i));
+-          }
+-        parameterArray.SetElement(j+9, Transform_elem(*lin,j,3));
+-        }
+-
+-      if(xfm->inverse_flag)
+-        {
+-        typedef AffineTransform<TParametersValueType, 3> AffineTransformType;
+-        typename AffineTransformType::Pointer tmp = AffineTransformType::New();
+-        tmp->SetParametersByValue(parameterArray);
+-        tmp->GetInverse(static_cast< AffineTransformType* >( transform.GetPointer()) );
+-        }
+-      else
+-        {
+-        transform->SetParametersByValue(parameterArray);
+-        }
+-      this->GetReadTransformList().push_back(transform);
+-
+-      break;
+-      }
+-    case CONCATENATED_TRANSFORM:
+-      {
+-      for(int i = 0; i < get_n_concated_transforms(xfm); ++i)
+-        {
+-        this->ReadOneTransform(get_nth_general_transform(xfm, i));
+-        }
+-      break;
+-      }
+-    case THIN_PLATE_SPLINE:
+-      itkExceptionMacro( << "Reading THIN_PLATE_SPLINE transform is not supported yet" );
+-      break;
+-    case USER_TRANSFORM:
+-      itkExceptionMacro( << "Reading USER_TRANSFORM transform is not supported yet" );
+-      break;
+-    case GRID_TRANSFORM :
+-    {
+-      if(xfm->displacement_volume_file)
+-        {
+-        typedef DisplacementFieldTransform<TParametersValueType, 3> DisplacementFieldTransformType;
+-        typedef typename DisplacementFieldTransformType::DisplacementFieldType GridImageType;
+-        typedef ImageFileReader< GridImageType >                               MincReaderType;
+-
+-        MINCImageIO::Pointer mincIO             = MINCImageIO::New();
+-        typename MincReaderType::Pointer reader = MincReaderType::New();
+-        reader->SetImageIO( mincIO );
+-        reader->SetFileName( xfm->displacement_volume_file );
+-        reader->Update();
+-
+-        typename GridImageType::Pointer grid = reader->GetOutput();
+-
+-        TransformPointer transform;
+-        std::string transformTypeName = "DisplacementFieldTransform_";
+-        transformTypeName += typeNameString;
+-        transformTypeName += "_3_3";
+-        this->CreateTransform(transform, transformTypeName);
+-        DisplacementFieldTransformType * gridTransform = static_cast< DisplacementFieldTransformType* >( transform.GetPointer());
+-        if( xfm->inverse_flag ) //TODO: invert grid transform?
+-          {
+-          gridTransform->SetInverseDisplacementField( grid );
+-          }
+-        else
+-          {
+-          gridTransform->SetDisplacementField( grid );
+-          }
+-
+-        this->GetReadTransformList().push_back( transform );
+-
+-        break;
+-        }
+-      else
+-        {
+-        itkExceptionMacro( << "Got grid transform without file name !" );
+-        }
+-    }
+-    default:
+-      itkExceptionMacro( << "Reading Unknown transform is not supported!" );
+-      break;
+-  }
+-}
+-
+-template<typename TParametersValueType>
+-void
+-MINCTransformIOTemplate<TParametersValueType>
+-::Read()
+-{
+-  if(input_transform_file((char*)this->GetFileName(), &m_XFM) != VIO_OK)
+-    {
+-    itkExceptionMacro( << "Error reading XFM:" << this->GetFileName() );
+-    }
+-  this->m_XFM_initialized=true;
+-
+-  this->ReadOneTransform(&m_XFM);
+-
+-  _cleanup();
+-}
+-
+-template<typename TParametersValueType>
+-void
+-MINCTransformIOTemplate<TParametersValueType>
+-::WriteOneTransform(const int transformIndex,
+-                    const TransformType *curTransform,
+-                    std::vector<VIO_General_transform> &xfm,
+-                    const char * xfm_file_base,int & serial )
+-{
+-  const std::string transformType = curTransform->GetTransformTypeAsString();
+-
+-  const MatrixOffsetTransformBaseType * matrixOffsetTransform =
+-        dynamic_cast<const MatrixOffsetTransformBaseType *>( curTransform );
+-
+-  //
+-  // write out transform type.
+-  //
+-  // composite transform doesn't store own parameters
+-  if(transformType.find("CompositeTransform") != std::string::npos)
+-    {
+-      if(transformIndex != 0)
+-        {
+-        itkExceptionMacro(<< "Composite Transform can only be 1st transform in a file");
+-        }
+-    }
+-  else
+-    {
+-    if(matrixOffsetTransform)
+-      {
+-      VIO_Transform lin;
+-      memset(&lin, 0, sizeof(VIO_Transform));
+-
+-      MatrixType matrix = matrixOffsetTransform->GetMatrix();
+-      OffsetType offset = matrixOffsetTransform->GetOffset();
+-
+-      for(int j=0; j < 3; ++j)
+-        {
+-        for(int i=0; i < 3; ++i)
+-          {
+-          Transform_elem(lin,j,i)=matrix(j,i);
+-          }
+-        Transform_elem(lin,j,3)=offset[j];
+-        }
+-      //add 4th normalization row (not stored)
+-      Transform_elem(lin,3,3)=1.0;
+-
+-      xfm.push_back(VIO_General_transform());
+-      memset(&xfm[xfm.size()-1], 0, sizeof(VIO_General_transform));
+-      create_linear_transform(&xfm[xfm.size()-1], &lin);
+-      }
+-    else if( transformType.find("DisplacementFieldTransform_") != std::string::npos
+-             && transformType.find("_3_3") != std::string::npos
+-             && curTransform->GetFixedParameters().Size() == 18 )
+-      {
+-      bool _inverse_grid=false;
+-      typedef DisplacementFieldTransform<TParametersValueType, 3> DisplacementFieldTransformType;
+-      typedef typename DisplacementFieldTransformType::DisplacementFieldType GridImageType;
+-      typedef ImageFileWriter< GridImageType > MincWriterType;
+-      DisplacementFieldTransformType* _grid_transform = static_cast< DisplacementFieldTransformType* >( const_cast< TransformType* >( curTransform ));
+-      char tmp[1024];
+-      sprintf(tmp,"%s_grid_%d.mnc",xfm_file_base,serial);
+-      ++serial;
+-
+-      MINCImageIO::Pointer mincIO = MINCImageIO::New();
+-      typename MincWriterType::Pointer writer = MincWriterType::New();
+-      writer->SetImageIO( mincIO );
+-      writer->SetFileName( tmp );
+-
+-      if( _grid_transform->GetDisplacementField() )
+-        {
+-        writer->SetInput( _grid_transform->GetModifiableDisplacementField() );
+-        }
+-      else if( _grid_transform->GetInverseDisplacementField() )
+-        {
+-        writer->SetInput( _grid_transform->GetModifiableInverseDisplacementField() );
+-        _inverse_grid=true;
+-        }
+-      else
+-        {
+-        itkExceptionMacro(<< "Trying to write-out displacement transform without displacement field");
+-        }
+-      writer->Update();
+-
+-      xfm.push_back( VIO_General_transform() );
+-      create_grid_transform_no_copy( &xfm[xfm.size()-1], ITK_NULLPTR, ITK_NULLPTR ); //relying on volume_io using the same name
+-      if(_inverse_grid)
+-        {
+-        xfm[xfm.size()-1].inverse_flag=TRUE;
+-        }
+-      }
+-    else
+-      {
+-      itkExceptionMacro(<< "Transform type:" << transformType.c_str() << "is Unsupported");
+-      }
+-  }
+-}
+-
+-template<typename TParametersValueType>
+-void
+-MINCTransformIOTemplate<TParametersValueType>
+-::Write()
+-{
+-  std::string xfm_filename = this->GetFileName();
+-
+-  std::string::size_type xfmPos = xfm_filename.rfind(".xfm");
+-
+-  if (xfmPos == std::string::npos)
+-    {
+-    xfmPos = xfm_filename.rfind(".XFM");
+-    }
+-  std::string xfm_file_base(xfm_filename,0,xfmPos);
+-
+-  std::vector<VIO_General_transform> xfm;
+-
+-  ConstTransformListType &transformList = this->GetWriteTransformList();
+-
+-  std::string compositeTransformType = transformList.front()->GetTransformTypeAsString();
+-
+-  CompositeTransformIOHelperTemplate<TParametersValueType> helper;
+-
+-  // if the first transform in the list is a
+-  // composite transform, use its internal list
+-  // instead of the IO
+-  if( compositeTransformType.find("CompositeTransform") != std::string::npos )
+-    {
+-    transformList = helper.GetTransformList(transformList.front().GetPointer());
+-    }
+-
+-  typename ConstTransformListType::const_iterator end = transformList.end();
+-
+-  int count = 0;
+-  int serial = 0;
+-  for( typename ConstTransformListType::const_iterator it = transformList.begin();
+-      it != end; ++it,++count )
+-    {
+-    this->WriteOneTransform(count, (*it).GetPointer(), xfm, xfm_file_base.c_str(), serial);
+-    }
+-
+-  VIO_General_transform transform = xfm[0];
+-
+-  for( size_t i=1; i < xfm.size(); ++i )
+-    {
+-    VIO_General_transform concated;
+-    concat_general_transforms( &transform, &xfm[i], &concated );
+-    delete_general_transform( &transform );
+-    delete_general_transform( &xfm[i] );
+-    transform = concated;
+-    }
+-
+-  VIO_Status wrt = output_transform_file((char*)(xfm_filename.c_str()),(char*)"ITK-XFM writer",&transform);
+-
+-  delete_general_transform(&transform);
+-
+-  if(wrt!=VIO_OK)
+-    {
+-    itkExceptionMacro( << "Error writing XFM:" << xfm_filename.c_str() );
+-    }
+-}
+-
+-} // end namespace itk
+-
+-#endif
+diff --git a/Modules/IO/MINC/include/itkMINCTransformIOFactory.h b/Modules/IO/MINC/include/itkMINCTransformIOFactory.h
+deleted file mode 100644
+index 419a972..0000000
+--- a/Modules/IO/MINC/include/itkMINCTransformIOFactory.h
++++ /dev/null
+@@ -1,72 +0,0 @@
+-/*=========================================================================
+- *
+- *  Copyright Insight Software Consortium
+- *
+- *  Licensed under the Apache License, Version 2.0 (the "License");
+- *  you may not use this file except in compliance with the License.
+- *  You may obtain a copy of the License at
+- *
+- *         http://www.apache.org/licenses/LICENSE-2.0.txt
+- *
+- *  Unless required by applicable law or agreed to in writing, software
+- *  distributed under the License is distributed on an "AS IS" BASIS,
+- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- *  See the License for the specific language governing permissions and
+- *  limitations under the License.
+- *
+- *=========================================================================*/
+-
+-#ifndef itkMINCTransformIOFactory_h
+-#define itkMINCTransformIOFactory_h
+-
+-#include "itkObjectFactoryBase.h"
+-#include "itkTransformIOBase.h"
+-#include "ITKIOMINCExport.h"
+-
+-namespace itk
+-{
+-/** \class MINCTransformIOFactory
+-   * \brief Create instances of MincTransformIO objects using an object factory.
+-   *
+-   * \ingroup ITKIOMINC
+-   */
+-  class ITKIOMINC_EXPORT MINCTransformIOFactory:public ObjectFactoryBase
+-  {
+-  public:
+-    /** Standard class typedefs. */
+-    typedef MINCTransformIOFactory     Self;
+-    typedef ObjectFactoryBase          Superclass;
+-    typedef SmartPointer< Self >       Pointer;
+-    typedef SmartPointer< const Self > ConstPointer;
+-
+-    /** Class methods used to interface with the registered factories. */
+-    virtual const char * GetITKSourceVersion() const ITK_OVERRIDE;
+-
+-    virtual const char * GetDescription() const ITK_OVERRIDE;
+-
+-    /** Method for class instantiation. */
+-    itkFactorylessNewMacro(Self);
+-
+-    /** Run-time type information (and related methods). */
+-    itkTypeMacro(MINCTransformIOFactory, ObjectFactoryBase);
+-
+-    /** Register one factory of this type  */
+-    static void RegisterOneFactory(void)
+-    {
+-      MINCTransformIOFactory::Pointer metaFactory = MINCTransformIOFactory::New();
+-
+-      ObjectFactoryBase::RegisterFactory(metaFactory);
+-    }
+-
+-  protected:
+-    MINCTransformIOFactory();
+-    ~MINCTransformIOFactory();
+-    virtual void PrintSelf(std::ostream & os, Indent indent) const ITK_OVERRIDE;
+-
+-  private:
+-    MINCTransformIOFactory(const Self &); //purposely not implemented
+-    void operator=(const Self &);        //purposely not implemented
+-  };
+-} // end namespace itk
+-
+-#endif //itkMINCTransformIOFactory_h
+diff --git a/Modules/IO/MINC/src/CMakeLists.txt b/Modules/IO/MINC/src/CMakeLists.txt
+index f031ffd..0cdc5ff 100644
+--- a/Modules/IO/MINC/src/CMakeLists.txt
++++ b/Modules/IO/MINC/src/CMakeLists.txt
+@@ -1,7 +1,6 @@
+ set(ITKIOMINC_SRC
+   itkMINCImageIO.cxx
+   itkMINCImageIOFactory.cxx
+-  itkMINCTransformIOFactory.cxx
+ )
+ 
+ add_library(ITKIOMINC ${ITKIOMINC_SRC})
+diff --git a/Modules/IO/MINC/src/itkMINCTransformIOFactory.cxx b/Modules/IO/MINC/src/itkMINCTransformIOFactory.cxx
+deleted file mode 100644
+index cb1348b..0000000
+--- a/Modules/IO/MINC/src/itkMINCTransformIOFactory.cxx
++++ /dev/null
+@@ -1,75 +0,0 @@
+-/*=========================================================================
+- *
+- *  Copyright Insight Software Consortium
+- *
+- *  Licensed under the Apache License, Version 2.0 (the "License");
+- *  you may not use this file except in compliance with the License.
+- *  You may obtain a copy of the License at
+- *
+- *         http://www.apache.org/licenses/LICENSE-2.0.txt
+- *
+- *  Unless required by applicable law or agreed to in writing, software
+- *  distributed under the License is distributed on an "AS IS" BASIS,
+- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- *  See the License for the specific language governing permissions and
+- *  limitations under the License.
+- *
+- *=========================================================================*/
+-#include "itkVersion.h"
+-#include "itkMINCTransformIOFactory.h"
+-#include "itkCreateObjectFunction.h"
+-#include "itkMINCTransformIO.h"
+-#include "itkTransformFactory.h"
+-
+-namespace itk
+-{
+-  void MINCTransformIOFactory::PrintSelf(std::ostream &, Indent) const
+-  {}
+-
+-  MINCTransformIOFactory::MINCTransformIOFactory()
+-  {
+-    this->RegisterOverride( "itkTransformIOBaseTemplate",
+-                            "itkMINCTransformIO",
+-                            "MINC XFM Transform float IO",
+-                            1,
+-                            CreateObjectFunction< MINCTransformIOTemplate< float > >::New() );
+-
+-    this->RegisterOverride( "itkTransformIOBaseTemplate",
+-                            "itkMINCTransformIO",
+-                            "MINC XFM Transform double IO",
+-                            1,
+-                            CreateObjectFunction< MINCTransformIOTemplate< double > >::New() );
+-  }
+-
+-  MINCTransformIOFactory::~MINCTransformIOFactory()
+-  {}
+-
+-  const char *
+-  MINCTransformIOFactory::GetITKSourceVersion(void) const
+-  {
+-    return ITK_SOURCE_VERSION;
+-  }
+-
+-  const char *
+-  MINCTransformIOFactory::GetDescription() const
+-  {
+-    return "MINC XFM TransformIO Factory, allows the"
+-          " loading of Minc XFM transforms into insight";
+-  }
+-
+-  // Undocumented API used to register during static initialization.
+-  // DO NOT CALL DIRECTLY.
+-  static bool MINCTransformIOFactoryHasBeenRegistered;
+-
+-  void ITKIOMINC_EXPORT MINCTransformIOFactoryRegister__Private(void)
+-  {
+-    if( ! MINCTransformIOFactoryHasBeenRegistered )
+-    {
+-      MINCTransformIOFactoryHasBeenRegistered = true;
+-      MINCTransformIOFactory::RegisterOneFactory();
+-
+-      //TransformFactory< DisplacementFieldTransform<double,3> >::RegisterTransform ();
+-      // register additional transform type
+-    }
+-  }
+-} // end namespace itk
+diff --git a/Modules/IO/MINC/test/CMakeLists.txt b/Modules/IO/MINC/test/CMakeLists.txt
+index 314c6d2..d93909a 100644
+--- a/Modules/IO/MINC/test/CMakeLists.txt
++++ b/Modules/IO/MINC/test/CMakeLists.txt
+@@ -17,22 +17,8 @@ set(ITKIOMINCTests
+    itkMINCImageIOTest_Labels.cxx
+   )
+ 
+-set(ITKIOTransformMINCTests
+-    itkIOTransformMINCTest.cxx
+-    itkMINCTransformAdapterTest.cxx
+- )
+-
+ CreateTestDriver(ITKIOMINC "${ITKIOMINC-Test_LIBRARIES}" "${ITKIOMINCTests}")
+ 
+-CreateTestDriver(ITKIOTransformMINC "${ITKIOMINC-Test_LIBRARIES}" "${ITKIOTransformMINCTests}")
+-  TARGET_LINK_LIBRARIES(ITKIOTransformMINCTestDriver ITKIOTransformBase )
+-
+-itk_add_test(NAME itkIOTransformMINCTest
+-      COMMAND ITKIOTransformMINCTestDriver itkIOTransformMINCTest)
+-
+-itk_add_test(NAME itkMINCTransformAdapterTest
+-      COMMAND ITKIOTransformMINCTestDriver itkMINCTransformAdapterTest)
+-
+ itk_add_test(NAME itkMINCImageIOTest1
+   COMMAND ITKIOMINCTestDriver itkMINCImageIOTest ${ITK_TEST_OUTPUT_DIR} )
+ 
+diff --git a/Modules/IO/MINC/test/itkIOTransformMINCTest.cxx b/Modules/IO/MINC/test/itkIOTransformMINCTest.cxx
+deleted file mode 100644
+index 9b2d811..0000000
+--- a/Modules/IO/MINC/test/itkIOTransformMINCTest.cxx
++++ /dev/null
+@@ -1,486 +0,0 @@
+-/*=========================================================================
+- *
+- *  Copyright Insight Software Consortium
+- *
+- *  Licensed under the Apache License, Version 2.0 (the "License");
+- *  you may not use this file except in compliance with the License.
+- *  You may obtain a copy of the License at
+- *
+- *         http://www.apache.org/licenses/LICENSE-2.0.txt
+- *
+- *  Unless required by applicable law or agreed to in writing, software
+- *  distributed under the License is distributed on an "AS IS" BASIS,
+- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- *  See the License for the specific language governing permissions and
+- *  limitations under the License.
+- *
+- *=========================================================================*/
+-
+-#include <iostream>
+-#include <fstream>
+-#include "itkMINCTransformIOFactory.h"
+-#include "itkTransformFileWriter.h"
+-#include "itkTransformFileReader.h"
+-#include "itkAffineTransform.h"
+-#include "itkTransformFactory.h"
+-#include "itksys/SystemTools.hxx"
+-#include "itkDisplacementFieldTransform.h"
+-#include "itkIOTestHelper.h"
+-#include "vnl/vnl_math.h"
+-
+-
+-static const int    point_counter=1000;
+-
+-
+-template<typename T>void RandomPix(vnl_random &randgen,itk::Vector<T,3> &pix,
+-                      double _max=itk::NumericTraits<T>::max() )
+-{
+-  for(unsigned int i = 0; i < 3; i++)
+-    {
+-    pix[i] = randgen.drand64(_max);
+-    }
+-}
+-
+-template<typename T>void RandomPoint(vnl_random &randgen,itk::Point<T,3> &pix,
+-                      double _max=itk::NumericTraits<T>::max() )
+-{
+-  for(unsigned int i = 0; i < 3; i++)
+-    {
+-    pix[i] = randgen.drand64(_max);
+-    }
+-}
+-
+-
+-static int check_linear(const char *linear_transform)
+-{
+-  typedef itk::AffineTransform<double,3>  AffineTransformType;
+-  const double tolerance = 1e-5;
+-
+-  AffineTransformType::Pointer        affine = AffineTransformType::New();
+-  AffineTransformType::InputPointType cor;
+-
+-  itk::ObjectFactoryBase::RegisterFactory(itk::MINCTransformIOFactory::New() );
+-
+-  // Set it's parameters
+-  AffineTransformType::OutputVectorType rot_axis;
+-  rot_axis[0]=0.0;
+-  rot_axis[1]=1.0;
+-  rot_axis[2]=0.0;
+-  // Set it's parameters
+-  affine->Rotate3D(rot_axis,vnl_math::pi/6);
+-
+-  AffineTransformType::OutputVectorType offset;
+-
+-  offset[0]=0.0;
+-  offset[1]=0.0;
+-  offset[2]=10.0;
+-
+-  affine->Translate(offset);
+-
+-  affine->Scale(4.0);
+-
+-  itk::TransformFileWriter::Pointer writer;
+-  itk::TransformFileReader::Pointer reader;
+-
+-  reader = itk::TransformFileReader::New();
+-  writer = itk::TransformFileWriter::New();
+-  writer->AddTransform(affine);
+-
+-  writer->SetFileName( linear_transform );
+-  reader->SetFileName( linear_transform );
+-
+-  // Testing writing std::cout << "Testing write : ";
+-  affine->Print ( std::cout );
+-  try
+-  {
+-    writer->Update();
+-    std::cout << std::endl;
+-    std::cout << "Testing read : " << std::endl;
+-    reader->Update();
+-  }
+-  catch( itk::ExceptionObject & excp )
+-  {
+-    std::cerr << "Error while saving the transforms" << std::endl;
+-    std::cerr << excp << std::endl;
+-    std::cout << "[FAILED]" << std::endl;
+-    return EXIT_FAILURE;
+-  }
+-
+-  try
+-  {
+-    itk::TransformFileReader::TransformListType list=*reader->GetTransformList();
+-
+-    if(list.front()->GetTransformTypeAsString() != "AffineTransform_double_3_3")
+-      {
+-        std::cerr<<"Read back transform of type:"<<list.front()->GetTransformTypeAsString()<<std::endl;
+-        return EXIT_FAILURE;
+-      }
+-    AffineTransformType::Pointer affine2 = static_cast<AffineTransformType*>(list.front().GetPointer());
+-
+-    std::cout<<"Read transform : " << std::endl;
+-    affine2->Print( std::cout );
+-
+-    vnl_random randgen(12345678);
+-
+-    AffineTransformType::InputPointType pnt,pnt2;
+-
+-    std::cout << "Testing that transformations are the same ..." << std::endl;
+-    for(int i=0;i<point_counter;i++)
+-      {
+-      AffineTransformType::OutputPointType v1;
+-      AffineTransformType::OutputPointType v2;
+-
+-      RandomPoint<double>(randgen,pnt,100);
+-      pnt2=pnt;
+-      v1= affine->TransformPoint( pnt );
+-      v2= affine2->TransformPoint( pnt2 );
+-
+-      if( ( v1-v2 ).GetSquaredNorm() > tolerance)
+-        {
+-        std::cerr << "Original Pixel (" << v1
+-                  << ") doesn't match read-in Pixel ("
+-                  << v2 << " ) "
+-                  << " in "<< linear_transform << " at "<< pnt <<std::endl;
+-        return EXIT_FAILURE;
+-        }
+-      }
+-      std::cout << " Done !" << std::endl;
+-  }
+-  catch( itk::ExceptionObject & excp )
+-  {
+-    std::cerr << "Error while reading the transforms" << std::endl;
+-    std::cerr << excp << std::endl;
+-    std::cout << "[FAILED]" << std::endl;
+-    return EXIT_FAILURE;
+-  }
+-
+-  return EXIT_SUCCESS;
+-}
+-
+-static int check_nonlinear_double(const char *nonlinear_transform)
+-{
+-  const double tolerance = 1e-5;
+-
+-  typedef itk::DisplacementFieldTransform<double,3>         DisplacementFieldTransform;
+-  typedef DisplacementFieldTransform::DisplacementFieldType DisplacementFieldType;
+-
+-  DisplacementFieldTransform::Pointer disp = DisplacementFieldTransform::New();
+-  DisplacementFieldType::Pointer field=DisplacementFieldType::New();
+-
+-  //create zero displacement field
+-  DisplacementFieldType::SizeType    imageSize3D = {{ 10, 10, 10}};
+-  DisplacementFieldType::IndexType   startIndex3D = { {0, 0, 0}};
+-
+-  double spacing[]={2.0, 2.0, 2.0};
+-  double origin[]={-10.0, -10.0, -10.0};
+-  DisplacementFieldType::RegionType  region;
+-
+-  region.SetSize  (imageSize3D);
+-  region.SetIndex (startIndex3D);
+-
+-  field->SetLargestPossibleRegion (region);
+-  field->SetBufferedRegion (region);
+-  field->SetRequestedRegion (region);
+-
+-  field->SetSpacing( spacing );
+-  field->SetOrigin( origin );
+-  field->Allocate ();
+-
+-  DisplacementFieldType::PixelType zeroDisplacement;
+-  zeroDisplacement.Fill( 0.0 );
+-  field->FillBuffer( zeroDisplacement );
+-
+-  vnl_random  randgen(12345678);
+-  itk::ImageRegionIterator<DisplacementFieldType> it(field,field->GetLargestPossibleRegion() );
+-
+-  for(it.GoToBegin(); !it.IsAtEnd(); ++it)
+-    {
+-    DisplacementFieldType::PixelType pix;
+-     if( tolerance > 0.0 )
+-       {
+-       RandomPix<double>(randgen,pix,100);
+-       }
+-     else
+-       {
+-       RandomPix<double>(randgen,pix);
+-       }
+-    it.Set(pix);
+-    }
+-
+-  disp->SetDisplacementField(field);
+-
+-  disp->Print ( std::cout );
+-
+-  itk::TransformFileWriter::Pointer nlwriter;
+-  itk::TransformFileReader::Pointer nlreader;
+-
+-  nlreader = itk::TransformFileReader::New();
+-  nlwriter = itk::TransformFileWriter::New();
+-  nlwriter->AddTransform(disp);
+-  nlwriter->SetFileName(nonlinear_transform);
+-  nlreader->SetFileName(nonlinear_transform);
+-
+-  // Testing writing
+-  std::cout << "Testing write of non linear transform (double) : " << std::endl;
+-
+-  try
+-    {
+-    nlwriter->Update();
+-    }
+-  catch( itk::ExceptionObject & excp )
+-    {
+-    std::cerr << "Error while saving the transforms" << std::endl;
+-    std::cerr << excp << std::endl;
+-    std::cout << "[FAILED]" << std::endl;
+-    return EXIT_FAILURE;
+-    }
+-
+-  // Testing writing
+-  std::cout << "Testing read of non linear transform (double): " << std::endl;
+-  try
+-    {
+-    nlreader->Update();
+-    }
+-  catch( itk::ExceptionObject & excp )
+-    {
+-    std::cerr << "Error while reading the transforms" << std::endl;
+-    std::cerr << excp << std::endl;
+-    std::cout << "[FAILED]" << std::endl;
+-    return EXIT_FAILURE;
+-    }
+-  std::cout << "[PASSED]" << std::endl;
+-
+-  std::cout << "Comparing of non linear transform (double) : " << std::endl;
+-  itk::TransformFileReader::TransformListType list=*nlreader->GetTransformList();
+-  std::cout<<"Read :"<<list.size()<<" transformations"<<std::endl;
+-
+-  if(list.front()->GetTransformTypeAsString() != "DisplacementFieldTransform_double_3_3")
+-    {
+-      std::cerr<<"Read back transform of type:"<<list.front()->GetTransformTypeAsString()<<std::endl;
+-      return EXIT_FAILURE;
+-    }
+-  DisplacementFieldTransform::Pointer disp2 = static_cast<DisplacementFieldTransform*>(list.front().GetPointer());
+-  DisplacementFieldType::ConstPointer field2=disp2->GetDisplacementField();
+-
+-  itk::ImageRegionConstIterator<DisplacementFieldType> it2(field2,field2->GetLargestPossibleRegion() );
+-  if(tolerance == 0.0)
+-    {
+-    for(it.GoToBegin(),it2.GoToBegin(); !it.IsAtEnd() && !it2.IsAtEnd(); ++it,++it2)
+-      {
+-      if(it.Value() != it2.Value() )
+-        {
+-        std::cout << "Original Pixel (" << it.Value()
+-                  << ") doesn't match read-in Pixel ("
+-                  << it2.Value() << " ) " << std::endl
+-                  << " in "<< nonlinear_transform  << std::endl;
+-        return EXIT_FAILURE;
+-        }
+-      }
+-    } else { //account for rounding errors
+-    for( it.GoToBegin(),it2.GoToBegin(); !it.IsAtEnd() && !it2.IsAtEnd(); ++it,++it2 )
+-      {
+-      if( ( it.Value() - it2.Value() ).GetSquaredNorm() > tolerance)
+-        {
+-        std::cout << "Original Pixel (" << it.Value()
+-                  << ") doesn't match read-in Pixel ("
+-                  << it2.Value() << " ) "
+-                  << " in "<< nonlinear_transform <<std::endl;
+-        return EXIT_FAILURE;
+-        }
+-      }
+-    }
+-
+-
+-  return EXIT_SUCCESS;
+-}
+-
+-
+-static int check_nonlinear_float(const char *nonlinear_transform)
+-{
+-  double tolerance=1e-5;
+-
+-  typedef itk::TransformFileWriterTemplate<float> TransformFileWriterFloat;
+-  typedef itk::TransformFileReaderTemplate<float> TransformFileReaderFloat;
+-
+-  typedef itk::DisplacementFieldTransform<float,3>         DisplacementFieldTransform;
+-  typedef DisplacementFieldTransform::DisplacementFieldType DisplacementFieldType;
+-
+-  DisplacementFieldTransform::Pointer disp = DisplacementFieldTransform::New();
+-  DisplacementFieldType::Pointer field=DisplacementFieldType::New();
+-
+-  //create zero displacement field
+-  DisplacementFieldType::SizeType    imageSize3D = {{ 10, 10, 10}};
+-  DisplacementFieldType::IndexType   startIndex3D = { {0, 0, 0}};
+-
+-  double spacing[]={2.0, 2.0, 2.0};
+-  double origin[]={-10.0, -10.0, -10.0};
+-  DisplacementFieldType::RegionType  region;
+-
+-  region.SetSize  (imageSize3D);
+-  region.SetIndex (startIndex3D);
+-
+-  field->SetLargestPossibleRegion (region);
+-  field->SetBufferedRegion (region);
+-  field->SetRequestedRegion (region);
+-
+-  field->SetSpacing( spacing );
+-  field->SetOrigin( origin );
+-  field->Allocate ();
+-
+-  DisplacementFieldType::PixelType zeroDisplacement;
+-  zeroDisplacement.Fill( 0.0 );
+-  field->FillBuffer( zeroDisplacement );
+-
+-  vnl_random                          randgen(12345678);
+-  itk::ImageRegionIterator<DisplacementFieldType> it(field,field->GetLargestPossibleRegion() );
+-
+-  for(it.GoToBegin(); !it.IsAtEnd(); ++it)
+-    {
+-    DisplacementFieldType::PixelType pix;
+-     if(tolerance > 0.0)
+-       {
+-       RandomPix<float>(randgen,pix,100);
+-       }
+-     else
+-       {
+-       RandomPix<float>(randgen,pix);
+-       }
+-    it.Set(pix);
+-    }
+-
+-  disp->SetDisplacementField(field);
+-
+-  disp->Print ( std::cout );
+-
+-  TransformFileWriterFloat::Pointer nlwriter;
+-  TransformFileReaderFloat::Pointer nlreader;
+-
+-  nlreader = TransformFileReaderFloat::New();
+-  nlwriter = TransformFileWriterFloat::New();
+-  nlwriter->AddTransform(disp);
+-  nlwriter->SetFileName(nonlinear_transform);
+-  nlreader->SetFileName(nonlinear_transform);
+-
+-  // Testing writing
+-  std::cout << "Testing write of non linear transform (float): " << std::endl;
+-
+-  try
+-  {
+-    nlwriter->Update();
+-  }
+-  catch( itk::ExceptionObject & excp )
+-  {
+-    std::cerr << "Error while saving the transforms" << std::endl;
+-    std::cerr << excp << std::endl;
+-    std::cout << "[FAILED]" << std::endl;
+-    return EXIT_FAILURE;
+-  }
+-
+-  // Testing writing
+-  std::cout << "Testing read of non linear transform (float) : " << std::endl;
+-  try
+-    {
+-    nlreader->Update();
+-    }
+-  catch( itk::ExceptionObject & excp )
+-    {
+-    std::cerr << "Error while reading the transforms" << std::endl;
+-    std::cerr << excp << std::endl;
+-    std::cout << "[FAILED]" << std::endl;
+-    return EXIT_FAILURE;
+-    }
+-  std::cout << "[PASSED]" << std::endl;
+-
+-  std::cout << "Comparing of non linear transform : " << std::endl;
+-  TransformFileReaderFloat::TransformListType list=*nlreader->GetTransformList();
+-  std::cout<<"Read :"<<list.size()<<" transformations"<<std::endl;
+-
+-  if(list.front()->GetTransformTypeAsString() != "DisplacementFieldTransform_float_3_3")
+-    {
+-      std::cerr<<"Read back transform of type:"<<list.front()->GetTransformTypeAsString()<<std::endl;
+-      return EXIT_FAILURE;
+-    }
+-  DisplacementFieldTransform::Pointer disp2 = static_cast<DisplacementFieldTransform*>(list.front().GetPointer());
+-  DisplacementFieldType::ConstPointer field2=disp2->GetDisplacementField();
+-
+-  itk::ImageRegionConstIterator<DisplacementFieldType> it2(field2,field2->GetLargestPossibleRegion() );
+-  if(tolerance == 0.0)
+-    {
+-    for(it.GoToBegin(),it2.GoToBegin(); !it.IsAtEnd() && !it2.IsAtEnd(); ++it,++it2)
+-      {
+-      if(it.Value() != it2.Value() )
+-        {
+-        std::cout << "Original Pixel (" << it.Value()
+-                  << ") doesn't match read-in Pixel ("
+-                  << it2.Value() << " ) " << std::endl
+-                  << " in "<< nonlinear_transform  << std::endl;
+-        return EXIT_FAILURE;
+-        }
+-      }
+-    } else { //account for rounding errors
+-    for( it.GoToBegin(),it2.GoToBegin(); !it.IsAtEnd() && !it2.IsAtEnd(); ++it,++it2 )
+-      {
+-      if( (it.Value() - it2.Value()).GetSquaredNorm() > tolerance)
+-        {
+-        std::cout << "Original Pixel (" << it.Value()
+-                  << ") doesn't match read-in Pixel ("
+-                  << it2.Value() << " ) "
+-                  << " in "<< nonlinear_transform <<std::endl;
+-        return EXIT_FAILURE;
+-        }
+-      }
+-    }
+-
+-
+-  return EXIT_SUCCESS;
+-}
+-
+-static int secondTest()
+-{
+-  std::filebuf fb;
+-  fb.open("Rotation.xfm",std::ios::out);
+-  std::ostream os(&fb);
+-  os << "MNI Transform File"<<std::endl;
+-  os << "Transform_Type = Linear;"<<std::endl;
+-  os << "Linear_Transform ="<<std::endl;
+-  os << "1 0 0 0"<<std::endl;
+-  os << "0 0.866025447845459 -0.5 0"<<std::endl;
+-  os << "0 0.5 0.866025447845459 0;"<<std::endl;
+-  fb.close();
+-
+-  itk::TransformFileReader::Pointer reader;
+-  reader = itk::TransformFileReader::New();
+-  reader->SetFileName("Rotation.xfm");
+-
+-  reader->Update();
+-
+-  const itk::TransformFileReader::TransformListType * list = reader->GetTransformList();
+-  itk::TransformFileReader::TransformListType::const_iterator lit =  list->begin();
+-  while ( lit != list->end() )
+-  {
+-    (*lit)->Print ( std::cout );
+-    lit++;
+-  }
+-  return EXIT_SUCCESS;
+-}
+-
+-int itkIOTransformMINCTest(int argc, char* argv[])
+-{
+-  if (argc > 1)
+-  {
+-    itksys::SystemTools::ChangeDirectory(argv[1]);
+-  }
+-  itk::TransformFactory< itk::DisplacementFieldTransform<double,3> >::RegisterTransform ();
+-  itk::TransformFactory< itk::DisplacementFieldTransform<float,3> >::RegisterTransform ();
+-
+-  int result1 =  check_linear("itkIOTransformMINCTestTransformLinear.xfm");
+-  int result2 =  check_nonlinear_double( "itkIOTransformMINCTestTransformNonLinear.xfm" );
+-  int result3 =  check_nonlinear_float( "itkIOTransformMINCTestTransformNonLinear_float.xfm" );
+-  int result4 =  secondTest();
+-
+-  return !( result1 == EXIT_SUCCESS &&
+-            result2 == EXIT_SUCCESS &&
+-            result3 == EXIT_SUCCESS &&
+-            result4 == EXIT_SUCCESS
+-          );
+-}
+diff --git a/Modules/IO/MINC/test/itkMINCTransformAdapterTest.cxx b/Modules/IO/MINC/test/itkMINCTransformAdapterTest.cxx
+deleted file mode 100644
+index e2ba7c3..0000000
+--- a/Modules/IO/MINC/test/itkMINCTransformAdapterTest.cxx
++++ /dev/null
+@@ -1,244 +0,0 @@
+-/*=========================================================================
+- *
+- *  Copyright Insight Software Consortium
+- *
+- *  Licensed under the Apache License, Version 2.0 (the "License");
+- *  you may not use this file except in compliance with the License.
+- *  You may obtain a copy of the License at
+- *
+- *         http://www.apache.org/licenses/LICENSE-2.0.txt
+- *
+- *  Unless required by applicable law or agreed to in writing, software
+- *  distributed under the License is distributed on an "AS IS" BASIS,
+- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- *  See the License for the specific language governing permissions and
+- *  limitations under the License.
+- *
+- *=========================================================================*/
+-
+-#include <iostream>
+-#include <fstream>
+-#include "itkMINCTransformIOFactory.h"
+-#include "itkTransformFileWriter.h"
+-#include "itkTransformFileReader.h"
+-#include "itkAffineTransform.h"
+-#include "itkTransformFactory.h"
+-#include "itksys/SystemTools.hxx"
+-#include "itkDisplacementFieldTransform.h"
+-#include "itkIOTestHelper.h"
+-#include "itkMINCTransformAdapter.h"
+-#include "vnl/vnl_math.h"
+-
+-
+-static const double tolerance = 1e-5;
+-static const int    point_counter=1000;
+-
+-
+-template<typename T>void RandomPix(vnl_random &randgen,itk::Vector<T,3> &pix,
+-                      double _max=itk::NumericTraits<T>::max() )
+-{
+-  for(unsigned int i = 0; i < 3; i++)
+-    {
+-    pix[i] = randgen.drand64(_max);
+-    }
+-}
+-
+-template<typename T>void RandomPoint(vnl_random &randgen,itk::Point<T,3> &pix,
+-                      double _max=itk::NumericTraits<T>::max() )
+-{
+-  for(unsigned int i = 0; i < 3; i++)
+-    {
+-    pix[i] = randgen.drand64(_max);
+-    }
+-}
+-
+-
+-static int compare_linear(const char *linear_transform)
+-{
+-  itk::ObjectFactoryBase::RegisterFactory(itk::MINCTransformIOFactory::New() );
+-
+-  typedef itk::AffineTransform<double,3> AffineTransformType;
+-  AffineTransformType::Pointer        affine = AffineTransformType::New();
+-  AffineTransformType::InputPointType cor;
+-
+-  AffineTransformType::OutputVectorType rot_axis;
+-  rot_axis[0]=1.0;
+-  rot_axis[1]=1.0;
+-  rot_axis[2]=0.0;
+-  // Set it's parameters
+-  affine->Rotate3D(rot_axis,vnl_math::pi/12);
+-
+-  AffineTransformType::OutputVectorType offset;
+-
+-  offset[0]=0.0;
+-  offset[1]=0.0;
+-  offset[2]=10.0;
+-
+-  affine->Translate(offset);
+-
+-  affine->Scale(1.2);
+-
+-  itk::TransformFileWriter::Pointer writer;
+-
+-  writer = itk::TransformFileWriter::New();
+-  writer->AddTransform(affine);
+-  writer->SetFileName( linear_transform );
+-
+-  try
+-    {
+-    writer->Update();
+-
+-    std::cout << "Comparing of linear transforms ITK vs MINC: "<< affine << std::endl;
+-    itk::MINCTransformAdapter<double,3,3>::Pointer xfm=itk::MINCTransformAdapter<double,3,3>::New();
+-
+-    xfm->OpenXfm(linear_transform);
+-
+-    vnl_random randgen(12345678);
+-
+-    AffineTransformType::InputPointType pnt,pnt2;
+-
+-    for(int i=0;i<point_counter;i++)
+-      {
+-      AffineTransformType::OutputPointType v1;
+-      AffineTransformType::OutputPointType v2;
+-
+-      RandomPoint<double>(randgen,pnt,100);
+-      pnt2=pnt;
+-      v1= affine->TransformPoint( pnt );
+-      v2= xfm->TransformPoint( pnt2 );
+-
+-      if( ( v1-v2 ).GetSquaredNorm() > tolerance)
+-        {
+-        std::cout << "Original Pixel (" << v1
+-                  << ") doesn't match read-in Pixel ("
+-                  << v2 << " ) "
+-                  << " in "<< linear_transform << " at "<< pnt <<std::endl;
+-        return EXIT_FAILURE;
+-        }
+-      }
+-
+-    }
+-  catch( itk::ExceptionObject & excp )
+-    {
+-    std::cerr << "Error while reading the transforms" << std::endl;
+-    std::cerr << excp << std::endl;
+-    std::cout << "[FAILED]" << std::endl;
+-    return EXIT_FAILURE;
+-    }
+-
+-  return EXIT_SUCCESS;
+-}
+-
+-static int compare_nonlinear_double(const char *nonlinear_transform)
+-{
+-
+-  typedef itk::DisplacementFieldTransform<double,3>         DisplacementFieldTransform;
+-  typedef DisplacementFieldTransform::DisplacementFieldType DisplacementFieldType;
+-
+-  DisplacementFieldTransform::Pointer disp = DisplacementFieldTransform::New();
+-  DisplacementFieldType::Pointer field=DisplacementFieldType::New();
+-
+-  //create zero displacement field
+-  DisplacementFieldType::SizeType    imageSize3D = {{ 10, 10, 10}};
+-  DisplacementFieldType::IndexType   startIndex3D = { {0, 0, 0}};
+-
+-  double spacing[]={2.0, 2.0, 2.0};
+-  double origin[]={-10.0, -10.0, -10.0};
+-  DisplacementFieldType::RegionType  region;
+-
+-  region.SetSize  (imageSize3D);
+-  region.SetIndex (startIndex3D);
+-
+-  field->SetLargestPossibleRegion (region);
+-  field->SetBufferedRegion (region);
+-  field->SetRequestedRegion (region);
+-
+-  field->SetSpacing( spacing );
+-  field->SetOrigin( origin );
+-  field->Allocate ();
+-
+-  DisplacementFieldType::PixelType zeroDisplacement;
+-  zeroDisplacement.Fill( 0.0 );
+-  field->FillBuffer( zeroDisplacement );
+-
+-  vnl_random                          randgen(12345678);
+-  itk::ImageRegionIteratorWithIndex<DisplacementFieldType> it(field,field->GetLargestPossibleRegion() );
+-
+-  for(it.GoToBegin(); !it.IsAtEnd(); ++it)
+-    {
+-    DisplacementFieldType::PixelType pix;
+-     if( tolerance > 0.0 )
+-       {
+-       RandomPix<double>(randgen,pix,100);
+-       }
+-     else
+-       {
+-       RandomPix<double>(randgen,pix);
+-       }
+-    it.Set(pix);
+-    }
+-
+-  disp->SetDisplacementField(field);
+-
+-  itk::TransformFileWriter::Pointer nlwriter;
+-
+-  nlwriter = itk::TransformFileWriter::New();
+-  nlwriter->AddTransform(disp);
+-  nlwriter->SetFileName(nonlinear_transform);
+-
+-  try
+-    {
+-    nlwriter->Update();
+-    }
+-  catch( itk::ExceptionObject & excp )
+-    {
+-    std::cerr << "Error while saving the transforms" << std::endl;
+-    std::cerr << excp << std::endl;
+-    std::cout << "[FAILED]" << std::endl;
+-    return EXIT_FAILURE;
+-    }
+-
+-  std::cout << "Comparing of non linear transforms ITK vs MINC " << std::endl;
+-  itk::MINCTransformAdapter<double,3,3>::Pointer xfm=itk::MINCTransformAdapter<double,3,3>::New();
+-  xfm->OpenXfm(nonlinear_transform);
+-
+-  for( it.GoToBegin(); !it.IsAtEnd(); ++it )
+-    {
+-    DisplacementFieldTransform::OutputPointType v1;
+-    DisplacementFieldTransform::OutputPointType v2;
+-    DisplacementFieldType::PointType pnt;
+-
+-    field->TransformIndexToPhysicalPoint( it.GetIndex (), pnt);
+-
+-    v1= disp->TransformPoint( pnt );
+-    v2= xfm->TransformPoint( pnt );
+-
+-    if( ( v1-v2 ).GetSquaredNorm() > tolerance)
+-      {
+-      std::cout << "Original Pixel (" << v1
+-                << ") doesn't match read-in Pixel ("
+-                << v2 << " ) "
+-                << " in "<< nonlinear_transform <<std::endl;
+-      return EXIT_FAILURE;
+-      }
+-
+-    }
+-
+-
+-  return EXIT_SUCCESS;
+-}
+-
+-int itkMINCTransformAdapterTest(int argc, char* argv[])
+-{
+-  if (argc > 1)
+-  {
+-    itksys::SystemTools::ChangeDirectory(argv[1]);
+-  }
+-  itk::TransformFactory< itk::DisplacementFieldTransform<double,3> >::RegisterTransform ();
+-  itk::ObjectFactoryBase::RegisterFactory(itk::MINCTransformIOFactory::New() );
+-
+-  int result1 = compare_linear( "itkMINCTransformAdapterTestTransformLinear.xfm" );
+-  int result2 =  compare_nonlinear_double( "itkMINCTransformAdapterTestTransformNonLinear.xfm" );
+-
+-  return !( result1 == EXIT_SUCCESS && result2 == EXIT_SUCCESS );
+-}
+diff --git a/Modules/IO/TransformMINC/CMakeLists.txt b/Modules/IO/TransformMINC/CMakeLists.txt
+new file mode 100644
+index 0000000..339b349
+--- /dev/null
++++ b/Modules/IO/TransformMINC/CMakeLists.txt
+@@ -0,0 +1,12 @@
++project(ITKIOTransformMINC)
++set(ITKIOTransformMINC_LIBRARIES ITKIOTransformMINC)
++
++if(NOT ITK_USE_SYSTEM_HDF5)
++  include_directories(
++    "${ITKHDF5_SOURCE_DIR}/src/itkhdf5"
++    "${ITKHDF5_SOURCE_DIR}/src/itkhdf5/src"
++    "${ITKHDF5_BINARY_DIR}/src/itkhdf5"
++    )
++endif()
++
++itk_module_impl()
+diff --git a/Modules/IO/TransformMINC/README b/Modules/IO/TransformMINC/README
+new file mode 100644
+index 0000000..8ff0179
+--- /dev/null
++++ b/Modules/IO/TransformMINC/README
+@@ -0,0 +1,5 @@
++ITK4-IOMINC
++===========
++
++TransformMINC module for ITK integration, to read and write MINC-style .xfm
++files
+diff --git a/Modules/IO/TransformMINC/include/itkMINCTransformAdapter.h b/Modules/IO/TransformMINC/include/itkMINCTransformAdapter.h
+new file mode 100644
+index 0000000..f95f258
+--- /dev/null
++++ b/Modules/IO/TransformMINC/include/itkMINCTransformAdapter.h
+@@ -0,0 +1,325 @@
++/*=========================================================================
++ *
++ *  Copyright Insight Software Consortium
++ *
++ *  Licensed under the Apache License, Version 2.0 (the "License");
++ *  you may not use this file except in compliance with the License.
++ *  You may obtain a copy of the License at
++ *
++ *         http://www.apache.org/licenses/LICENSE-2.0.txt
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ *
++ *=========================================================================*/
++#ifndef itkMINCTransformAdapter_h
++#define itkMINCTransformAdapter_h
++
++#include "itkObject.h"
++#include "itkPoint.h"
++#include "itkVector.h"
++#include "itkCovariantVector.h"
++#include "vnl/vnl_matrix_fixed.h"
++#include "vnl/vnl_vector_fixed.h"
++#include "vnl/vnl_det.h"
++#include "vnl/vnl_vector_fixed_ref.h"
++#include "vnl/vnl_vector.h"
++#include "itkTransform.h"
++#include "itkObjectFactory.h"
++
++//minc header
++#include "itk_minc2.h"
++
++namespace itk
++{
++
++/** \class MINCTransformAdapter
++  * \ingroup  ITKIOTransformMINC
++  * \brief ITK wrapper around MINC general transform functions, supports all the transformations that MINC XFM supports
++  *
++  * \author Vladimir S. FONOV
++  *         Brain Imaging Center, Montreal Neurological Institute, McGill University, Montreal Canada 2012
++  * \ingroup ITKIOTransformMINC
++  */
++template<typename TParametersValueType=double, unsigned int NInputDimensions=3,unsigned int NOutputDimensions=3>
++  class MINCTransformAdapter : public Transform<TParametersValueType, NInputDimensions, NOutputDimensions>
++{
++public:
++  /** Standard class typedefs. */
++  typedef MINCTransformAdapter  Self;
++
++  typedef Transform<TParametersValueType, NInputDimensions, NOutputDimensions> Superclass;
++
++  typedef SmartPointer<Self>        Pointer;
++  typedef SmartPointer<const Self>  ConstPointer;
++
++  typedef typename Superclass::NumberOfParametersType  NumberOfParametersType;
++
++  /** New method for creating an object using a factory. */
++  itkNewMacro(Self);
++
++  /** Run-time type information (and related methods). */
++  itkTypeMacro( MINCTransformAdapter, Transform );
++
++  /** Dimension of the domain space. */
++  itkStaticConstMacro(InputSpaceDimension, unsigned int, NInputDimensions);
++  itkStaticConstMacro(OutputSpaceDimension, unsigned int, NOutputDimensions);
++
++  /** Type of the input parameters. */
++  typedef  double ScalarType;
++
++  /** Type of the input parameters. */
++  typedef typename Superclass::ParametersType      ParametersType;
++  typedef typename Superclass::FixedParametersType FixedParametersType;
++
++  /** Type of the Jacobian matrix. */
++  typedef typename Superclass::JacobianType  JacobianType;
++
++  /** Standard vector type for this class. */
++  typedef Vector<TParametersValueType, itkGetStaticConstMacro(InputSpaceDimension)>  InputVectorType;
++  typedef Vector<TParametersValueType, itkGetStaticConstMacro(OutputSpaceDimension)> OutputVectorType;
++
++  /** Standard variable length vector type for this class
++  *  this provides an interface for the VectorImage class */
++  typedef VariableLengthVector<TParametersValueType> InputVectorPixelType;
++  typedef VariableLengthVector<TParametersValueType> OutputVectorPixelType;
++
++  /** Standard covariant vector type for this class */
++  typedef CovariantVector<TParametersValueType, itkGetStaticConstMacro(InputSpaceDimension)>  InputCovariantVectorType;
++
++  typedef CovariantVector<TParametersValueType, itkGetStaticConstMacro(OutputSpaceDimension)> OutputCovariantVectorType;
++
++  /** Standard coordinate point type for this class */
++  typedef Point<TParametersValueType,NInputDimensions > InputPointType;
++  typedef Point<TParametersValueType,NInputDimensions > OutputPointType;
++
++  /** Standard vnl_vector type for this class. */
++  typedef vnl_vector_fixed<TParametersValueType, NInputDimensions>  InputVnlVectorType;
++  typedef vnl_vector_fixed<TParametersValueType, NOutputDimensions> OutputVnlVectorType;
++
++  /**  Method to transform a point. */
++  virtual OutputPointType TransformPoint(const InputPointType  &point ) const ITK_OVERRIDE
++  {
++    if(!m_Initialized)
++      {
++      return point;
++      }
++
++    if(m_Invert && !m_Initialized_invert)
++      {
++      return point;
++      }
++
++    OutputPointType pnt;
++    //works only for 3D->3D transforms
++    general_transform_point((m_Invert ? &m_Xfm_inv : &m_Xfm), point[0], point[1], point[2], &pnt[0], &pnt[1], &pnt[2]);
++
++    return pnt;
++  }
++
++  //! use finate element difference to estimate local jacobian
++  void estimate_local_jacobian(const InputPointType  &orig, vnl_matrix_fixed< double, 3, 3 > &m)
++  {
++    double u1,v1,w1;
++    double u2,v2,w2;
++    const double delta=1e-4;
++
++    general_transform_point((m_Invert ? &m_Xfm_inv : &m_Xfm) , orig[0]-delta, orig[1], orig[2],&u1, &v1, &w1);
++    general_transform_point((m_Invert ? &m_Xfm_inv : &m_Xfm) , orig[0]+delta, orig[1], orig[2],&u2, &v2, &w2);
++    m(0,0)=(u2-u1)/(2*delta);
++    m(0,1)=(v2-v1)/(2*delta);
++    m(0,2)=(w2-w1)/(2*delta);
++
++    general_transform_point((m_Invert ? &m_Xfm_inv : &m_Xfm) , orig[0], orig[1]-delta, orig[2],&u1, &v1, &w1);
++    general_transform_point((m_Invert ? &m_Xfm_inv : &m_Xfm) , orig[0], orig[1]+delta, orig[2],&u2, &v2, &w2);
++    m(1,0)=(u2-u1)/(2*delta);
++    m(1,1)=(v2-v1)/(2*delta);
++    m(1,2)=(w2-w1)/(2*delta);
++
++    general_transform_point((m_Invert ? &m_Xfm_inv : &m_Xfm), orig[0], orig[1], orig[2]-delta,&u1, &v1, &w1);
++    general_transform_point((m_Invert ? &m_Xfm_inv : &m_Xfm), orig[0], orig[1], orig[2]+delta,&u2, &v2, &w2);
++    m(2,0)=(u2-u1)/(2*delta);
++    m(2,1)=(v2-v1)/(2*delta);
++    m(2,2)=(w2-w1)/(2*delta);
++  }
++
++  /**  Method to transform a vector. */
++  OutputVectorType TransformVector( const InputVectorType& vector, const InputPointType &  ) const ITK_OVERRIDE
++  {
++    itkExceptionMacro( << "Not Implemented" );
++    return vector;
++  }
++
++  /**  Method to transform a vector. */
++  OutputVnlVectorType TransformVector( const InputVnlVectorType& vector, const InputPointType & ) const ITK_OVERRIDE
++  {
++    itkExceptionMacro( << "Not Implemented" );
++    return vector;
++  }
++
++  /**  Method to transform a vector. */
++  OutputVectorType TransformVector( const InputVectorType& vector) const ITK_OVERRIDE
++  {
++    return Superclass::TransformVector(vector);
++  }
++
++  /**  Method to transform a vector. */
++  OutputVnlVectorType TransformVector( const InputVnlVectorType& vector) const ITK_OVERRIDE
++  {
++    return Superclass::TransformVector(vector);
++  }
++
++  /**  Method to transform a vector. */
++  OutputVectorPixelType TransformVector( const InputVectorPixelType& vector) const ITK_OVERRIDE
++  {
++    return Superclass::TransformVector(vector);
++  }
++
++  /**  Method to transform a vector. */
++  OutputVectorPixelType TransformVector(
++    const InputVectorPixelType& vector,
++    const InputPointType & ) const ITK_OVERRIDE
++  {
++    itkExceptionMacro( << "Not Implemented" );
++    return vector;
++  }
++
++  /**  Method to transform a CovariantVector. */
++  virtual OutputCovariantVectorType TransformCovariantVector(
++    const InputCovariantVectorType &vector
++  , const InputPointType & ) const ITK_OVERRIDE
++  {
++    itkExceptionMacro( << "Not Implemented" );
++    return vector;
++  }
++
++/**  Method to transform a CovariantVector. */
++  virtual OutputCovariantVectorType TransformCovariantVector(
++    const InputCovariantVectorType &vector) const ITK_OVERRIDE
++  {
++    return Superclass::TransformCovariantVector(vector);
++  }
++
++/**  Method to transform a CovariantVector. */
++  virtual OutputVectorPixelType TransformCovariantVector(
++    const InputVectorPixelType &vector) const ITK_OVERRIDE
++  {
++    return Superclass::TransformCovariantVector(vector);
++  }
++
++  /**  Method to transform a CovariantVector. */
++  virtual OutputVectorPixelType TransformCovariantVector(
++    const InputVectorPixelType &vector, const InputPointType & ) const ITK_OVERRIDE
++  {
++    itkExceptionMacro( << "Not Implemented" );
++    return vector;
++  }
++
++  /** Set the transformation to an Identity
++    */
++  virtual void SetIdentity( void )
++  {
++    cleanup();
++  }
++
++  virtual void SetFixedParameters(const FixedParametersType &) ITK_OVERRIDE
++  {
++    itkExceptionMacro( << "Not Implemented" );
++  }
++
++  virtual void ComputeJacobianWithRespectToParameters(
++              const InputPointType &,
++              JacobianType &) const ITK_OVERRIDE
++  {
++    itkExceptionMacro( << "Not Implemented" );
++  }
++
++  virtual NumberOfParametersType GetNumberOfParameters(void) const ITK_OVERRIDE
++  {
++    //this transform is defined by XFM file
++    itkExceptionMacro( << "Not Defined" );
++    return 0;
++  }
++
++  /** Set the Transformation Parameters
++    * and update the internal transformation. */
++  virtual void  SetParameters(const ParametersType &) ITK_OVERRIDE
++  {
++    itkExceptionMacro( << "Not Implemented" );
++  }
++
++  virtual const ParametersType & GetParameters(void) const ITK_OVERRIDE
++  {
++    itkExceptionMacro( << "Not Implemented" );
++    return m_Parameters;
++  }
++
++  void OpenXfm(const char *xfm)
++  {
++    cleanup();
++    if(input_transform_file((char*)xfm, &m_Xfm) != VIO_OK)
++      itkExceptionMacro( << "Error reading XFM:" << xfm );
++    m_Initialized=true;
++  }
++
++  void Invert(void)
++  {
++    if(!m_Initialized)
++      itkExceptionMacro( << "XFM not initialized" );
++    if(!m_Initialized_invert)
++      {
++      create_inverse_general_transform(&m_Xfm,&m_Xfm_inv);
++      m_Initialized_invert=true;
++      }
++    m_Invert= !m_Invert;
++  }
++
++protected:
++  MINCTransformAdapter():
++    Transform<TParametersValueType, NInputDimensions, NOutputDimensions>(0),
++    m_Invert(false),
++    m_Initialized(false),
++    m_Initialized_invert(false)
++  {
++    if(NInputDimensions!=3 || NOutputDimensions!=3)
++      itkExceptionMacro(<< "Sorry, only 3D to 3d minc xfm transform is currently implemented");
++  }
++
++  virtual ~MINCTransformAdapter()
++  {
++    cleanup();
++  }
++
++  void cleanup(void)
++  {
++    if(m_Initialized)
++      {
++      delete_general_transform(&m_Xfm);
++      }
++    if(m_Initialized_invert)
++      {
++      delete_general_transform(&m_Xfm_inv);
++      }
++    m_Initialized=false;
++    m_Initialized_invert=false;
++  }
++
++  ParametersType m_Parameters;
++
++  mutable VIO_General_transform m_Xfm;
++  mutable VIO_General_transform m_Xfm_inv;
++
++  bool m_Invert;
++  bool m_Initialized;
++  bool m_Initialized_invert;
++
++private:
++  MINCTransformAdapter ( const Self & ); //purposely not implemented
++  void operator= ( const Self & ); //purposely not implemented
++};
++
++}
++#endif //itkMINCTransformAdapter_h
+diff --git a/Modules/IO/TransformMINC/include/itkMINCTransformIO.h b/Modules/IO/TransformMINC/include/itkMINCTransformIO.h
+new file mode 100644
+index 0000000..360d671
+--- /dev/null
++++ b/Modules/IO/TransformMINC/include/itkMINCTransformIO.h
+@@ -0,0 +1,103 @@
++/*=========================================================================
++ *
++ *  Copyright Insight Software Consortium
++ *
++ *  Licensed under the Apache License, Version 2.0 (the "License");
++ *  you may not use this file except in compliance with the License.
++ *  You may obtain a copy of the License at
++ *
++ *         http://www.apache.org/licenses/LICENSE-2.0.txt
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ *
++ *=========================================================================*/
++#ifndef itkMINCTransformIO_h
++#define itkMINCTransformIO_h
++
++#include "itkTransformIOBase.h"
++
++#include <string>
++#include <vector>
++#include <itk_minc2.h>
++#include "itkMatrixOffsetTransformBase.h"
++
++namespace itk
++{
++
++/** \class MINCTransformIOTemplate
++ *
++* \brief Read and write transforms in Minc XFM Format
++*
++* \author Vladimir S. FONOV
++*         Brain Imaging Center, Montreal Neurological Institute, McGill University, Montreal Canada 2012
++*
++* \ingroup ITKIOTransformMINC
++*/
++template<typename TParametersValueType>
++class MINCTransformIOTemplate: public TransformIOBaseTemplate<TParametersValueType>
++{
++public:
++  typedef MINCTransformIOTemplate                         Self;
++  typedef TransformIOBaseTemplate< TParametersValueType > Superclass;
++  typedef SmartPointer<Self>                              Pointer;
++  typedef SmartPointer<const Self>                        ConstPointer;
++
++  typedef typename Superclass::TransformType          TransformType;
++  typedef typename Superclass::TransformPointer       TransformPointer;
++  typedef typename Superclass::TransformListType      TransformListType;
++  typedef typename Superclass::ConstTransformListType ConstTransformListType;
++  typedef typename TransformType::ParametersType      ParametersType;
++
++  typedef MatrixOffsetTransformBase<TParametersValueType, 3, 3> MatrixOffsetTransformBaseType;
++
++  typedef typename MatrixOffsetTransformBaseType::MatrixType    MatrixType;
++  typedef typename MatrixOffsetTransformBaseType::OffsetType    OffsetType;
++
++  /** Run-time type information (and related methods). */
++  itkTypeMacro( MINCTransformIOTemplate, TransformIOBaseTemplate );
++  itkNewMacro( Self );
++
++  /** Determine the file type. Returns true if this ImageIO can read the
++  * file specified. */
++  virtual bool CanReadFile( const char * fileName ) ITK_OVERRIDE;
++
++  /** Determine the file type. Returns true if this ImageIO can write the
++  * file specified. */
++  virtual bool CanWriteFile( const char * fileName ) ITK_OVERRIDE;
++
++  /** Reads the data from disk into the memory buffer provided. */
++  virtual void Read() ITK_OVERRIDE;
++
++  virtual void Write() ITK_OVERRIDE;
++
++protected:
++  MINCTransformIOTemplate();
++  virtual ~MINCTransformIOTemplate();
++
++  VIO_General_transform m_XFM;
++  bool                  m_XFM_initialized;
++
++private:
++  void _cleanup();
++  void WriteOneTransform(const int transformIndex,
++                         const TransformType *transform,
++                         std::vector<VIO_General_transform> &_xfm,
++                         const char * xfm_file_base,int & serial);
++
++  void ReadOneTransform(VIO_General_transform *xfm);
++};
++
++/** This helps to meet backward compatibility */
++typedef MINCTransformIOTemplate<double> MINCTransformIO;
++
++} // end namespace itk
++
++#ifndef ITK_MANUAL_INSTANTIATION
++#include "itkMINCTransformIO.hxx"
++#endif
++
++#endif // itkMINCTransformIO_h
+diff --git a/Modules/IO/TransformMINC/include/itkMINCTransformIO.hxx b/Modules/IO/TransformMINC/include/itkMINCTransformIO.hxx
+new file mode 100644
+index 0000000..e30a9df
+--- /dev/null
++++ b/Modules/IO/TransformMINC/include/itkMINCTransformIO.hxx
+@@ -0,0 +1,362 @@
++/*=========================================================================
++ *
++ *  Copyright Insight Software Consortium
++ *
++ *  Licensed under the Apache License, Version 2.0 (the "License");
++ *  you may not use this file except in compliance with the License.
++ *  You may obtain a copy of the License at
++ *
++ *         http://www.apache.org/licenses/LICENSE-2.0.txt
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ *
++ *=========================================================================*/
++#ifndef itkMINCTransformIO_hxx
++#define itkMINCTransformIO_hxx
++
++#include "itksys/SystemTools.hxx"
++#include "itksys/SystemInformation.hxx"
++#include "itkCompositeTransform.h"
++#include "itkCompositeTransformIOHelper.h"
++#include "itkVersion.h"
++#include "itkMINCTransformIO.h"
++#include "itkMINCImageIO.h"
++#include "itkMINCImageIOFactory.h"
++#include "itkImageFileReader.h"
++#include "itkImageFileWriter.h"
++#include "itkAffineTransform.h"
++#include "itkImage.h"
++#include "itkVector.h"
++#include "itkDisplacementFieldTransform.h"
++#include "itkMetaDataObject.h"
++
++namespace itk
++{
++
++template<typename TParametersValueType>
++MINCTransformIOTemplate<TParametersValueType>
++::MINCTransformIOTemplate()
++{
++  m_XFM_initialized=false;
++}
++
++template<typename TParametersValueType>
++MINCTransformIOTemplate<TParametersValueType>
++::~MINCTransformIOTemplate()
++{
++  _cleanup();
++}
++
++template<typename TParametersValueType>
++void
++MINCTransformIOTemplate<TParametersValueType>
++::_cleanup(void)
++{
++  if(m_XFM_initialized)
++      delete_general_transform(&m_XFM);
++  m_XFM_initialized=false;
++}
++
++template<typename TParametersValueType>
++bool
++MINCTransformIOTemplate<TParametersValueType>
++::CanReadFile(const char *fileName)
++{
++  std::string ext(itksys::SystemTools::GetFilenameLastExtension(fileName));
++  return (ext == ".xfm" || ext==".XFM");
++}
++
++template<typename TParametersValueType>
++bool
++MINCTransformIOTemplate<TParametersValueType>
++::CanWriteFile(const char *fileName)
++{
++  std::string ext(itksys::SystemTools::GetFilenameLastExtension(fileName));
++  return (ext == ".xfm" || ext==".XFM");
++}
++
++template<typename TParametersValueType>
++void
++MINCTransformIOTemplate<TParametersValueType>
++::ReadOneTransform(VIO_General_transform *xfm)
++{
++  const std::string typeNameString = Superclass::GetTypeNameString();
++  switch(get_transform_type(xfm))
++  {
++    case LINEAR:
++      {
++      VIO_Transform *lin=get_linear_transform_ptr(xfm);
++
++      TransformPointer transform;
++      std::string transformTypeName = "AffineTransform_";
++      transformTypeName += typeNameString;
++      transformTypeName += "_3_3";
++      this->CreateTransform(transform, transformTypeName);
++      ParametersType parameterArray;
++      parameterArray.SetSize(12);
++
++      for(int j = 0; j < 3; ++j)
++        {
++        for(int i = 0; i < 3; ++i)
++          {
++          parameterArray.SetElement(i+j*3, Transform_elem(*lin,j,i));
++          }
++        parameterArray.SetElement(j+9, Transform_elem(*lin,j,3));
++        }
++
++      if(xfm->inverse_flag)
++        {
++        typedef AffineTransform<TParametersValueType, 3> AffineTransformType;
++        typename AffineTransformType::Pointer tmp = AffineTransformType::New();
++        tmp->SetParametersByValue(parameterArray);
++        tmp->GetInverse(static_cast< AffineTransformType* >( transform.GetPointer()) );
++        }
++      else
++        {
++        transform->SetParametersByValue(parameterArray);
++        }
++      this->GetReadTransformList().push_back(transform);
++
++      break;
++      }
++    case CONCATENATED_TRANSFORM:
++      {
++      for(int i = 0; i < get_n_concated_transforms(xfm); ++i)
++        {
++        this->ReadOneTransform(get_nth_general_transform(xfm, i));
++        }
++      break;
++      }
++    case THIN_PLATE_SPLINE:
++      itkExceptionMacro( << "Reading THIN_PLATE_SPLINE transform is not supported yet" );
++      break;
++    case USER_TRANSFORM:
++      itkExceptionMacro( << "Reading USER_TRANSFORM transform is not supported yet" );
++      break;
++    case GRID_TRANSFORM :
++    {
++      if(xfm->displacement_volume_file)
++        {
++        typedef DisplacementFieldTransform<TParametersValueType, 3> DisplacementFieldTransformType;
++        typedef typename DisplacementFieldTransformType::DisplacementFieldType GridImageType;
++        typedef ImageFileReader< GridImageType >                               MincReaderType;
++
++        MINCImageIO::Pointer mincIO             = MINCImageIO::New();
++        typename MincReaderType::Pointer reader = MincReaderType::New();
++        reader->SetImageIO( mincIO );
++        reader->SetFileName( xfm->displacement_volume_file );
++        reader->Update();
++
++        typename GridImageType::Pointer grid = reader->GetOutput();
++
++        TransformPointer transform;
++        std::string transformTypeName = "DisplacementFieldTransform_";
++        transformTypeName += typeNameString;
++        transformTypeName += "_3_3";
++        this->CreateTransform(transform, transformTypeName);
++        DisplacementFieldTransformType * gridTransform = static_cast< DisplacementFieldTransformType* >( transform.GetPointer());
++        if( xfm->inverse_flag ) //TODO: invert grid transform?
++          {
++          gridTransform->SetInverseDisplacementField( grid );
++          }
++        else
++          {
++          gridTransform->SetDisplacementField( grid );
++          }
++
++        this->GetReadTransformList().push_back( transform );
++
++        break;
++        }
++      else
++        {
++        itkExceptionMacro( << "Got grid transform without file name !" );
++        }
++    }
++    default:
++      itkExceptionMacro( << "Reading Unknown transform is not supported!" );
++      break;
++  }
++}
++
++template<typename TParametersValueType>
++void
++MINCTransformIOTemplate<TParametersValueType>
++::Read()
++{
++  if(input_transform_file((char*)this->GetFileName(), &m_XFM) != VIO_OK)
++    {
++    itkExceptionMacro( << "Error reading XFM:" << this->GetFileName() );
++    }
++  this->m_XFM_initialized=true;
++
++  this->ReadOneTransform(&m_XFM);
++
++  _cleanup();
++}
++
++template<typename TParametersValueType>
++void
++MINCTransformIOTemplate<TParametersValueType>
++::WriteOneTransform(const int transformIndex,
++                    const TransformType *curTransform,
++                    std::vector<VIO_General_transform> &xfm,
++                    const char * xfm_file_base,int & serial )
++{
++  const std::string transformType = curTransform->GetTransformTypeAsString();
++
++  const MatrixOffsetTransformBaseType * matrixOffsetTransform =
++        dynamic_cast<const MatrixOffsetTransformBaseType *>( curTransform );
++
++  //
++  // write out transform type.
++  //
++  // composite transform doesn't store own parameters
++  if(transformType.find("CompositeTransform") != std::string::npos)
++    {
++      if(transformIndex != 0)
++        {
++        itkExceptionMacro(<< "Composite Transform can only be 1st transform in a file");
++        }
++    }
++  else
++    {
++    if(matrixOffsetTransform)
++      {
++      VIO_Transform lin;
++      memset(&lin, 0, sizeof(VIO_Transform));
++
++      MatrixType matrix = matrixOffsetTransform->GetMatrix();
++      OffsetType offset = matrixOffsetTransform->GetOffset();
++
++      for(int j=0; j < 3; ++j)
++        {
++        for(int i=0; i < 3; ++i)
++          {
++          Transform_elem(lin,j,i)=matrix(j,i);
++          }
++        Transform_elem(lin,j,3)=offset[j];
++        }
++      //add 4th normalization row (not stored)
++      Transform_elem(lin,3,3)=1.0;
++
++      xfm.push_back(VIO_General_transform());
++      memset(&xfm[xfm.size()-1], 0, sizeof(VIO_General_transform));
++      create_linear_transform(&xfm[xfm.size()-1], &lin);
++      }
++    else if( transformType.find("DisplacementFieldTransform_") != std::string::npos
++             && transformType.find("_3_3") != std::string::npos
++             && curTransform->GetFixedParameters().Size() == 18 )
++      {
++      bool _inverse_grid=false;
++      typedef DisplacementFieldTransform<TParametersValueType, 3> DisplacementFieldTransformType;
++      typedef typename DisplacementFieldTransformType::DisplacementFieldType GridImageType;
++      typedef ImageFileWriter< GridImageType > MincWriterType;
++      DisplacementFieldTransformType* _grid_transform = static_cast< DisplacementFieldTransformType* >( const_cast< TransformType* >( curTransform ));
++      char tmp[1024];
++      sprintf(tmp,"%s_grid_%d.mnc",xfm_file_base,serial);
++      ++serial;
++
++      MINCImageIO::Pointer mincIO = MINCImageIO::New();
++      typename MincWriterType::Pointer writer = MincWriterType::New();
++      writer->SetImageIO( mincIO );
++      writer->SetFileName( tmp );
++
++      if( _grid_transform->GetDisplacementField() )
++        {
++        writer->SetInput( _grid_transform->GetModifiableDisplacementField() );
++        }
++      else if( _grid_transform->GetInverseDisplacementField() )
++        {
++        writer->SetInput( _grid_transform->GetModifiableInverseDisplacementField() );
++        _inverse_grid=true;
++        }
++      else
++        {
++        itkExceptionMacro(<< "Trying to write-out displacement transform without displacement field");
++        }
++      writer->Update();
++
++      xfm.push_back( VIO_General_transform() );
++      create_grid_transform_no_copy( &xfm[xfm.size()-1], ITK_NULLPTR, ITK_NULLPTR ); //relying on volume_io using the same name
++      if(_inverse_grid)
++        {
++        xfm[xfm.size()-1].inverse_flag=TRUE;
++        }
++      }
++    else
++      {
++      itkExceptionMacro(<< "Transform type:" << transformType.c_str() << "is Unsupported");
++      }
++  }
++}
++
++template<typename TParametersValueType>
++void
++MINCTransformIOTemplate<TParametersValueType>
++::Write()
++{
++  std::string xfm_filename = this->GetFileName();
++
++  std::string::size_type xfmPos = xfm_filename.rfind(".xfm");
++
++  if (xfmPos == std::string::npos)
++    {
++    xfmPos = xfm_filename.rfind(".XFM");
++    }
++  std::string xfm_file_base(xfm_filename,0,xfmPos);
++
++  std::vector<VIO_General_transform> xfm;
++
++  ConstTransformListType &transformList = this->GetWriteTransformList();
++
++  std::string compositeTransformType = transformList.front()->GetTransformTypeAsString();
++
++  CompositeTransformIOHelperTemplate<TParametersValueType> helper;
++
++  // if the first transform in the list is a
++  // composite transform, use its internal list
++  // instead of the IO
++  if( compositeTransformType.find("CompositeTransform") != std::string::npos )
++    {
++    transformList = helper.GetTransformList(transformList.front().GetPointer());
++    }
++
++  typename ConstTransformListType::const_iterator end = transformList.end();
++
++  int count = 0;
++  int serial = 0;
++  for( typename ConstTransformListType::const_iterator it = transformList.begin();
++      it != end; ++it,++count )
++    {
++    this->WriteOneTransform(count, (*it).GetPointer(), xfm, xfm_file_base.c_str(), serial);
++    }
++
++  VIO_General_transform transform = xfm[0];
++
++  for( size_t i=1; i < xfm.size(); ++i )
++    {
++    VIO_General_transform concated;
++    concat_general_transforms( &transform, &xfm[i], &concated );
++    delete_general_transform( &transform );
++    delete_general_transform( &xfm[i] );
++    transform = concated;
++    }
++
++  VIO_Status wrt = output_transform_file((char*)(xfm_filename.c_str()),(char*)"ITK-XFM writer",&transform);
++
++  delete_general_transform(&transform);
++
++  if(wrt!=VIO_OK)
++    {
++    itkExceptionMacro( << "Error writing XFM:" << xfm_filename.c_str() );
++    }
++}
++
++} // end namespace itk
++
++#endif
+diff --git a/Modules/IO/TransformMINC/include/itkMINCTransformIOFactory.h b/Modules/IO/TransformMINC/include/itkMINCTransformIOFactory.h
+new file mode 100644
+index 0000000..f47e46e
+--- /dev/null
++++ b/Modules/IO/TransformMINC/include/itkMINCTransformIOFactory.h
+@@ -0,0 +1,71 @@
++/*=========================================================================
++ *
++ *  Copyright Insight Software Consortium
++ *
++ *  Licensed under the Apache License, Version 2.0 (the "License");
++ *  you may not use this file except in compliance with the License.
++ *  You may obtain a copy of the License at
++ *
++ *         http://www.apache.org/licenses/LICENSE-2.0.txt
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ *
++ *=========================================================================*/
++
++#ifndef itkMINCTransformIOFactory_h
++#define itkMINCTransformIOFactory_h
++
++#include "itkObjectFactoryBase.h"
++#include "itkTransformIOBase.h"
++
++namespace itk
++{
++/** \class MINCTransformIOFactory
++   * \brief Create instances of MincTransformIO objects using an object factory.
++   *
++   * \ingroup ITKIOTransformMINC
++   */
++  class MINCTransformIOFactory:public ObjectFactoryBase
++  {
++  public:
++    /** Standard class typedefs. */
++    typedef MINCTransformIOFactory     Self;
++    typedef ObjectFactoryBase          Superclass;
++    typedef SmartPointer< Self >       Pointer;
++    typedef SmartPointer< const Self > ConstPointer;
++
++    /** Class methods used to interface with the registered factories. */
++    virtual const char * GetITKSourceVersion() const ITK_OVERRIDE;
++
++    virtual const char * GetDescription() const ITK_OVERRIDE;
++
++    /** Method for class instantiation. */
++    itkFactorylessNewMacro(Self);
++
++    /** Run-time type information (and related methods). */
++    itkTypeMacro(MINCTransformIOFactory, ObjectFactoryBase);
++
++    /** Register one factory of this type  */
++    static void RegisterOneFactory(void)
++    {
++      MINCTransformIOFactory::Pointer metaFactory = MINCTransformIOFactory::New();
++
++      ObjectFactoryBase::RegisterFactory(metaFactory);
++    }
++
++  protected:
++    MINCTransformIOFactory();
++    ~MINCTransformIOFactory();
++    virtual void PrintSelf(std::ostream & os, Indent indent) const ITK_OVERRIDE;
++
++  private:
++    MINCTransformIOFactory(const Self &); //purposely not implemented
++    void operator=(const Self &);        //purposely not implemented
++  };
++} // end namespace itk
++
++#endif //itkMINCTransformIOFactory_h
+diff --git a/Modules/IO/TransformMINC/itk-module.cmake b/Modules/IO/TransformMINC/itk-module.cmake
+new file mode 100644
+index 0000000..900b09e
+--- /dev/null
++++ b/Modules/IO/TransformMINC/itk-module.cmake
+@@ -0,0 +1,16 @@
++set(DOCUMENTATION "This module contains the classes for the input and output
++of itkTransform object in MINC format (.xfm).")
++
++itk_module(ITKIOTransformMINC
++  DEPENDS
++    ITKIOTransformBase
++  PRIVATE_DEPENDS
++    ITKMINC
++    ITKIOMINC
++  TEST_DEPENDS
++    ITKTestKernel
++    ITKDisplacementField
++  DESCRIPTION
++    "${DOCUMENTATION}"
++  EXCLUDE_FROM_DEFAULT
++)
+diff --git a/Modules/IO/TransformMINC/src/CMakeLists.txt b/Modules/IO/TransformMINC/src/CMakeLists.txt
+new file mode 100644
+index 0000000..eb02655
+--- /dev/null
++++ b/Modules/IO/TransformMINC/src/CMakeLists.txt
+@@ -0,0 +1,9 @@
++set(ITKIOTransformMINC_SRC
++  itkMINCTransformIOFactory.cxx
++)
++
++add_library(ITKIOTransformMINC ${ITKIOTransformMINC_SRC})
++
++itk_module_link_dependencies()
++
++itk_module_target(ITKIOTransformMINC)
+diff --git a/Modules/IO/TransformMINC/src/itkMINCTransformIOFactory.cxx b/Modules/IO/TransformMINC/src/itkMINCTransformIOFactory.cxx
+new file mode 100644
+index 0000000..a1b0406
+--- /dev/null
++++ b/Modules/IO/TransformMINC/src/itkMINCTransformIOFactory.cxx
+@@ -0,0 +1,75 @@
++/*=========================================================================
++ *
++ *  Copyright Insight Software Consortium
++ *
++ *  Licensed under the Apache License, Version 2.0 (the "License");
++ *  you may not use this file except in compliance with the License.
++ *  You may obtain a copy of the License at
++ *
++ *         http://www.apache.org/licenses/LICENSE-2.0.txt
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ *
++ *=========================================================================*/
++#include "itkVersion.h"
++#include "itkMINCTransformIOFactory.h"
++#include "itkCreateObjectFunction.h"
++#include "itkMINCTransformIO.h"
++#include "itkTransformFactory.h"
++
++namespace itk
++{
++  void MINCTransformIOFactory::PrintSelf(std::ostream &, Indent) const
++  {}
++
++  MINCTransformIOFactory::MINCTransformIOFactory()
++  {
++    this->RegisterOverride( "itkTransformIOBaseTemplate",
++                            "itkMINCTransformIO",
++                            "MINC XFM Transform float IO",
++                            1,
++                            CreateObjectFunction< MINCTransformIOTemplate< float > >::New() );
++
++    this->RegisterOverride( "itkTransformIOBaseTemplate",
++                            "itkMINCTransformIO",
++                            "MINC XFM Transform double IO",
++                            1,
++                            CreateObjectFunction< MINCTransformIOTemplate< double > >::New() );
++  }
++
++  MINCTransformIOFactory::~MINCTransformIOFactory()
++  {}
++
++  const char *
++  MINCTransformIOFactory::GetITKSourceVersion(void) const
++  {
++    return ITK_SOURCE_VERSION;
++  }
++
++  const char *
++  MINCTransformIOFactory::GetDescription() const
++  {
++    return "MINC XFM TransformIO Factory, allows the"
++          " loading of Minc XFM transforms into insight";
++  }
++
++  // Undocumented API used to register during static initialization.
++  // DO NOT CALL DIRECTLY.
++  static bool MINCTransformIOFactoryHasBeenRegistered;
++
++  void MINCTransformIOFactoryRegister__Private(void)
++  {
++    if( ! MINCTransformIOFactoryHasBeenRegistered )
++    {
++      MINCTransformIOFactoryHasBeenRegistered = true;
++      MINCTransformIOFactory::RegisterOneFactory();
++
++      //TransformFactory< DisplacementFieldTransform<double,3> >::RegisterTransform ();
++      // register additional transform type
++    }
++  }
++} // end namespace itk
+diff --git a/Modules/IO/TransformMINC/test/CMakeLists.txt b/Modules/IO/TransformMINC/test/CMakeLists.txt
+new file mode 100644
+index 0000000..fe61894
+--- /dev/null
++++ b/Modules/IO/TransformMINC/test/CMakeLists.txt
+@@ -0,0 +1,23 @@
++itk_module_test()
++
++if(NOT ITK_USE_SYSTEM_HDF5)
++  include_directories(
++    "${ITKHDF5_SOURCE_DIR}/src/itkhdf5"
++    "${ITKHDF5_SOURCE_DIR}/src/itkhdf5/src"
++    "${ITKHDF5_BINARY_DIR}/src/itkhdf5"
++    )
++endif()
++
++set(ITKIOTransformMINCTests
++    itkIOTransformMINCTest.cxx
++    itkMINCTransformAdapterTest.cxx
++ )
++
++CreateTestDriver(ITKIOTransformMINC "${ITKIOTransformMINC-Test_LIBRARIES}" "${ITKIOTransformMINCTests}")
++  TARGET_LINK_LIBRARIES(ITKIOTransformMINCTestDriver LINK_PUBLIC ITKIOTransformBase )
++
++itk_add_test(NAME itkIOTransformMINCTest
++      COMMAND ITKIOTransformMINCTestDriver itkIOTransformMINCTest)
++
++itk_add_test(NAME itkMINCTransformAdapterTest
++      COMMAND ITKIOTransformMINCTestDriver itkMINCTransformAdapterTest)
+diff --git a/Modules/IO/TransformMINC/test/README b/Modules/IO/TransformMINC/test/README
+new file mode 100644
+index 0000000..12ac721
+--- /dev/null
++++ b/Modules/IO/TransformMINC/test/README
+@@ -0,0 +1 @@
++ITKTransformMINC Test Suite for ITKv4
+diff --git a/Modules/IO/TransformMINC/test/itkIOTransformMINCTest.cxx b/Modules/IO/TransformMINC/test/itkIOTransformMINCTest.cxx
+new file mode 100644
+index 0000000..9b2d811
+--- /dev/null
++++ b/Modules/IO/TransformMINC/test/itkIOTransformMINCTest.cxx
+@@ -0,0 +1,486 @@
++/*=========================================================================
++ *
++ *  Copyright Insight Software Consortium
++ *
++ *  Licensed under the Apache License, Version 2.0 (the "License");
++ *  you may not use this file except in compliance with the License.
++ *  You may obtain a copy of the License at
++ *
++ *         http://www.apache.org/licenses/LICENSE-2.0.txt
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ *
++ *=========================================================================*/
++
++#include <iostream>
++#include <fstream>
++#include "itkMINCTransformIOFactory.h"
++#include "itkTransformFileWriter.h"
++#include "itkTransformFileReader.h"
++#include "itkAffineTransform.h"
++#include "itkTransformFactory.h"
++#include "itksys/SystemTools.hxx"
++#include "itkDisplacementFieldTransform.h"
++#include "itkIOTestHelper.h"
++#include "vnl/vnl_math.h"
++
++
++static const int    point_counter=1000;
++
++
++template<typename T>void RandomPix(vnl_random &randgen,itk::Vector<T,3> &pix,
++                      double _max=itk::NumericTraits<T>::max() )
++{
++  for(unsigned int i = 0; i < 3; i++)
++    {
++    pix[i] = randgen.drand64(_max);
++    }
++}
++
++template<typename T>void RandomPoint(vnl_random &randgen,itk::Point<T,3> &pix,
++                      double _max=itk::NumericTraits<T>::max() )
++{
++  for(unsigned int i = 0; i < 3; i++)
++    {
++    pix[i] = randgen.drand64(_max);
++    }
++}
++
++
++static int check_linear(const char *linear_transform)
++{
++  typedef itk::AffineTransform<double,3>  AffineTransformType;
++  const double tolerance = 1e-5;
++
++  AffineTransformType::Pointer        affine = AffineTransformType::New();
++  AffineTransformType::InputPointType cor;
++
++  itk::ObjectFactoryBase::RegisterFactory(itk::MINCTransformIOFactory::New() );
++
++  // Set it's parameters
++  AffineTransformType::OutputVectorType rot_axis;
++  rot_axis[0]=0.0;
++  rot_axis[1]=1.0;
++  rot_axis[2]=0.0;
++  // Set it's parameters
++  affine->Rotate3D(rot_axis,vnl_math::pi/6);
++
++  AffineTransformType::OutputVectorType offset;
++
++  offset[0]=0.0;
++  offset[1]=0.0;
++  offset[2]=10.0;
++
++  affine->Translate(offset);
++
++  affine->Scale(4.0);
++
++  itk::TransformFileWriter::Pointer writer;
++  itk::TransformFileReader::Pointer reader;
++
++  reader = itk::TransformFileReader::New();
++  writer = itk::TransformFileWriter::New();
++  writer->AddTransform(affine);
++
++  writer->SetFileName( linear_transform );
++  reader->SetFileName( linear_transform );
++
++  // Testing writing std::cout << "Testing write : ";
++  affine->Print ( std::cout );
++  try
++  {
++    writer->Update();
++    std::cout << std::endl;
++    std::cout << "Testing read : " << std::endl;
++    reader->Update();
++  }
++  catch( itk::ExceptionObject & excp )
++  {
++    std::cerr << "Error while saving the transforms" << std::endl;
++    std::cerr << excp << std::endl;
++    std::cout << "[FAILED]" << std::endl;
++    return EXIT_FAILURE;
++  }
++
++  try
++  {
++    itk::TransformFileReader::TransformListType list=*reader->GetTransformList();
++
++    if(list.front()->GetTransformTypeAsString() != "AffineTransform_double_3_3")
++      {
++        std::cerr<<"Read back transform of type:"<<list.front()->GetTransformTypeAsString()<<std::endl;
++        return EXIT_FAILURE;
++      }
++    AffineTransformType::Pointer affine2 = static_cast<AffineTransformType*>(list.front().GetPointer());
++
++    std::cout<<"Read transform : " << std::endl;
++    affine2->Print( std::cout );
++
++    vnl_random randgen(12345678);
++
++    AffineTransformType::InputPointType pnt,pnt2;
++
++    std::cout << "Testing that transformations are the same ..." << std::endl;
++    for(int i=0;i<point_counter;i++)
++      {
++      AffineTransformType::OutputPointType v1;
++      AffineTransformType::OutputPointType v2;
++
++      RandomPoint<double>(randgen,pnt,100);
++      pnt2=pnt;
++      v1= affine->TransformPoint( pnt );
++      v2= affine2->TransformPoint( pnt2 );
++
++      if( ( v1-v2 ).GetSquaredNorm() > tolerance)
++        {
++        std::cerr << "Original Pixel (" << v1
++                  << ") doesn't match read-in Pixel ("
++                  << v2 << " ) "
++                  << " in "<< linear_transform << " at "<< pnt <<std::endl;
++        return EXIT_FAILURE;
++        }
++      }
++      std::cout << " Done !" << std::endl;
++  }
++  catch( itk::ExceptionObject & excp )
++  {
++    std::cerr << "Error while reading the transforms" << std::endl;
++    std::cerr << excp << std::endl;
++    std::cout << "[FAILED]" << std::endl;
++    return EXIT_FAILURE;
++  }
++
++  return EXIT_SUCCESS;
++}
++
++static int check_nonlinear_double(const char *nonlinear_transform)
++{
++  const double tolerance = 1e-5;
++
++  typedef itk::DisplacementFieldTransform<double,3>         DisplacementFieldTransform;
++  typedef DisplacementFieldTransform::DisplacementFieldType DisplacementFieldType;
++
++  DisplacementFieldTransform::Pointer disp = DisplacementFieldTransform::New();
++  DisplacementFieldType::Pointer field=DisplacementFieldType::New();
++
++  //create zero displacement field
++  DisplacementFieldType::SizeType    imageSize3D = {{ 10, 10, 10}};
++  DisplacementFieldType::IndexType   startIndex3D = { {0, 0, 0}};
++
++  double spacing[]={2.0, 2.0, 2.0};
++  double origin[]={-10.0, -10.0, -10.0};
++  DisplacementFieldType::RegionType  region;
++
++  region.SetSize  (imageSize3D);
++  region.SetIndex (startIndex3D);
++
++  field->SetLargestPossibleRegion (region);
++  field->SetBufferedRegion (region);
++  field->SetRequestedRegion (region);
++
++  field->SetSpacing( spacing );
++  field->SetOrigin( origin );
++  field->Allocate ();
++
++  DisplacementFieldType::PixelType zeroDisplacement;
++  zeroDisplacement.Fill( 0.0 );
++  field->FillBuffer( zeroDisplacement );
++
++  vnl_random  randgen(12345678);
++  itk::ImageRegionIterator<DisplacementFieldType> it(field,field->GetLargestPossibleRegion() );
++
++  for(it.GoToBegin(); !it.IsAtEnd(); ++it)
++    {
++    DisplacementFieldType::PixelType pix;
++     if( tolerance > 0.0 )
++       {
++       RandomPix<double>(randgen,pix,100);
++       }
++     else
++       {
++       RandomPix<double>(randgen,pix);
++       }
++    it.Set(pix);
++    }
++
++  disp->SetDisplacementField(field);
++
++  disp->Print ( std::cout );
++
++  itk::TransformFileWriter::Pointer nlwriter;
++  itk::TransformFileReader::Pointer nlreader;
++
++  nlreader = itk::TransformFileReader::New();
++  nlwriter = itk::TransformFileWriter::New();
++  nlwriter->AddTransform(disp);
++  nlwriter->SetFileName(nonlinear_transform);
++  nlreader->SetFileName(nonlinear_transform);
++
++  // Testing writing
++  std::cout << "Testing write of non linear transform (double) : " << std::endl;
++
++  try
++    {
++    nlwriter->Update();
++    }
++  catch( itk::ExceptionObject & excp )
++    {
++    std::cerr << "Error while saving the transforms" << std::endl;
++    std::cerr << excp << std::endl;
++    std::cout << "[FAILED]" << std::endl;
++    return EXIT_FAILURE;
++    }
++
++  // Testing writing
++  std::cout << "Testing read of non linear transform (double): " << std::endl;
++  try
++    {
++    nlreader->Update();
++    }
++  catch( itk::ExceptionObject & excp )
++    {
++    std::cerr << "Error while reading the transforms" << std::endl;
++    std::cerr << excp << std::endl;
++    std::cout << "[FAILED]" << std::endl;
++    return EXIT_FAILURE;
++    }
++  std::cout << "[PASSED]" << std::endl;
++
++  std::cout << "Comparing of non linear transform (double) : " << std::endl;
++  itk::TransformFileReader::TransformListType list=*nlreader->GetTransformList();
++  std::cout<<"Read :"<<list.size()<<" transformations"<<std::endl;
++
++  if(list.front()->GetTransformTypeAsString() != "DisplacementFieldTransform_double_3_3")
++    {
++      std::cerr<<"Read back transform of type:"<<list.front()->GetTransformTypeAsString()<<std::endl;
++      return EXIT_FAILURE;
++    }
++  DisplacementFieldTransform::Pointer disp2 = static_cast<DisplacementFieldTransform*>(list.front().GetPointer());
++  DisplacementFieldType::ConstPointer field2=disp2->GetDisplacementField();
++
++  itk::ImageRegionConstIterator<DisplacementFieldType> it2(field2,field2->GetLargestPossibleRegion() );
++  if(tolerance == 0.0)
++    {
++    for(it.GoToBegin(),it2.GoToBegin(); !it.IsAtEnd() && !it2.IsAtEnd(); ++it,++it2)
++      {
++      if(it.Value() != it2.Value() )
++        {
++        std::cout << "Original Pixel (" << it.Value()
++                  << ") doesn't match read-in Pixel ("
++                  << it2.Value() << " ) " << std::endl
++                  << " in "<< nonlinear_transform  << std::endl;
++        return EXIT_FAILURE;
++        }
++      }
++    } else { //account for rounding errors
++    for( it.GoToBegin(),it2.GoToBegin(); !it.IsAtEnd() && !it2.IsAtEnd(); ++it,++it2 )
++      {
++      if( ( it.Value() - it2.Value() ).GetSquaredNorm() > tolerance)
++        {
++        std::cout << "Original Pixel (" << it.Value()
++                  << ") doesn't match read-in Pixel ("
++                  << it2.Value() << " ) "
++                  << " in "<< nonlinear_transform <<std::endl;
++        return EXIT_FAILURE;
++        }
++      }
++    }
++
++
++  return EXIT_SUCCESS;
++}
++
++
++static int check_nonlinear_float(const char *nonlinear_transform)
++{
++  double tolerance=1e-5;
++
++  typedef itk::TransformFileWriterTemplate<float> TransformFileWriterFloat;
++  typedef itk::TransformFileReaderTemplate<float> TransformFileReaderFloat;
++
++  typedef itk::DisplacementFieldTransform<float,3>         DisplacementFieldTransform;
++  typedef DisplacementFieldTransform::DisplacementFieldType DisplacementFieldType;
++
++  DisplacementFieldTransform::Pointer disp = DisplacementFieldTransform::New();
++  DisplacementFieldType::Pointer field=DisplacementFieldType::New();
++
++  //create zero displacement field
++  DisplacementFieldType::SizeType    imageSize3D = {{ 10, 10, 10}};
++  DisplacementFieldType::IndexType   startIndex3D = { {0, 0, 0}};
++
++  double spacing[]={2.0, 2.0, 2.0};
++  double origin[]={-10.0, -10.0, -10.0};
++  DisplacementFieldType::RegionType  region;
++
++  region.SetSize  (imageSize3D);
++  region.SetIndex (startIndex3D);
++
++  field->SetLargestPossibleRegion (region);
++  field->SetBufferedRegion (region);
++  field->SetRequestedRegion (region);
++
++  field->SetSpacing( spacing );
++  field->SetOrigin( origin );
++  field->Allocate ();
++
++  DisplacementFieldType::PixelType zeroDisplacement;
++  zeroDisplacement.Fill( 0.0 );
++  field->FillBuffer( zeroDisplacement );
++
++  vnl_random                          randgen(12345678);
++  itk::ImageRegionIterator<DisplacementFieldType> it(field,field->GetLargestPossibleRegion() );
++
++  for(it.GoToBegin(); !it.IsAtEnd(); ++it)
++    {
++    DisplacementFieldType::PixelType pix;
++     if(tolerance > 0.0)
++       {
++       RandomPix<float>(randgen,pix,100);
++       }
++     else
++       {
++       RandomPix<float>(randgen,pix);
++       }
++    it.Set(pix);
++    }
++
++  disp->SetDisplacementField(field);
++
++  disp->Print ( std::cout );
++
++  TransformFileWriterFloat::Pointer nlwriter;
++  TransformFileReaderFloat::Pointer nlreader;
++
++  nlreader = TransformFileReaderFloat::New();
++  nlwriter = TransformFileWriterFloat::New();
++  nlwriter->AddTransform(disp);
++  nlwriter->SetFileName(nonlinear_transform);
++  nlreader->SetFileName(nonlinear_transform);
++
++  // Testing writing
++  std::cout << "Testing write of non linear transform (float): " << std::endl;
++
++  try
++  {
++    nlwriter->Update();
++  }
++  catch( itk::ExceptionObject & excp )
++  {
++    std::cerr << "Error while saving the transforms" << std::endl;
++    std::cerr << excp << std::endl;
++    std::cout << "[FAILED]" << std::endl;
++    return EXIT_FAILURE;
++  }
++
++  // Testing writing
++  std::cout << "Testing read of non linear transform (float) : " << std::endl;
++  try
++    {
++    nlreader->Update();
++    }
++  catch( itk::ExceptionObject & excp )
++    {
++    std::cerr << "Error while reading the transforms" << std::endl;
++    std::cerr << excp << std::endl;
++    std::cout << "[FAILED]" << std::endl;
++    return EXIT_FAILURE;
++    }
++  std::cout << "[PASSED]" << std::endl;
++
++  std::cout << "Comparing of non linear transform : " << std::endl;
++  TransformFileReaderFloat::TransformListType list=*nlreader->GetTransformList();
++  std::cout<<"Read :"<<list.size()<<" transformations"<<std::endl;
++
++  if(list.front()->GetTransformTypeAsString() != "DisplacementFieldTransform_float_3_3")
++    {
++      std::cerr<<"Read back transform of type:"<<list.front()->GetTransformTypeAsString()<<std::endl;
++      return EXIT_FAILURE;
++    }
++  DisplacementFieldTransform::Pointer disp2 = static_cast<DisplacementFieldTransform*>(list.front().GetPointer());
++  DisplacementFieldType::ConstPointer field2=disp2->GetDisplacementField();
++
++  itk::ImageRegionConstIterator<DisplacementFieldType> it2(field2,field2->GetLargestPossibleRegion() );
++  if(tolerance == 0.0)
++    {
++    for(it.GoToBegin(),it2.GoToBegin(); !it.IsAtEnd() && !it2.IsAtEnd(); ++it,++it2)
++      {
++      if(it.Value() != it2.Value() )
++        {
++        std::cout << "Original Pixel (" << it.Value()
++                  << ") doesn't match read-in Pixel ("
++                  << it2.Value() << " ) " << std::endl
++                  << " in "<< nonlinear_transform  << std::endl;
++        return EXIT_FAILURE;
++        }
++      }
++    } else { //account for rounding errors
++    for( it.GoToBegin(),it2.GoToBegin(); !it.IsAtEnd() && !it2.IsAtEnd(); ++it,++it2 )
++      {
++      if( (it.Value() - it2.Value()).GetSquaredNorm() > tolerance)
++        {
++        std::cout << "Original Pixel (" << it.Value()
++                  << ") doesn't match read-in Pixel ("
++                  << it2.Value() << " ) "
++                  << " in "<< nonlinear_transform <<std::endl;
++        return EXIT_FAILURE;
++        }
++      }
++    }
++
++
++  return EXIT_SUCCESS;
++}
++
++static int secondTest()
++{
++  std::filebuf fb;
++  fb.open("Rotation.xfm",std::ios::out);
++  std::ostream os(&fb);
++  os << "MNI Transform File"<<std::endl;
++  os << "Transform_Type = Linear;"<<std::endl;
++  os << "Linear_Transform ="<<std::endl;
++  os << "1 0 0 0"<<std::endl;
++  os << "0 0.866025447845459 -0.5 0"<<std::endl;
++  os << "0 0.5 0.866025447845459 0;"<<std::endl;
++  fb.close();
++
++  itk::TransformFileReader::Pointer reader;
++  reader = itk::TransformFileReader::New();
++  reader->SetFileName("Rotation.xfm");
++
++  reader->Update();
++
++  const itk::TransformFileReader::TransformListType * list = reader->GetTransformList();
++  itk::TransformFileReader::TransformListType::const_iterator lit =  list->begin();
++  while ( lit != list->end() )
++  {
++    (*lit)->Print ( std::cout );
++    lit++;
++  }
++  return EXIT_SUCCESS;
++}
++
++int itkIOTransformMINCTest(int argc, char* argv[])
++{
++  if (argc > 1)
++  {
++    itksys::SystemTools::ChangeDirectory(argv[1]);
++  }
++  itk::TransformFactory< itk::DisplacementFieldTransform<double,3> >::RegisterTransform ();
++  itk::TransformFactory< itk::DisplacementFieldTransform<float,3> >::RegisterTransform ();
++
++  int result1 =  check_linear("itkIOTransformMINCTestTransformLinear.xfm");
++  int result2 =  check_nonlinear_double( "itkIOTransformMINCTestTransformNonLinear.xfm" );
++  int result3 =  check_nonlinear_float( "itkIOTransformMINCTestTransformNonLinear_float.xfm" );
++  int result4 =  secondTest();
++
++  return !( result1 == EXIT_SUCCESS &&
++            result2 == EXIT_SUCCESS &&
++            result3 == EXIT_SUCCESS &&
++            result4 == EXIT_SUCCESS
++          );
++}
+diff --git a/Modules/IO/TransformMINC/test/itkMINCTransformAdapterTest.cxx b/Modules/IO/TransformMINC/test/itkMINCTransformAdapterTest.cxx
+new file mode 100644
+index 0000000..e2ba7c3
+--- /dev/null
++++ b/Modules/IO/TransformMINC/test/itkMINCTransformAdapterTest.cxx
+@@ -0,0 +1,244 @@
++/*=========================================================================
++ *
++ *  Copyright Insight Software Consortium
++ *
++ *  Licensed under the Apache License, Version 2.0 (the "License");
++ *  you may not use this file except in compliance with the License.
++ *  You may obtain a copy of the License at
++ *
++ *         http://www.apache.org/licenses/LICENSE-2.0.txt
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ *
++ *=========================================================================*/
++
++#include <iostream>
++#include <fstream>
++#include "itkMINCTransformIOFactory.h"
++#include "itkTransformFileWriter.h"
++#include "itkTransformFileReader.h"
++#include "itkAffineTransform.h"
++#include "itkTransformFactory.h"
++#include "itksys/SystemTools.hxx"
++#include "itkDisplacementFieldTransform.h"
++#include "itkIOTestHelper.h"
++#include "itkMINCTransformAdapter.h"
++#include "vnl/vnl_math.h"
++
++
++static const double tolerance = 1e-5;
++static const int    point_counter=1000;
++
++
++template<typename T>void RandomPix(vnl_random &randgen,itk::Vector<T,3> &pix,
++                      double _max=itk::NumericTraits<T>::max() )
++{
++  for(unsigned int i = 0; i < 3; i++)
++    {
++    pix[i] = randgen.drand64(_max);
++    }
++}
++
++template<typename T>void RandomPoint(vnl_random &randgen,itk::Point<T,3> &pix,
++                      double _max=itk::NumericTraits<T>::max() )
++{
++  for(unsigned int i = 0; i < 3; i++)
++    {
++    pix[i] = randgen.drand64(_max);
++    }
++}
++
++
++static int compare_linear(const char *linear_transform)
++{
++  itk::ObjectFactoryBase::RegisterFactory(itk::MINCTransformIOFactory::New() );
++
++  typedef itk::AffineTransform<double,3> AffineTransformType;
++  AffineTransformType::Pointer        affine = AffineTransformType::New();
++  AffineTransformType::InputPointType cor;
++
++  AffineTransformType::OutputVectorType rot_axis;
++  rot_axis[0]=1.0;
++  rot_axis[1]=1.0;
++  rot_axis[2]=0.0;
++  // Set it's parameters
++  affine->Rotate3D(rot_axis,vnl_math::pi/12);
++
++  AffineTransformType::OutputVectorType offset;
++
++  offset[0]=0.0;
++  offset[1]=0.0;
++  offset[2]=10.0;
++
++  affine->Translate(offset);
++
++  affine->Scale(1.2);
++
++  itk::TransformFileWriter::Pointer writer;
++
++  writer = itk::TransformFileWriter::New();
++  writer->AddTransform(affine);
++  writer->SetFileName( linear_transform );
++
++  try
++    {
++    writer->Update();
++
++    std::cout << "Comparing of linear transforms ITK vs MINC: "<< affine << std::endl;
++    itk::MINCTransformAdapter<double,3,3>::Pointer xfm=itk::MINCTransformAdapter<double,3,3>::New();
++
++    xfm->OpenXfm(linear_transform);
++
++    vnl_random randgen(12345678);
++
++    AffineTransformType::InputPointType pnt,pnt2;
++
++    for(int i=0;i<point_counter;i++)
++      {
++      AffineTransformType::OutputPointType v1;
++      AffineTransformType::OutputPointType v2;
++
++      RandomPoint<double>(randgen,pnt,100);
++      pnt2=pnt;
++      v1= affine->TransformPoint( pnt );
++      v2= xfm->TransformPoint( pnt2 );
++
++      if( ( v1-v2 ).GetSquaredNorm() > tolerance)
++        {
++        std::cout << "Original Pixel (" << v1
++                  << ") doesn't match read-in Pixel ("
++                  << v2 << " ) "
++                  << " in "<< linear_transform << " at "<< pnt <<std::endl;
++        return EXIT_FAILURE;
++        }
++      }
++
++    }
++  catch( itk::ExceptionObject & excp )
++    {
++    std::cerr << "Error while reading the transforms" << std::endl;
++    std::cerr << excp << std::endl;
++    std::cout << "[FAILED]" << std::endl;
++    return EXIT_FAILURE;
++    }
++
++  return EXIT_SUCCESS;
++}
++
++static int compare_nonlinear_double(const char *nonlinear_transform)
++{
++
++  typedef itk::DisplacementFieldTransform<double,3>         DisplacementFieldTransform;
++  typedef DisplacementFieldTransform::DisplacementFieldType DisplacementFieldType;
++
++  DisplacementFieldTransform::Pointer disp = DisplacementFieldTransform::New();
++  DisplacementFieldType::Pointer field=DisplacementFieldType::New();
++
++  //create zero displacement field
++  DisplacementFieldType::SizeType    imageSize3D = {{ 10, 10, 10}};
++  DisplacementFieldType::IndexType   startIndex3D = { {0, 0, 0}};
++
++  double spacing[]={2.0, 2.0, 2.0};
++  double origin[]={-10.0, -10.0, -10.0};
++  DisplacementFieldType::RegionType  region;
++
++  region.SetSize  (imageSize3D);
++  region.SetIndex (startIndex3D);
++
++  field->SetLargestPossibleRegion (region);
++  field->SetBufferedRegion (region);
++  field->SetRequestedRegion (region);
++
++  field->SetSpacing( spacing );
++  field->SetOrigin( origin );
++  field->Allocate ();
++
++  DisplacementFieldType::PixelType zeroDisplacement;
++  zeroDisplacement.Fill( 0.0 );
++  field->FillBuffer( zeroDisplacement );
++
++  vnl_random                          randgen(12345678);
++  itk::ImageRegionIteratorWithIndex<DisplacementFieldType> it(field,field->GetLargestPossibleRegion() );
++
++  for(it.GoToBegin(); !it.IsAtEnd(); ++it)
++    {
++    DisplacementFieldType::PixelType pix;
++     if( tolerance > 0.0 )
++       {
++       RandomPix<double>(randgen,pix,100);
++       }
++     else
++       {
++       RandomPix<double>(randgen,pix);
++       }
++    it.Set(pix);
++    }
++
++  disp->SetDisplacementField(field);
++
++  itk::TransformFileWriter::Pointer nlwriter;
++
++  nlwriter = itk::TransformFileWriter::New();
++  nlwriter->AddTransform(disp);
++  nlwriter->SetFileName(nonlinear_transform);
++
++  try
++    {
++    nlwriter->Update();
++    }
++  catch( itk::ExceptionObject & excp )
++    {
++    std::cerr << "Error while saving the transforms" << std::endl;
++    std::cerr << excp << std::endl;
++    std::cout << "[FAILED]" << std::endl;
++    return EXIT_FAILURE;
++    }
++
++  std::cout << "Comparing of non linear transforms ITK vs MINC " << std::endl;
++  itk::MINCTransformAdapter<double,3,3>::Pointer xfm=itk::MINCTransformAdapter<double,3,3>::New();
++  xfm->OpenXfm(nonlinear_transform);
++
++  for( it.GoToBegin(); !it.IsAtEnd(); ++it )
++    {
++    DisplacementFieldTransform::OutputPointType v1;
++    DisplacementFieldTransform::OutputPointType v2;
++    DisplacementFieldType::PointType pnt;
++
++    field->TransformIndexToPhysicalPoint( it.GetIndex (), pnt);
++
++    v1= disp->TransformPoint( pnt );
++    v2= xfm->TransformPoint( pnt );
++
++    if( ( v1-v2 ).GetSquaredNorm() > tolerance)
++      {
++      std::cout << "Original Pixel (" << v1
++                << ") doesn't match read-in Pixel ("
++                << v2 << " ) "
++                << " in "<< nonlinear_transform <<std::endl;
++      return EXIT_FAILURE;
++      }
++
++    }
++
++
++  return EXIT_SUCCESS;
++}
++
++int itkMINCTransformAdapterTest(int argc, char* argv[])
++{
++  if (argc > 1)
++  {
++    itksys::SystemTools::ChangeDirectory(argv[1]);
++  }
++  itk::TransformFactory< itk::DisplacementFieldTransform<double,3> >::RegisterTransform ();
++  itk::ObjectFactoryBase::RegisterFactory(itk::MINCTransformIOFactory::New() );
++
++  int result1 = compare_linear( "itkMINCTransformAdapterTestTransformLinear.xfm" );
++  int result2 =  compare_nonlinear_double( "itkMINCTransformAdapterTestTransformNonLinear.xfm" );
++
++  return !( result1 == EXIT_SUCCESS && result2 == EXIT_SUCCESS );
++}
+-- 
+1.9.1
+
+
+From 1ac9d66a2fbc9c768d5698743644e3376e7452aa Mon Sep 17 00:00:00 2001
+From: "Vladimir S. FONOV" <vladimir.fonov@gmail.com>
+Date: Mon, 23 Nov 2015 17:21:38 -0500
+Subject: [PATCH 2/4] WIP: Adding more changes
+
+Change-Id: I16c1efa2bf5ea0117f9f3f55b96113f3e4567c9c
+---
+ Modules/IO/MINC/itk-module.cmake          | 2 --
+ Modules/IO/TransformMINC/itk-module.cmake | 1 -
+ 2 files changed, 3 deletions(-)
+
+diff --git a/Modules/IO/MINC/itk-module.cmake b/Modules/IO/MINC/itk-module.cmake
+index b966fed..62112f3 100644
+--- a/Modules/IO/MINC/itk-module.cmake
++++ b/Modules/IO/MINC/itk-module.cmake
+@@ -6,8 +6,6 @@ itk_module(ITKIOMINC
+   DEPENDS
+     ITKMINC
+     ITKIOImageBase
+-    ITKIOTransformBase
+-    ITKTransform
+   TEST_DEPENDS
+     ITKTestKernel
+     ITKImageStatistics
+diff --git a/Modules/IO/TransformMINC/itk-module.cmake b/Modules/IO/TransformMINC/itk-module.cmake
+index 900b09e..7fb19cb 100644
+--- a/Modules/IO/TransformMINC/itk-module.cmake
++++ b/Modules/IO/TransformMINC/itk-module.cmake
+@@ -4,7 +4,6 @@ of itkTransform object in MINC format (.xfm).")
+ itk_module(ITKIOTransformMINC
+   DEPENDS
+     ITKIOTransformBase
+-  PRIVATE_DEPENDS
+     ITKMINC
+     ITKIOMINC
+   TEST_DEPENDS
+-- 
+1.9.1
+
+
+From d004005a0a66bd45c6520b38df17b5a17c7f04ca Mon Sep 17 00:00:00 2001
+From: "Vladimir S. FONOV" <vladimir.fonov@gmail.com>
+Date: Mon, 23 Nov 2015 17:26:35 -0500
+Subject: [PATCH 3/4] WIP: More changes
+
+Change-Id: I30c52e65d023a50c29dbb6d40d43c807ab8e4316
+---
+ Modules/IO/TransformMINC/itk-module.cmake   | 1 +
+ Modules/IO/TransformMINC/src/CMakeLists.txt | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Modules/IO/TransformMINC/itk-module.cmake b/Modules/IO/TransformMINC/itk-module.cmake
+index 7fb19cb..a735024 100644
+--- a/Modules/IO/TransformMINC/itk-module.cmake
++++ b/Modules/IO/TransformMINC/itk-module.cmake
+@@ -6,6 +6,7 @@ itk_module(ITKIOTransformMINC
+     ITKIOTransformBase
+     ITKMINC
+     ITKIOMINC
++
+   TEST_DEPENDS
+     ITKTestKernel
+     ITKDisplacementField
+diff --git a/Modules/IO/TransformMINC/src/CMakeLists.txt b/Modules/IO/TransformMINC/src/CMakeLists.txt
+index eb02655..4214983 100644
+--- a/Modules/IO/TransformMINC/src/CMakeLists.txt
++++ b/Modules/IO/TransformMINC/src/CMakeLists.txt
+@@ -4,6 +4,6 @@ set(ITKIOTransformMINC_SRC
+ 
+ add_library(ITKIOTransformMINC ${ITKIOTransformMINC_SRC})
+ 
+-itk_module_link_dependencies()
++#itk_module_link_dependencies()
+ 
+ itk_module_target(ITKIOTransformMINC)
+-- 
+1.9.1
+
+
+From e41acfa9450756caff8f0d2a3fc08d471c48b672 Mon Sep 17 00:00:00 2001
+From: "Vladimir S. FONOV" <vladimir.fonov@gmail.com>
+Date: Mon, 23 Nov 2015 18:50:57 -0500
+Subject: [PATCH 4/4] WIP: more changes
+
+Change-Id: If7d62bb70f29aac8f9502854f5ce33ebe71fba3c
+---
+ Modules/IO/TransformMINC/itk-module.cmake | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/Modules/IO/TransformMINC/itk-module.cmake b/Modules/IO/TransformMINC/itk-module.cmake
+index a735024..5a439da 100644
+--- a/Modules/IO/TransformMINC/itk-module.cmake
++++ b/Modules/IO/TransformMINC/itk-module.cmake
+@@ -3,10 +3,12 @@ of itkTransform object in MINC format (.xfm).")
+ 
+ itk_module(ITKIOTransformMINC
+   DEPENDS
+-    ITKIOTransformBase
+     ITKMINC
++    ITKIOImageBase
++    ITKIOTransformBase
++    ITKIOMINC
++    ITKTransform
+     ITKIOMINC
+-
+   TEST_DEPENDS
+     ITKTestKernel
+     ITKDisplacementField
+-- 
+1.9.1
+
