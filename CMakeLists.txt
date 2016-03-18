@@ -68,6 +68,8 @@ SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}/cmake-modules"
 
 INCLUDE(PreventInSourceBuilds)
 AssureOutOfSourceBuilds(minc-toolkit-v2)
+# a hack to disable internal man pages per project
+SET(DISABLE_MAN_PAGES_INSTALL ON)
 INCLUDE(InstallManPages)
 
 # default install directories
@@ -520,6 +522,10 @@ IF(USE_SUPERBUILD)
         DESTINATION .)
 ENDIF(USE_SUPERBUILD)
 
+
+ADD_SUBDIRECTORY(man-pages)
+
+
 # write configuration information
 IF(UNIX)
   CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/minc-toolkit-config.unix.sh.cmake ${CMAKE_CURRENT_BINARY_DIR}/minc-toolkit-config.sh @ONLY)
@@ -532,6 +538,8 @@ IF(APPLE)
 ENDIF(APPLE)
 
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/minc-toolkit-config.sh ${CMAKE_CURRENT_BINARY_DIR}/minc-toolkit-config.csh DESTINATION .)
+
+
 
 # setup additional variables for making Debian package
 INCLUDE(DebianPackageAddons)
