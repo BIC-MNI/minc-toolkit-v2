@@ -41,15 +41,22 @@ ExternalProject_Add(ZLIB
       -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
       -DMACOSX_RPATH:BOOL=ON
       -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
-      
+
   INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix} 
   INSTALL_DIR ${staging_prefix}/${install_prefix}
 )
 
 SET(ZLIB_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
-SET(ZLIB_LIBRARY     ${staging_prefix}/${install_prefix}/lib/libz.a )
+SET(ZLIB_STATIC_LIBRARY     ${staging_prefix}/${install_prefix}/lib/libz.a )
+SET(ZLIB_SHARED_LIBRARY     ${staging_prefix}/${install_prefix}/lib/libz.so )
 SET(ZLIB_DIR         ${staging_prefix}/${install_prefix}/share/cmake/ZLIB/ )
 SET(ZLIB_FOUND ON)
+
+IF(MT_BUILD_SHARED_LIBS)
+  SET(ZLIB_LIBRARY     ${ZLIB_SHARED_LIBRARY} )
+ELSE(MT_BUILD_SHARED_LIBS)
+  SET(ZLIB_LIBRARY ${ZLIB_STATIC_LIBRARY} )
+ENDIF(MT_BUILD_SHARED_LIBS)
 
 configure_file(${CMAKE_SOURCE_DIR}/cmake-modules/ZLIB-config.cmake.install.in ${staging_prefix}/${install_prefix}/share/cmake/ZLIB/ZLIBConfig.cmake @ONLY )
 
