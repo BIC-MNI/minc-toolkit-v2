@@ -46,14 +46,21 @@ ExternalProject_Add(ZLIB
   INSTALL_DIR ${staging_prefix}/${install_prefix}
 )
 
-SET(ZLIB_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
+SET(ZLIB_SHARED_LIB_SUFFIX ".so")
+
+IF(APPLE)
+  SET(ZLIB_SHARED_LIB_SUFFIX ".dylib")
+ENDIF(APPLE)
+
+
+SET(ZLIB_INCLUDE_DIR        ${staging_prefix}/${install_prefix}/include )
 SET(ZLIB_STATIC_LIBRARY     ${staging_prefix}/${install_prefix}/lib/libz.a )
-SET(ZLIB_SHARED_LIBRARY     ${staging_prefix}/${install_prefix}/lib/libz.so )
-SET(ZLIB_DIR         ${staging_prefix}/${install_prefix}/share/cmake/ZLIB/ )
+SET(ZLIB_SHARED_LIBRARY     ${staging_prefix}/${install_prefix}/lib/libz${ZLIB_SHARED_LIB_SUFFIX} )
+SET(ZLIB_DIR                ${staging_prefix}/${install_prefix}/share/cmake/ZLIB/ )
 SET(ZLIB_FOUND ON)
 
 IF(MT_BUILD_SHARED_LIBS)
-  SET(ZLIB_LIBRARY     ${ZLIB_SHARED_LIBRARY} )
+  SET(ZLIB_LIBRARY ${ZLIB_SHARED_LIBRARY} )
 ELSE(MT_BUILD_SHARED_LIBS)
   SET(ZLIB_LIBRARY ${ZLIB_STATIC_LIBRARY} )
 ENDIF(MT_BUILD_SHARED_LIBS)
