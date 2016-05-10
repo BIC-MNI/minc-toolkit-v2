@@ -27,10 +27,10 @@ Here is a list of bundled packages:
  * register - interactive 3D image viewer and co-registration tool
  * Display  - interactive 3D image viewer and segmentation tool
  * postf    - interactive 3D image viewer for statistical results
- * ITK      - Imaging Tookkit
- * minc4itk - MINC to ITK glue library
- * c3d      - Convert3D multipurpose image processing tool from UPENN
- * mincANTS - ANTS nonlinear registration tool from UPENN
+ * ITK      - Imaging Toolkit  https://itk.org/
+ * c3d      - Convert3D multipurpose image processing tool from UPENN http://www.itksnap.org/c3d/
+ * ANTS     - ANTS nonlinear registration tool from UPENN  https://github.com/stnava/ANTs
+ * Elastix  - Elastix a toolbox for rigid and nonrigid registration of images. http://elastix.isi.uu.nl/ 
 
 ##Installation
 
@@ -41,46 +41,50 @@ Installing from github, need CMake >= 3.1
   cd minc-toolkit-v2
   mkdir build && cd build
   ccmake .. # Enter configuration details, recommend not to use any system-provided libraries that are included in minc-toolkit-v2
-  # example configuration for linux to build all the tools and install them into /opt/minc-itk4 :
-    CMAKE_BUILD_TYPE:STRING=Release
-    CMAKE_INSTALL_PREFIX:PATH=/opt/minc-itk4
-    MT_BUILD_ABC:BOOL=ON
-    MT_BUILD_ANTS:BOOL=ON
-    MT_BUILD_C3D:BOOL=ON
-    MT_BUILD_ELASTIX:BOOL=ON
-    MT_BUILD_IM:BOOL=OFF
-    MT_BUILD_ITK_TOOLS:BOOL=ON
-    MT_BUILD_LITE:BOOL=OFF
-    MT_BUILD_SHARED_LIBS:BOOL=ON
-    MT_BUILD_VISUAL_TOOLS:BOOL=ON
-    MT_USE_OPENMP:BOOL=ON
-    USE_SYSTEM_FFTW3D:BOOL=OFF
-    USE_SYSTEM_FFTW3F:BOOL=OFF
-    USE_SYSTEM_GLUT:BOOL=OFF
-    USE_SYSTEM_GSL:BOOL=OFF
-    USE_SYSTEM_HDF5:BOOL=OFF
-    USE_SYSTEM_ITK:BOOL=OFF
-    USE_SYSTEM_NETCDF:BOOL=OFF
-    USE_SYSTEM_NIFTI:BOOL=OFF
-    USE_SYSTEM_PCRE:BOOL=OFF
-    USE_SYSTEM_ZLIB:BOOL=OFF
-  #
-  make && make test && make install
 </code></pre>
-Important: **CMAKE_BUILD_TYPE is set to Release by default, if you have older build set it manually or face severe speed degradation of some tools**
-<pre><code>
-  cmake -DCMAKE_BUILD_TYPE:STRING=Release .
+Following command will configure build system to build all the tools and install them into `/opt/minc-itk4` on Linux 
+<code><pre>
+ cmake .. \
+-DCMAKE_BUILD_TYPE:STRING=Release   \
+-DCMAKE_INSTALL_PREFIX:PATH=/opt/minc-itk4   \
+-DMT_BUILD_ABC:BOOL=ON   \
+-DMT_BUILD_ANTS:BOOL=ON   \
+-DMT_BUILD_C3D:BOOL=ON   \
+-DMT_BUILD_ELASTIX:BOOL=ON   \
+-DMT_BUILD_IM:BOOL=OFF   \
+-DMT_BUILD_ITK_TOOLS:BOOL=ON   \
+-DMT_BUILD_LITE:BOOL=OFF   \
+-DMT_BUILD_SHARED_LIBS:BOOL=ON   \
+-DMT_BUILD_VISUAL_TOOLS:BOOL=ON   \
+-DMT_USE_OPENMP:BOOL=ON   \
+-DUSE_SYSTEM_FFTW3D:BOOL=OFF   \
+-DUSE_SYSTEM_FFTW3F:BOOL=OFF   \
+-DUSE_SYSTEM_GLUT:BOOL=OFF   \
+-DUSE_SYSTEM_GSL:BOOL=OFF   \
+-DUSE_SYSTEM_HDF5:BOOL=OFF   \
+-DUSE_SYSTEM_ITK:BOOL=OFF   \
+-DUSE_SYSTEM_NETCDF:BOOL=OFF   \
+-DUSE_SYSTEM_NIFTI:BOOL=OFF   \
+-DUSE_SYSTEM_PCRE:BOOL=OFF   \
+-DUSE_SYSTEM_ZLIB:BOOL=OFF 
+
+make && make install
 </code></pre>
 ##Dependencies
 
 ###Following packages are needed to compile all tools:
- * Perl  - http://www.perl.org/
- * BISON - http://www.gnu.org/software/bison/
- * FLEX  - http://flex.sf.net/
- * libxi
- * libxmu
+ * Tools without GUI
+   * Cmake - https://cmake.org/
+   * Perl  - http://www.perl.org/
+   * BISON - http://www.gnu.org/software/bison/
+   * FLEX  - http://flex.sf.net/
+   * bc    - http://ftp.gnu.org/gnu/bc/ 
+ * More packages for tools with GUI
+   * X11  development libraries
+   * libxi 
+   * libxmu
 
-###Following packages are included :
+###Following packages are built internally :
  * zlib   - http://zlib.net/
  * NETCDF - http://www.unidata.ucar.edu/software/netcdf/
  * HDF5   - http://www.hdfgroup.org/HDF5/
@@ -89,11 +93,14 @@ Important: **CMAKE_BUILD_TYPE is set to Release by default, if you have older bu
  * FFTW3  - http://www.fftw.org/
  * ITK 4.9- http://www.itk.org/
  * NIFTI  - http://niftilib.sourceforge.net/
-##Installing Dependencies on Ubuntu:
+ 
+##Installing Build Dependencies on Ubuntu:
 <pre><code>
 sudo apt-get install \
- build-essential g++ \
+ build-essential g++ bc \
  cmake cmake-curses-gui \
  bison flex \
- libxi6 libxi-dev libxmu6 libxmu-dev libxmu-headers
+ libx11-dev x11proto-core-dev \
+ libxi6 libxi-dev \
+ libxmu6 libxmu-dev libxmu-headers
 </code></pre>
