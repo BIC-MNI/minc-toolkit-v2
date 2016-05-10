@@ -58,7 +58,8 @@ ELSE(${CMAKE_SYSTEM_NAME} MATCHES Windows)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES Windows)
 
 IF( NOT CMAKE_BUILD_TYPE )
-   SET( CMAKE_BUILD_TYPE Release )
+   message("Build type is not set, setting to Release!")
+   SET( CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE )
 ENDIF()
 
 SET(CPACK_PACKAGE_FILE_NAME "minc-toolkit-${MINC_TOOLKIT_VERSION_FULL}-${MT_SYSTEM_NAME}")
