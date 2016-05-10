@@ -53,10 +53,10 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
   endif(MT_BUILD_SHARED_LIBS) 
 
 
-  message("HDF5_LIBRARY=${HDF5_LIBRARY}")
-  message("HDF5_CPP_LIBRARY=${HDF5_CPP_LIBRARY}")
-   message("HDF5_HL_LIBRARY=${HDF5_HL_LIBRARY}")
-  message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
+#   message("HDF5_LIBRARY=${HDF5_LIBRARY}")
+#   message("HDF5_CPP_LIBRARY=${HDF5_CPP_LIBRARY}")
+#   message("HDF5_HL_LIBRARY=${HDF5_HL_LIBRARY}")
+#   message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
 
 
   ExternalProject_Add(ITKv4
