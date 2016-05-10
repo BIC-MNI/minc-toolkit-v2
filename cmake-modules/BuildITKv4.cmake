@@ -47,10 +47,17 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
     SET(HDF5_HL_CPP_LIBRARY ${hdf_library_dir}/libhdf5_hl_cpp_debug${HDF5_LIB_SUFFIX})
   ENDIF()
   
-
+  
   else(MT_BUILD_SHARED_LIBS) 
     SET(ITK_SHARED_LIBRARY "OFF")
   endif(MT_BUILD_SHARED_LIBS) 
+
+
+  message("HDF5_LIBRARY=${HDF5_LIBRARY}")
+  message("HDF5_CPP_LIBRARY=${HDF5_CPP_LIBRARY}")
+   message("HDF5_HL_LIBRARY=${HDF5_HL_LIBRARY}")
+  message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
+
 
   ExternalProject_Add(ITKv4
     #GIT_REPOSITORY "http://itk.org/ITK.git"
