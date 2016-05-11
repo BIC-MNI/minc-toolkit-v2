@@ -12,8 +12,8 @@ macro(build_im install_prefix staging_prefix  zlib_include_dir zlib_library zlib
 
   ExternalProject_Add(IM
           SOURCE_DIR IM
-          URL "http://mirrors-usa.go-parts.com/mirrors/ImageMagick/ImageMagick-6.9.0-7.tar.bz2"
-          URL_MD5 "cd50f3cb75e7428b2998eae06b8d5cab"
+          URL "http://mirrors-usa.go-parts.com/mirrors/ImageMagick/ImageMagick-6.9.3-8.tar.bz2"
+          URL_MD5 "8f52a5f38598f32b0784e63a8e3e1500"
           BUILD_IN_SOURCE 1
           INSTALL_DIR     "${CMAKE_BINARY_DIR}/external"
           BUILD_COMMAND   $(MAKE) 
