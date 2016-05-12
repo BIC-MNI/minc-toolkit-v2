@@ -7,7 +7,7 @@ file(DOWNLOAD
 
 add_custom_target( 
     unpack_man_pages ALL
-    cmake -E tar zxf ${CMAKE_CURRENT_BINARY_DIR}/minc-man-pages-${MINC_MAN_PAGES_VERSION}.tar.gz
+    ${CMAKE_COMMAND} -E tar zxf ${CMAKE_CURRENT_BINARY_DIR}/minc-man-pages-${MINC_MAN_PAGES_VERSION}.tar.gz
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/minc-man-pages-${MINC_MAN_PAGES_VERSION}.tar.gz
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Unpacking minc-man-pages-${MINC_MAN_PAGES_VERSION}.tar.gz" VERBATIM
