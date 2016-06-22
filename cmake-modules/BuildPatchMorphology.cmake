@@ -40,6 +40,7 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
         -DCMAKE_STATIC_LINKER_FLAGS_RELEASE:STRING=${CMAKE_STATIC_LINKER_FLAGS_RELEASE}
         -DCMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+        -DBUILD_TESTING:BOOL=${BUILD_TESTING}
   )
   if(APPLE)
     list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
@@ -51,7 +52,7 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
     )
   endif()
 
-  ExternalProject_Add(PATCHMORPHOLOGY
+  ExternalProject_Add(patch_morphology
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/patch_morphology
     BINARY_DIR patch_morphology-build
     LIST_SEPARATOR :::  
@@ -67,7 +68,19 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
         -DMACOSX_RPATH:BOOL=ON
         -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
         ${CMAKE_EXTERNAL_PROJECT_ARGS}
+    CMAKE_CACHE_ARGS
+        -DMINC_TEST_ENVIRONMENT:STRING=${MINC_TEST_ENVIRONMENT}
     INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
+    TEST_BEFORE_INSTALL 0 #TODO: figure out how to run test on external project
   )
+  string(REPLACE cmake ctest CTEST_COMMAND "${CMAKE_COMMAND}")
+  
+  IF(BUILD_TESTING)
+    ADD_TEST(NAME TEST_PATCH_MORPHOLOGY COMMAND ${CTEST_COMMAND} --output-on-failure 
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/patch_morphology-build 
+    )
+      
+  ENDIF(BUILD_TESTING)
+
 endmacro(build_PatchMorphology)
