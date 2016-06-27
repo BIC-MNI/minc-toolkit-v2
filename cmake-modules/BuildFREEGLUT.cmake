@@ -22,7 +22,7 @@ macro(build_freeglut install_prefix staging_prefix)
 
 ExternalProject_Add(FREEGLUT 
   SOURCE_DIR FREEGLUT
-  URL "http://iweb.dl.sourceforge.net/project/freeglut/freeglut/2.6.0/freeglut-2.6.0.tar.gz"
+  URL "http://downloads.sourceforge.net/project/freeglut/freeglut/2.6.0/freeglut-2.6.0.tar.gz"
   URL_MD5 "39f0f2de89f399529d2b981188082218"
   BUILD_IN_SOURCE 1
   INSTALL_DIR     "${staging_prefix}"
