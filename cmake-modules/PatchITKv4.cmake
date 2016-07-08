@@ -5,7 +5,7 @@ macro(patch_itk_config file to_remove)
   STRING(REPLACE "${to_remove}//" "/" config_file "${config_file}")
   STRING(REPLACE "${to_remove}" "" config_file "${config_file}")
   message("patched ${file} ")
-  file(WRITE "${file}" "${config_file}")
+  #file(WRITE "${file}" "${config_file}")
 endmacro(patch_itk_config)
 
 
