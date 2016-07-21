@@ -28,16 +28,17 @@ macro(build_ANTS install_prefix staging_prefix itk_dir ) #boost_dir
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-        -DLIBMINC_DIR:PATH=${CMAKE_BINARY_DIR}/libminc
         -DITK_DIR:PATH=${itk_dir}
-        -DUSE_SYSTEM_ITK:BOOL=ON
-        -DRUN_LONG_TESTS:BOOL=OFF
-        -DRUN_SHORT_TESTS:BOOL=OFF
+        -DITK_USE_FFTWD:BOOL=OFF # V.F. not sure how to make it work
+        -DITK_USE_FFTWF:BOOL=OFF # V.F. not sure how to make it work
+        -DITK_USE_SYSTEM_FFTW:BOOL=OFF # V.F. not sure how to make it work
         -DANTS_SUPERBUILD:BOOL=OFF
         -DBUILD_TESTING:BOOL=OFF
-#        -DBoost_DIR:PATH=${boost_dir}
-#        -DBOOST_ROOT:PATH=${boost_dir}
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
+        -DCMAKE_SKIP_RPATH:BOOL=OFF
+        -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
+        -DMACOSX_RPATH:BOOL=ON
+        -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
         "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
         "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}"
         -DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}

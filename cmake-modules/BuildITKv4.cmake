@@ -6,7 +6,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
   else()
     set(CMAKE_GEN "${CMAKE_GENERATOR}")
   endif()
-  
+
   set(CMAKE_OSX_EXTERNAL_PROJECT_ARGS)
   if(APPLE)
     SET(ITK_CXX_COMPILER "${CMAKE_CXX_COMPILER}" CACHE FILEPATH "C++ Compiler for ITK")
@@ -19,35 +19,35 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
       -DCMAKE_CXX_COMPILER:FILEPATH=${ITK_CXX_COMPILER}
     )
   endif()
-	
+
   SET(HDF5_LIB_SUFFIX ".a")
-  
   IF(MT_BUILD_SHARED_LIBS) 
     SET(ITK_SHARED_LIBRARY "ON")
-    
     IF(MT_BUILD_SHARED_LIBS)
       IF(APPLE)
-        IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
-          SET(HDF5_LIB_SUFFIX ".dylib")
-        ELSE(${CMAKE_BUILD_TYPE} STREQUAL Release)
-          SET(HDF5_LIB_SUFFIX "_debug.dylib")
-        ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release)
+        SET(HDF5_LIB_SUFFIX ".dylib")
       ELSE(APPLE)
-        IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
           SET(HDF5_LIB_SUFFIX ".so")
-        ELSE(${CMAKE_BUILD_TYPE} STREQUAL Release)
-          SET(HDF5_LIB_SUFFIX "_debug.so")
-        ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release)
       ENDIF(APPLE)
   ELSE(MT_BUILD_SHARED_LIBS)
-    IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
       SET(HDF5_LIB_SUFFIX ".a")
-    ELSE(${CMAKE_BUILD_TYPE} STREQUAL Release)
-      SET(HDF5_LIB_SUFFIX "_debug.a")
-    ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release)
   ENDIF(MT_BUILD_SHARED_LIBS)
-    
-    
+  
+  IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
+    message("Using release version of HDF5")
+    SET(HDF5_LIBRARY ${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX})
+    SET(HDF5_CPP_LIBRARY ${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX})
+    SET(HDF5_HL_LIBRARY ${hdf_library_dir}/libhdf5_hl${HDF5_LIB_SUFFIX})
+    SET(HDF5_HL_CPP_LIBRARY ${hdf_library_dir}/libhdf5_hl_cpp${HDF5_LIB_SUFFIX})
+  ELSE()
+    message("Using debug version of HDF5")
+    SET(HDF5_LIBRARY ${hdf_library_dir}/libhdf5_debug${HDF5_LIB_SUFFIX})
+    SET(HDF5_CPP_LIBRARY ${hdf_library_dir}/libhdf5_cpp_debug${HDF5_LIB_SUFFIX})
+    SET(HDF5_HL_LIBRARY ${hdf_library_dir}/libhdf5_hl_debug${HDF5_LIB_SUFFIX})
+    SET(HDF5_HL_CPP_LIBRARY ${hdf_library_dir}/libhdf5_hl_cpp_debug${HDF5_LIB_SUFFIX})
+  ENDIF()
+  
+
   else(MT_BUILD_SHARED_LIBS) 
     SET(ITK_SHARED_LIBRARY "OFF")
   endif(MT_BUILD_SHARED_LIBS) 
@@ -55,9 +55,10 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
   ExternalProject_Add(ITKv4
     #GIT_REPOSITORY "http://itk.org/ITK.git"
     #GIT_TAG "421d314ff85ad542ad5c0f3d3c115fa7427b1c64"
-    URL "http://downloads.sourceforge.net/project/itk/itk/4.8/InsightToolkit-4.8.0.tar.gz"
-    URL_MD5 "2d62f628d9e96cc790fa37947a0f9bc3"
-    PATCH_COMMAND patch -p 1 -d ${CMAKE_CURRENT_BINARY_DIR}/ITKv4 -u -i ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/0001-BUG-Missing-ITKIOMINC_EXPORT-on-__Private.patch -s
+    
+    URL "https://github.com/InsightSoftwareConsortium/ITK/archive/v4.9.0.tar.gz"
+    URL_MD5 "5a3f39723c132e752acc2f8c82f4c06b"
+    PATCH_COMMAND patch -p 1 -d ${CMAKE_CURRENT_BINARY_DIR}/ITKv4 -u -i ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/ITK-4.9-ants-mask-fix.patch
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
@@ -65,34 +66,48 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
     CMAKE_ARGS
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DBUILD_SHARED_LIBS:BOOL=${ITK_SHARED_LIBRARY}
-        -DCMAKE_SKIP_RPATH:BOOL=YES
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
         "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
         "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}"
         -DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
         -DCMAKE_MODULE_LINKER_FLAGS:STRING=${CMAKE_MODULE_LINKER_FLAGS}
         -DCMAKE_SHARED_LINKER_FLAGS:STRING=${CMAKE_SHARED_LINKER_FLAGS}
+        -DCMAKE_SKIP_RPATH:BOOL=OFF
+        -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
+        -DMACOSX_RPATH:BOOL=ON
+        -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
         ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
         -DBUILD_EXAMPLES:BOOL=OFF
         -DBUILD_TESTING:BOOL=OFF
         -DITK_USE_REVIEW:BOOL=ON
         -DModule_ITKIOMINC:BOOL=ON
+        -DModule_ITKIOTransformMINC:BOOL=ON
         -DITK_USE_SYSTEM_MINC:BOOL=ON
         -DITK_USE_SYSTEM_HDF5:BOOL=ON
         -DITK_USE_SYSTEM_ZLIB:BOOL=ON
+        -DHAVE_ZLIB:BOOL=ON
+        -DITK_USE_FFTWD:BOOL=ON
+        -DITK_USE_FFTWF:BOOL=ON
+        -DITK_USE_SYSTEM_FFTW:BOOL=ON
+        -DFFTWD_LIB:FILEPATH=${FFTW3D_LIBRARY}
+        -DFFTWD_THREADS_LIB:FILEPATH=${FFTW3D_THREADS_LIBRARY}
+        -DFFTWF_LIB:FILEPATH=${FFTW3F_LIBRARY}
+        -DFFTWF_THREADS_LIB:FILEPATH=${FFTW3F_THREADS_LIBRARY}
+        -DFFTW_INCLUDE_PATH:PATH=${FFTW3D_INCLUDE_DIR}
         -DLIBMINC_DIR:PATH=${minc_dir}
         -DHDF5_CXX_COMPILER_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5c++
         -DHDF5_C_COMPILER_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5cc
-        -DHDF5_CXX_LIBRARY:PATH=${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX}
-        -DHDF5_C_LIBRARY:PATH=${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX}
         -DHDF5_DIFF_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5diff
         -DHDF5_CXX_INCLUDE_DIR:PATH=${hdf_include_dir}
         -DHDF5_C_INCLUDE_DIR:PATH=${hdf_include_dir}
-        -DHDF5_hdf5_LIBRARY:FILEPATH=${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX}
-        -DHDF5_hdf5_cpp_LIBRARY:FILEPATH=${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX}
-        -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX}
-        -DHDF5_hdf5_cpp_LIBRARY_RELEASE:FILEPATH=${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX}
+        -DHDF5_hdf5_LIBRARY:FILEPATH=${HDF5_LIBRARY}
+        -DHDF5_hdf5_cpp_LIBRARY:FILEPATH=${HDF5_CPP_LIBRARY}
+#        -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX}
+#        -DHDF5_hdf5_cpp_LIBRARY_RELEASE:FILEPATH=${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX}
+#        -DHDF5_hdf5_LIBRARY_DEBUG:FILEPATH=${hdf_library_dir}/libhdf5_debug${HDF5_LIB_SUFFIX}
+#        -DHDF5_hdf5_cpp_LIBRARY_DEBUG:FILEPATH=${hdf_library_dir}/libhdf5_cpp_debug${HDF5_LIB_SUFFIX}
 #        -DHDF5_DIR:PATH=/home/vfonov/src/build/minc-toolkit-itk4/HDF5-build
+        -DHDF5_DIR:PATH=${staging_prefix}/${install_prefix}/share/cmake
         -DHDF5_Fortran_COMPILER_EXECUTABLE:FILEPATH=''
         -DZLIB_LIBRARY:PATH=${zlib_library}
         -DZLIB_INCLUDE_DIR:PATH=${zlib_include_dir}

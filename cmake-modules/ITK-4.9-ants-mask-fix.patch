@@ -1,0 +1,587 @@
+From 78a3c3a7da15d7ae3b2d95b5a7b5786325cc5598 Mon Sep 17 00:00:00 2001
+From: Nick Tustison <ntustison@gmail.com>
+Date: Sun, 29 Nov 2015 17:38:01 -0800
+Subject: [PATCH] ENH:  Add fixed/moving masking in reg. methods.
+
+This commit enables fixed and moving masking in
+the specialized image classes (e.g., SyN and
+TimeVarying).
+
+Change-Id: Ie7e253ea2e28df26e1ba3d269476ecf6b19164d9
+---
+ .../include/itkBSplineSyNImageRegistrationMethod.h |  18 ++--
+ .../itkBSplineSyNImageRegistrationMethod.hxx       |  55 +++--------
+ .../include/itkImageRegistrationMethodv4.h         |  15 ++-
+ .../include/itkImageRegistrationMethodv4.hxx       |  40 +++++++-
+ .../include/itkSyNImageRegistrationMethod.h        |  16 ++-
+ .../include/itkSyNImageRegistrationMethod.hxx      | 109 ++++++++++++++++++++-
+ ...ngBSplineVelocityFieldImageRegistrationMethod.h |  10 +-
+ ...BSplineVelocityFieldImageRegistrationMethod.hxx |  11 ++-
+ 8 files changed, 206 insertions(+), 68 deletions(-)
+
+diff --git a/Modules/Registration/RegistrationMethodsv4/include/itkBSplineSyNImageRegistrationMethod.h b/Modules/Registration/RegistrationMethodsv4/include/itkBSplineSyNImageRegistrationMethod.h
+index 6830bbc..869ecba 100644
+--- a/Modules/Registration/RegistrationMethodsv4/include/itkBSplineSyNImageRegistrationMethod.h
++++ b/Modules/Registration/RegistrationMethodsv4/include/itkBSplineSyNImageRegistrationMethod.h
+@@ -21,7 +21,6 @@
+ #include "itkSyNImageRegistrationMethod.h"
+ 
+ #include "itkBSplineSmoothingOnUpdateDisplacementFieldTransform.h"
+-#include "itkImageMaskSpatialObject.h"
+ 
+ namespace itk
+ {
+@@ -82,8 +81,15 @@ public:
+   typedef typename Superclass::ImageMetricType                        ImageMetricType;
+   typedef typename ImageMetricType::Pointer                           ImageMetricPointer;
+   typedef typename ImageMetricType::MeasureType                       MeasureType;
+-  typedef typename ImageMetricType::FixedImageMaskType                FixedImageMaskType;
+-  typedef typename ImageMetricType::MovingImageMaskType               MovingImageMaskType;
++
++  typedef typename Superclass::ImageMaskSpatialObjectType             ImageMaskSpatialObjectType;
++  typedef typename ImageMaskSpatialObjectType::ImageType              MaskImageType;
++  typedef typename Superclass::FixedImageMaskType                     FixedImageMaskType;
++  typedef typename ImageMaskSpatialObjectType::ImageType              FixedMaskImageType;
++  typedef typename Superclass::FixedImageMasksContainerType           FixedImageMasksContainerType;
++  typedef typename Superclass::MovingImageMaskType                    MovingImageMaskType;
++  typedef typename ImageMaskSpatialObjectType::ImageType              MovingMaskImageType;
++  typedef typename Superclass::MovingImageMasksContainerType          MovingImageMasksContainerType;
+ 
+   typedef typename Superclass::VirtualImageType                       VirtualImageType;
+   typedef typename Superclass::VirtualImageBaseType                   VirtualImageBaseType;
+@@ -111,9 +117,6 @@ public:
+   typedef typename BSplineFilterType::RealImageType                     WeightedMaskImageType;
+   typedef typename BSplineFilterType::InputPointSetType                 BSplinePointSetType;
+ 
+-  typedef ImageMaskSpatialObject<ImageDimension>                      ImageMaskSpatialObjectType;
+-  typedef typename ImageMaskSpatialObjectType::ImageType              MaskImageType;
+-
+   typedef typename Superclass::CompositeTransformType                 CompositeTransformType;
+   typedef typename Superclass::DisplacementFieldTransformType         DisplacementFieldTransformType;
+   typedef typename Superclass::DisplacementFieldTransformPointer      DisplacementFieldTransformPointer;
+@@ -133,7 +136,8 @@ protected:
+ 
+   virtual DisplacementFieldPointer ComputeUpdateField( const FixedImagesContainerType, const PointSetsContainerType,
+     const TransformBaseType *, const MovingImagesContainerType, const PointSetsContainerType,
+-    const TransformBaseType *, const FixedImageMaskType *, MeasureType & ) ITK_OVERRIDE;
++    const TransformBaseType *, const FixedImageMasksContainerType, const MovingImageMasksContainerType,
++    MeasureType & ) ITK_OVERRIDE;
+   virtual DisplacementFieldPointer BSplineSmoothDisplacementField( const DisplacementFieldType *,
+     const ArrayType &, const WeightedMaskImageType *, const BSplinePointSetType * );
+ 
+diff --git a/Modules/Registration/RegistrationMethodsv4/include/itkBSplineSyNImageRegistrationMethod.hxx b/Modules/Registration/RegistrationMethodsv4/include/itkBSplineSyNImageRegistrationMethod.hxx
+index e6c97ed..e3ef3c2 100644
+--- a/Modules/Registration/RegistrationMethodsv4/include/itkBSplineSyNImageRegistrationMethod.hxx
++++ b/Modules/Registration/RegistrationMethodsv4/include/itkBSplineSyNImageRegistrationMethod.hxx
+@@ -86,29 +86,6 @@ BSplineSyNImageRegistrationMethod<TFixedImage, TMovingImage, TOutputTransform, T
+     itkExceptionMacro( "The virtual domain image is not found." );
+     }
+ 
+-  typename MovingImageMaskType::ConstPointer movingImageMask = ITK_NULLPTR;
+-  typename FixedImageMaskType::ConstPointer fixedImageMask = ITK_NULLPTR;
+-
+-  typename MultiMetricType::Pointer multiMetric = dynamic_cast<MultiMetricType *>( this->m_Metric.GetPointer() );
+-  if( multiMetric )
+-    {
+-    typename ImageMetricType::Pointer metricQueue = dynamic_cast<ImageMetricType *>( multiMetric->GetMetricQueue()[0].GetPointer() );
+-    if( metricQueue.IsNotNull() )
+-      {
+-      fixedImageMask = metricQueue->GetFixedImageMask();
+-      movingImageMask = metricQueue->GetMovingImageMask();
+-      }
+-    }
+-  else
+-    {
+-    typename ImageMetricType::Pointer metric = dynamic_cast<ImageMetricType *>( this->m_Metric.GetPointer() );
+-    if( metric.IsNotNull() )
+-      {
+-      fixedImageMask = metric->GetFixedImageMask();
+-      movingImageMask = metric->GetMovingImageMask();
+-      }
+-    }
+-
+   InitialTransformType* fixedInitialTransform = const_cast<InitialTransformType*>( this->GetFixedInitialTransform() );
+ 
+   // Monitor the convergence
+@@ -144,12 +121,12 @@ BSplineSyNImageRegistrationMethod<TFixedImage, TMovingImage, TOutputTransform, T
+     DisplacementFieldPointer fixedToMiddleSmoothUpdateField = this->ComputeUpdateField(
+       this->m_FixedSmoothImages, this->m_FixedPointSets, fixedComposite,
+       this->m_MovingSmoothImages, this->m_MovingPointSets, movingComposite,
+-      fixedImageMask, movingMetricValue );
++      this->m_FixedImageMasks, this->m_MovingImageMasks, movingMetricValue );
+ 
+     DisplacementFieldPointer movingToMiddleSmoothUpdateField = this->ComputeUpdateField(
+       this->m_MovingSmoothImages, this->m_MovingPointSets, movingComposite,
+       this->m_FixedSmoothImages, this->m_FixedPointSets, fixedComposite,
+-      movingImageMask, fixedMetricValue );
++      this->m_MovingImageMasks, this->m_FixedImageMasks, fixedMetricValue );
+ 
+     if ( this->m_AverageMidPointGradients )
+       {
+@@ -214,7 +191,8 @@ typename BSplineSyNImageRegistrationMethod<TFixedImage, TMovingImage, TOutputTra
+ BSplineSyNImageRegistrationMethod<TFixedImage, TMovingImage, TOutputTransform, TVirtualImage, TPointSet>
+ ::ComputeUpdateField( const FixedImagesContainerType fixedImages, const PointSetsContainerType fixedPointSets,
+   const TransformBaseType * fixedTransform, const MovingImagesContainerType movingImages, const PointSetsContainerType movingPointSets,
+-  const TransformBaseType * movingTransform, const FixedImageMaskType * mask, MeasureType & value )
++  const TransformBaseType * movingTransform, const FixedImageMasksContainerType fixedImageMasks, const MovingImageMasksContainerType movingImageMasks,
++  MeasureType & value )
+ {
+   DisplacementFieldPointer metricGradientField = ITK_NULLPTR;
+   DisplacementFieldPointer updateField = ITK_NULLPTR;
+@@ -301,21 +279,21 @@ BSplineSyNImageRegistrationMethod<TFixedImage, TMovingImage, TOutputTransform, T
+   else
+     {
+     metricGradientField = this->ComputeMetricGradientField(
+-        fixedImages, fixedPointSets, fixedTransform, movingImages, movingPointSets, movingTransform, mask, value );
++        fixedImages, fixedPointSets, fixedTransform, movingImages, movingPointSets, movingTransform, fixedImageMasks, movingImageMasks, value );
+ 
+-    if( mask )
++    if( fixedImageMasks[0] )
+       {
+       VirtualImageBaseConstPointer virtualDomainImage = this->GetCurrentLevelVirtualDomainImage();
+ 
+       typedef ResampleImageFilter<MaskImageType, WeightedMaskImageType, typename TOutputTransform::ScalarType> MaskResamplerType;
+-      typename MaskResamplerType::Pointer maskResampler = MaskResamplerType::New();
+-      maskResampler->SetTransform( fixedTransform );
+-      maskResampler->SetInput( dynamic_cast<ImageMaskSpatialObjectType *>( const_cast<FixedImageMaskType *>( mask ) )->GetImage() );
+-      maskResampler->UseReferenceImageOn();
+-      maskResampler->SetReferenceImage( virtualDomainImage );
+-      maskResampler->SetSize( virtualDomainImage->GetBufferedRegion().GetSize() );
+-      maskResampler->SetDefaultPixelValue( 0 );
+-      weightedMask = maskResampler->GetOutput();
++      typename MaskResamplerType::Pointer fixedMaskResampler = MaskResamplerType::New();
++      fixedMaskResampler->SetTransform( fixedTransform );
++      fixedMaskResampler->SetInput( dynamic_cast<ImageMaskSpatialObjectType *>( const_cast<FixedImageMaskType *>( fixedImageMasks[0].GetPointer() ) )->GetImage() );
++      fixedMaskResampler->UseReferenceImageOn();
++      fixedMaskResampler->SetReferenceImage( virtualDomainImage );
++      fixedMaskResampler->SetSize( virtualDomainImage->GetBufferedRegion().GetSize() );
++      fixedMaskResampler->SetDefaultPixelValue( 0 );
++      weightedMask = fixedMaskResampler->GetOutput();
+       weightedMask->Update();
+       weightedMask->DisconnectPipeline();
+       }
+@@ -331,9 +309,8 @@ BSplineSyNImageRegistrationMethod<TFixedImage, TMovingImage, TOutputTransform, T
+ template<typename TFixedImage, typename TMovingImage, typename TOutputTransform, typename TVirtualImage, typename TPointSet>
+ typename BSplineSyNImageRegistrationMethod<TFixedImage, TMovingImage, TOutputTransform, TVirtualImage, TPointSet>::DisplacementFieldPointer
+ BSplineSyNImageRegistrationMethod<TFixedImage, TMovingImage, TOutputTransform, TVirtualImage, TPointSet>
+-::BSplineSmoothDisplacementField( const DisplacementFieldType * field,
+-  const ArrayType & numberOfControlPoints, const WeightedMaskImageType * mask,
+-  const BSplinePointSetType * gradientPointSet )
++::BSplineSmoothDisplacementField( const DisplacementFieldType * field, const ArrayType & numberOfControlPoints,
++  const WeightedMaskImageType * mask, const BSplinePointSetType * gradientPointSet )
+ {
+   typedef ImageDuplicator<DisplacementFieldType> DuplicatorType;
+   typename DuplicatorType::Pointer duplicator = DuplicatorType::New();
+diff --git a/Modules/Registration/RegistrationMethodsv4/include/itkImageRegistrationMethodv4.h b/Modules/Registration/RegistrationMethodsv4/include/itkImageRegistrationMethodv4.h
+index 1d480f0..af477c3 100644
+--- a/Modules/Registration/RegistrationMethodsv4/include/itkImageRegistrationMethodv4.h
++++ b/Modules/Registration/RegistrationMethodsv4/include/itkImageRegistrationMethodv4.h
+@@ -149,6 +149,13 @@ public:
+   typedef ImageToImageMetricv4<FixedImageType, MovingImageType, VirtualImageType, RealType>        ImageMetricType;
+   typedef PointSetToPointSetMetricv4<PointSetType, PointSetType, RealType>                         PointSetMetricType;
+ 
++  typedef typename ImageMetricType::FixedImageMaskType                FixedImageMaskType;
++  typedef typename FixedImageMaskType::ConstPointer                   FixedImageMaskConstPointer;
++  typedef std::vector<FixedImageMaskConstPointer>                     FixedImageMasksContainerType;
++  typedef typename ImageMetricType::MovingImageMaskType               MovingImageMaskType;
++  typedef typename MovingImageMaskType::ConstPointer                  MovingImageMaskConstPointer;
++  typedef std::vector<MovingImageMaskConstPointer>                    MovingImageMasksContainerType;
++
+   /**
+    * Type for the output: Using Decorator pattern for enabling the transform to be
+    * passed in the data pipeline
+@@ -448,7 +455,7 @@ protected:
+   /** Initialize by setting the interconnects between the components. */
+   virtual void InitializeRegistrationAtEachLevel( const SizeValueType );
+ 
+-  /** Initialize by setting the interconnects between the components. */
++  /** Get the virtual domain image from the metric(s) */
+   virtual VirtualImageBaseConstPointer GetCurrentLevelVirtualDomainImage();
+ 
+   /** Get metric samples. */
+@@ -463,6 +470,8 @@ protected:
+ 
+   FixedImagesContainerType                                        m_FixedSmoothImages;
+   MovingImagesContainerType                                       m_MovingSmoothImages;
++  FixedImageMasksContainerType                                    m_FixedImageMasks;
++  MovingImageMasksContainerType                                   m_MovingImageMasks;
+   VirtualImagePointer                                             m_VirtualDomainImage;
+   PointSetsContainerType                                          m_FixedPointSets;
+   PointSetsContainerType                                          m_MovingPointSets;
+@@ -503,12 +512,12 @@ private:
+   template<typename TTransform>
+   static void MakeOutputTransform(SmartPointer<TTransform> &ptr)
+     {
+-      ptr = TTransform::New();
++    ptr = TTransform::New();
+     }
+ 
+   static void MakeOutputTransform(SmartPointer<InitialTransformType> &ptr)
+     {
+-      ptr = IdentityTransform<RealType, ImageDimension>::New().GetPointer();
++    ptr = IdentityTransform<RealType, ImageDimension>::New().GetPointer();
+     }
+ 
+ };
+diff --git a/Modules/Registration/RegistrationMethodsv4/include/itkImageRegistrationMethodv4.hxx b/Modules/Registration/RegistrationMethodsv4/include/itkImageRegistrationMethodv4.hxx
+index d16a635..f4cad87 100644
+--- a/Modules/Registration/RegistrationMethodsv4/include/itkImageRegistrationMethodv4.hxx
++++ b/Modules/Registration/RegistrationMethodsv4/include/itkImageRegistrationMethodv4.hxx
+@@ -424,7 +424,38 @@ ImageRegistrationMethodv4<TFixedImage, TMovingImage, TTransform, TVirtualImage,
+         this->m_VirtualDomainImage->SetRegions( virtualDomainBaseImage->GetLargestPossibleRegion() );
+         this->m_VirtualDomainImage->Allocate();
+         }
++      }
++
++    this->m_FixedImageMasks.clear();
++    this->m_FixedImageMasks.resize( this->m_NumberOfMetrics );
++    this->m_MovingImageMasks.clear();
++    this->m_MovingImageMasks.resize( this->m_NumberOfMetrics );
+ 
++    for( SizeValueType n = 0; n < this->m_NumberOfMetrics; n++ )
++      {
++      this->m_FixedImageMasks[n] = ITK_NULLPTR;
++      this->m_MovingImageMasks[n] = ITK_NULLPTR;
++
++      if( this->m_Metric->GetMetricCategory() == MetricType::IMAGE_METRIC ||
++          ( this->m_Metric->GetMetricCategory() == MetricType::MULTI_METRIC &&
++            multiMetric->GetMetricQueue()[n]->GetMetricCategory() == MetricType::IMAGE_METRIC ) )
++        {
++
++        if( this->m_Metric->GetMetricCategory() == MetricType::MULTI_METRIC )
++          {
++          this->m_FixedImageMasks[n] = dynamic_cast<ImageMetricType *>( multiMetric->GetMetricQueue()[n].GetPointer() )->GetFixedImageMask();
++          this->m_MovingImageMasks[n] = dynamic_cast<ImageMetricType *>( multiMetric->GetMetricQueue()[n].GetPointer() )->GetMovingImageMask();
++          }
++        else if( this->m_Metric->GetMetricCategory() == MetricType::IMAGE_METRIC )
++          {
++          this->m_FixedImageMasks[n] = dynamic_cast<ImageMetricType *>( this->m_Metric.GetPointer() )->GetFixedImageMask();
++          this->m_MovingImageMasks[n] = dynamic_cast<ImageMetricType *>( this->m_Metric.GetPointer() )->GetMovingImageMask();
++          }
++        else
++          {
++          itkExceptionMacro( "Invalid metric type." )
++          }
++        }
+       }
+     }
+   this->m_CompositeTransform->SetOnlyMostRecentTransformToOptimizeOn();
+@@ -616,11 +647,17 @@ ImageRegistrationMethodv4<TFixedImage, TMovingImage, TTransform, TVirtualImage,
+         {
+         multiMetric->GetMetricQueue()[n]->SetFixedObject( this->m_FixedSmoothImages[n] );
+         multiMetric->GetMetricQueue()[n]->SetMovingObject( this->m_MovingSmoothImages[n] );
++
++        dynamic_cast<ImageMetricType *>( multiMetric->GetMetricQueue()[n].GetPointer() )->SetFixedImageMask( this->m_FixedImageMasks[n] );
++        dynamic_cast<ImageMetricType *>( multiMetric->GetMetricQueue()[n].GetPointer() )->SetMovingImageMask( this->m_MovingImageMasks[n] );
+         }
+       else if( this->m_Metric->GetMetricCategory() == MetricType::IMAGE_METRIC )
+         {
+         this->m_Metric->SetFixedObject( this->m_FixedSmoothImages[n] );
+         this->m_Metric->SetMovingObject( this->m_MovingSmoothImages[n] );
++
++        dynamic_cast<ImageMetricType *>( this->m_Metric.GetPointer() )->SetFixedImageMask( this->m_FixedImageMasks[n] );
++        dynamic_cast<ImageMetricType *>( this->m_Metric.GetPointer() )->SetMovingImageMask( this->m_MovingImageMasks[n] );
+         }
+       else
+         {
+@@ -847,9 +884,8 @@ ImageRegistrationMethodv4<TFixedImage, TMovingImage, TTransform, TVirtualImage,
+ {
+   typedef typename ImageMetricType::VirtualImageType    VirtualDomainImageType;
+   typedef typename VirtualDomainImageType::RegionType   VirtualDomainRegionType;
+-  const VirtualDomainImageType * virtualImage = ITK_NULLPTR;
+ 
+-  typedef typename ImageMetricType::FixedImageMaskType  FixedImageMaskType;
++  const VirtualDomainImageType * virtualImage = ITK_NULLPTR;
+   const FixedImageMaskType * fixedMaskImage = ITK_NULLPTR;
+ 
+   SizeValueType numberOfLocalMetrics = 1;
+diff --git a/Modules/Registration/RegistrationMethodsv4/include/itkSyNImageRegistrationMethod.h b/Modules/Registration/RegistrationMethodsv4/include/itkSyNImageRegistrationMethod.h
+index 6861de3..d4aecb4 100644
+--- a/Modules/Registration/RegistrationMethodsv4/include/itkSyNImageRegistrationMethod.h
++++ b/Modules/Registration/RegistrationMethodsv4/include/itkSyNImageRegistrationMethod.h
+@@ -20,6 +20,7 @@
+ 
+ #include "itkImageRegistrationMethodv4.h"
+ 
++#include "itkImageMaskSpatialObject.h"
+ #include "itkDisplacementFieldTransform.h"
+ 
+ namespace itk
+@@ -102,8 +103,14 @@ public:
+   typedef typename Superclass::ImageMetricType                        ImageMetricType;
+   typedef typename ImageMetricType::Pointer                           ImageMetricPointer;
+   typedef typename ImageMetricType::MeasureType                       MeasureType;
+-  typedef typename ImageMetricType::FixedImageMaskType                FixedImageMaskType;
+-  typedef typename ImageMetricType::MovingImageMaskType               MovingImageMaskType;
++
++  typedef ImageMaskSpatialObject<ImageDimension>                      ImageMaskSpatialObjectType;
++  typedef typename Superclass::FixedImageMaskType                     FixedImageMaskType;
++  typedef typename ImageMaskSpatialObjectType::ImageType              FixedMaskImageType;
++  typedef typename Superclass::FixedImageMasksContainerType           FixedImageMasksContainerType;
++  typedef typename Superclass::MovingImageMaskType                    MovingImageMaskType;
++  typedef typename ImageMaskSpatialObjectType::ImageType              MovingMaskImageType;
++  typedef typename Superclass::MovingImageMasksContainerType          MovingImageMasksContainerType;
+ 
+   typedef typename Superclass::VirtualImageType                       VirtualImageType;
+   typedef typename Superclass::VirtualImageBaseType                   VirtualImageBaseType;
+@@ -205,10 +212,11 @@ protected:
+ 
+   virtual DisplacementFieldPointer ComputeUpdateField( const FixedImagesContainerType, const PointSetsContainerType,
+     const TransformBaseType *, const MovingImagesContainerType, const PointSetsContainerType,
+-    const TransformBaseType *, const FixedImageMaskType *, MeasureType & );
++    const TransformBaseType *, const FixedImageMasksContainerType, const MovingImageMasksContainerType, MeasureType & );
+   virtual DisplacementFieldPointer ComputeMetricGradientField( const FixedImagesContainerType,
+     const PointSetsContainerType, const TransformBaseType *, const MovingImagesContainerType,
+-    const PointSetsContainerType, const TransformBaseType *, const FixedImageMaskType *, MeasureType & );
++    const PointSetsContainerType, const TransformBaseType *, const FixedImageMasksContainerType,
++    const MovingImageMasksContainerType, MeasureType & );
+ 
+   virtual DisplacementFieldPointer ScaleUpdateField( const DisplacementFieldType * );
+   virtual DisplacementFieldPointer GaussianSmoothDisplacementField( const DisplacementFieldType *, const RealType );
+diff --git a/Modules/Registration/RegistrationMethodsv4/include/itkSyNImageRegistrationMethod.hxx b/Modules/Registration/RegistrationMethodsv4/include/itkSyNImageRegistrationMethod.hxx
+index 6f38354..1af81bd 100644
+--- a/Modules/Registration/RegistrationMethodsv4/include/itkSyNImageRegistrationMethod.hxx
++++ b/Modules/Registration/RegistrationMethodsv4/include/itkSyNImageRegistrationMethod.hxx
+@@ -187,12 +187,12 @@ SyNImageRegistrationMethod<TFixedImage, TMovingImage, TOutputTransform, TVirtual
+     DisplacementFieldPointer fixedToMiddleSmoothUpdateField = this->ComputeUpdateField(
+       this->m_FixedSmoothImages, this->m_FixedPointSets, fixedComposite,
+       this->m_MovingSmoothImages, this->m_MovingPointSets, movingComposite,
+-      ITK_NULLPTR, movingMetricValue );
++      this->m_FixedImageMasks, this->m_MovingImageMasks, movingMetricValue );
+ 
+     DisplacementFieldPointer movingToMiddleSmoothUpdateField = this->ComputeUpdateField(
+       this->m_MovingSmoothImages, this->m_MovingPointSets, movingComposite,
+       this->m_FixedSmoothImages, this->m_FixedPointSets, fixedComposite,
+-      ITK_NULLPTR, fixedMetricValue );
++      this->m_MovingImageMasks, this->m_FixedImageMasks, fixedMetricValue );
+ 
+     if ( this->m_AverageMidPointGradients )
+       {
+@@ -257,10 +257,12 @@ typename SyNImageRegistrationMethod<TFixedImage, TMovingImage, TOutputTransform,
+ SyNImageRegistrationMethod<TFixedImage, TMovingImage, TOutputTransform, TVirtualImage, TPointSet>
+ ::ComputeUpdateField( const FixedImagesContainerType fixedImages, const PointSetsContainerType fixedPointSets,
+   const TransformBaseType * fixedTransform, const MovingImagesContainerType movingImages, const PointSetsContainerType movingPointSets,
+-  const TransformBaseType * movingTransform, const FixedImageMaskType * mask, MeasureType & value )
++  const TransformBaseType * movingTransform, const FixedImageMasksContainerType fixedImageMasks, const MovingImageMasksContainerType movingImageMasks,
++  MeasureType & value )
+ {
+   DisplacementFieldPointer metricGradientField = this->ComputeMetricGradientField(
+-      fixedImages, fixedPointSets, fixedTransform, movingImages, movingPointSets, movingTransform, mask, value );
++      fixedImages, fixedPointSets, fixedTransform, movingImages, movingPointSets, movingTransform,
++      fixedImageMasks, movingImageMasks, value );
+ 
+   DisplacementFieldPointer updateField = this->GaussianSmoothDisplacementField( metricGradientField,
+     this->m_GaussianSmoothingVarianceForTheUpdateField );
+@@ -275,7 +277,8 @@ typename SyNImageRegistrationMethod<TFixedImage, TMovingImage, TOutputTransform,
+ SyNImageRegistrationMethod<TFixedImage, TMovingImage, TOutputTransform, TVirtualImage, TPointSet>
+ ::ComputeMetricGradientField( const FixedImagesContainerType fixedImages, const PointSetsContainerType fixedPointSets,
+   const TransformBaseType * fixedTransform, const MovingImagesContainerType movingImages, const PointSetsContainerType movingPointSets,
+-  const TransformBaseType * movingTransform, const FixedImageMaskType * itkNotUsed( mask ), MeasureType & value )
++  const TransformBaseType * movingTransform, const FixedImageMasksContainerType fixedImageMasks, const MovingImageMasksContainerType movingImageMasks,
++  MeasureType & value )
+ {
+   typename MultiMetricType::Pointer multiMetric = dynamic_cast<MultiMetricType *>( this->m_Metric.GetPointer() );
+ 
+@@ -303,6 +306,9 @@ SyNImageRegistrationMethod<TFixedImage, TMovingImage, TOutputTransform, TVirtual
+ 
+           multiMetric->SetFixedTransform( const_cast<TransformBaseType *>( fixedTransform ) );
+           multiMetric->SetMovingTransform( const_cast<TransformBaseType *>( movingTransform ) );
++
++          dynamic_cast<ImageMetricType *>( multiMetric->GetMetricQueue()[n].GetPointer() )->SetFixedImageMask( fixedImageMasks[n] );
++          dynamic_cast<ImageMetricType *>( multiMetric->GetMetricQueue()[n].GetPointer() )->SetMovingImageMask( movingImageMasks[n] );
+           }
+         else
+           {
+@@ -326,6 +332,50 @@ SyNImageRegistrationMethod<TFixedImage, TMovingImage, TOutputTransform, TVirtual
+ 
+           multiMetric->GetMetricQueue()[n]->SetFixedObject( fixedResampler->GetOutput() );
+           multiMetric->GetMetricQueue()[n]->SetMovingObject( movingResampler->GetOutput() );
++
++          if( fixedImageMasks[n] )
++            {
++            typedef NearestNeighborInterpolateImageFunction<FixedMaskImageType, RealType> NearestNeighborInterpolatorType;
++            typename NearestNeighborInterpolatorType::Pointer nearestNeighborInterpolator = NearestNeighborInterpolatorType::New();
++            nearestNeighborInterpolator->SetInputImage( dynamic_cast<ImageMaskSpatialObjectType *>( const_cast<FixedImageMaskType *>( fixedImageMasks[n].GetPointer() ) )->GetImage() );
++
++            typedef ResampleImageFilter<FixedMaskImageType, FixedMaskImageType, RealType> FixedMaskResamplerType;
++            typename FixedMaskResamplerType::Pointer fixedMaskResampler = FixedMaskResamplerType::New();
++            fixedMaskResampler->SetInput( dynamic_cast<ImageMaskSpatialObjectType *>( const_cast<FixedImageMaskType *>( fixedImageMasks[n].GetPointer() ) )->GetImage() );
++            fixedMaskResampler->SetTransform( fixedTransform );
++            fixedMaskResampler->SetInterpolator( nearestNeighborInterpolator );
++            fixedMaskResampler->UseReferenceImageOn();
++            fixedMaskResampler->SetReferenceImage( virtualDomainImage );
++            fixedMaskResampler->SetDefaultPixelValue( 0 );
++            fixedMaskResampler->Update();
++
++            typename ImageMaskSpatialObjectType::Pointer resampledFixedImageMask = ImageMaskSpatialObjectType::New();
++            resampledFixedImageMask->SetImage( fixedMaskResampler->GetOutput() );
++
++            dynamic_cast<ImageMetricType *>( multiMetric->GetMetricQueue()[n].GetPointer() )->SetFixedImageMask( resampledFixedImageMask );
++            }
++
++          if( movingImageMasks[n] )
++            {
++            typedef NearestNeighborInterpolateImageFunction<MovingMaskImageType, RealType> NearestNeighborInterpolatorType;
++            typename NearestNeighborInterpolatorType::Pointer nearestNeighborInterpolator = NearestNeighborInterpolatorType::New();
++            nearestNeighborInterpolator->SetInputImage( dynamic_cast<ImageMaskSpatialObjectType *>( const_cast<MovingImageMaskType *>( movingImageMasks[n].GetPointer() ) )->GetImage() );
++
++            typedef ResampleImageFilter<MovingMaskImageType, MovingMaskImageType, RealType> MovingMaskResamplerType;
++            typename MovingMaskResamplerType::Pointer movingMaskResampler = MovingMaskResamplerType::New();
++            movingMaskResampler->SetInput( dynamic_cast<ImageMaskSpatialObjectType *>( const_cast<MovingImageMaskType *>( movingImageMasks[n].GetPointer() ) )->GetImage() );
++            movingMaskResampler->SetTransform( movingTransform );
++            movingMaskResampler->SetInterpolator( nearestNeighborInterpolator );
++            movingMaskResampler->UseReferenceImageOn();
++            movingMaskResampler->SetReferenceImage( virtualDomainImage );
++            movingMaskResampler->SetDefaultPixelValue( 0 );
++            movingMaskResampler->Update();
++
++            typename ImageMaskSpatialObjectType::Pointer resampledMovingImageMask = ImageMaskSpatialObjectType::New();
++            resampledMovingImageMask->SetImage( movingMaskResampler->GetOutput() );
++
++            dynamic_cast<ImageMetricType *>( multiMetric->GetMetricQueue()[n].GetPointer() )->SetMovingImageMask( resampledMovingImageMask );
++            }
+           }
+         }
+       else
+@@ -360,12 +410,17 @@ SyNImageRegistrationMethod<TFixedImage, TMovingImage, TOutputTransform, TVirtual
+       }
+     else if( this->m_Metric->GetMetricCategory() == MetricType::IMAGE_METRIC )
+       {
++
+       if( !this->m_DownsampleImagesForMetricDerivatives )
+         {
+         this->m_Metric->SetFixedObject( fixedImages[0] );
+         this->m_Metric->SetMovingObject( movingImages[0] );
++
+         dynamic_cast<ImageMetricType *>( this->m_Metric.GetPointer() )->SetFixedTransform( const_cast<TransformBaseType *>( fixedTransform ) );
+         dynamic_cast<ImageMetricType *>( this->m_Metric.GetPointer() )->SetMovingTransform( const_cast<TransformBaseType *>( movingTransform ) );
++
++        dynamic_cast<ImageMetricType *>( this->m_Metric.GetPointer() )->SetFixedImageMask( fixedImageMasks[0] );
++        dynamic_cast<ImageMetricType *>( this->m_Metric.GetPointer() )->SetMovingImageMask( movingImageMasks[0] );
+         }
+       else
+         {
+@@ -389,6 +444,50 @@ SyNImageRegistrationMethod<TFixedImage, TMovingImage, TOutputTransform, TVirtual
+ 
+         this->m_Metric->SetFixedObject( fixedResampler->GetOutput() );
+         this->m_Metric->SetMovingObject( movingResampler->GetOutput() );
++
++        if( fixedImageMasks[0] )
++          {
++          typedef NearestNeighborInterpolateImageFunction<FixedMaskImageType, RealType> NearestNeighborInterpolatorType;
++          typename NearestNeighborInterpolatorType::Pointer nearestNeighborInterpolator = NearestNeighborInterpolatorType::New();
++          nearestNeighborInterpolator->SetInputImage( dynamic_cast<ImageMaskSpatialObjectType *>( const_cast<FixedImageMaskType *>( fixedImageMasks[0].GetPointer() ) )->GetImage() );
++
++          typedef ResampleImageFilter<FixedMaskImageType, FixedMaskImageType, RealType> FixedMaskResamplerType;
++          typename FixedMaskResamplerType::Pointer fixedMaskResampler = FixedMaskResamplerType::New();
++          fixedMaskResampler->SetInput( dynamic_cast<ImageMaskSpatialObjectType *>( const_cast<FixedImageMaskType *>( fixedImageMasks[0].GetPointer() ) )->GetImage() );
++          fixedMaskResampler->SetTransform( fixedTransform );
++          fixedMaskResampler->SetInterpolator( nearestNeighborInterpolator );
++          fixedMaskResampler->UseReferenceImageOn();
++          fixedMaskResampler->SetReferenceImage( virtualDomainImage );
++          fixedMaskResampler->SetDefaultPixelValue( 0 );
++          fixedMaskResampler->Update();
++
++          typename ImageMaskSpatialObjectType::Pointer resampledFixedImageMask = ImageMaskSpatialObjectType::New();
++          resampledFixedImageMask->SetImage( fixedMaskResampler->GetOutput() );
++
++          dynamic_cast<ImageMetricType *>( this->m_Metric.GetPointer() )->SetFixedImageMask( resampledFixedImageMask );
++          }
++
++        if( movingImageMasks[0] )
++          {
++          typedef NearestNeighborInterpolateImageFunction<MovingMaskImageType, RealType> NearestNeighborInterpolatorType;
++          typename NearestNeighborInterpolatorType::Pointer nearestNeighborInterpolator = NearestNeighborInterpolatorType::New();
++          nearestNeighborInterpolator->SetInputImage( dynamic_cast<ImageMaskSpatialObjectType *>( const_cast<MovingImageMaskType *>( movingImageMasks[0].GetPointer() ) )->GetImage() );
++
++          typedef ResampleImageFilter<MovingMaskImageType, MovingMaskImageType, RealType> MovingMaskResamplerType;
++          typename MovingMaskResamplerType::Pointer movingMaskResampler = MovingMaskResamplerType::New();
++          movingMaskResampler->SetInput( dynamic_cast<ImageMaskSpatialObjectType *>( const_cast<MovingImageMaskType *>( movingImageMasks[0].GetPointer() ) )->GetImage() );
++          movingMaskResampler->SetTransform( movingTransform );
++          movingMaskResampler->SetInterpolator( nearestNeighborInterpolator );
++          movingMaskResampler->UseReferenceImageOn();
++          movingMaskResampler->SetReferenceImage( virtualDomainImage );
++          movingMaskResampler->SetDefaultPixelValue( 0 );
++          movingMaskResampler->Update();
++
++          typename ImageMaskSpatialObjectType::Pointer resampledMovingImageMask = ImageMaskSpatialObjectType::New();
++          resampledMovingImageMask->SetImage( movingMaskResampler->GetOutput() );
++
++          dynamic_cast<ImageMetricType *>( this->m_Metric.GetPointer() )->SetMovingImageMask( resampledMovingImageMask );
++          }
+         }
+       }
+     else
+diff --git a/Modules/Registration/RegistrationMethodsv4/include/itkTimeVaryingBSplineVelocityFieldImageRegistrationMethod.h b/Modules/Registration/RegistrationMethodsv4/include/itkTimeVaryingBSplineVelocityFieldImageRegistrationMethod.h
+index c4f04d7..310749a 100644
+--- a/Modules/Registration/RegistrationMethodsv4/include/itkTimeVaryingBSplineVelocityFieldImageRegistrationMethod.h
++++ b/Modules/Registration/RegistrationMethodsv4/include/itkTimeVaryingBSplineVelocityFieldImageRegistrationMethod.h
+@@ -134,10 +134,14 @@ public:
+   typedef typename MetricType::Pointer                                MetricPointer;
+   typedef typename Superclass::PointSetMetricType                     PointSetMetricType;
+ 
+-  typedef typename ImageMetricType::FixedImageMaskType                FixedImageMaskType;
+-  typedef typename ImageMetricType::MovingImageMaskType               MovingImageMaskType;
+   typedef ImageMaskSpatialObject<ImageDimension>                      ImageMaskSpatialObjectType;
+   typedef typename ImageMaskSpatialObjectType::ImageType              MaskImageType;
++  typedef typename Superclass::FixedImageMaskType                     FixedImageMaskType;
++  typedef typename ImageMaskSpatialObjectType::ImageType              FixedMaskImageType;
++  typedef typename Superclass::FixedImageMasksContainerType           FixedImageMasksContainerType;
++  typedef typename Superclass::MovingImageMaskType                    MovingImageMaskType;
++  typedef typename ImageMaskSpatialObjectType::ImageType              MovingMaskImageType;
++  typedef typename Superclass::MovingImageMasksContainerType          MovingImageMasksContainerType;
+ 
+   typedef typename Superclass::InitialTransformType                                            InitialTransformType;
+   typedef TOutputTransform                                                                     OutputTransformType;
+@@ -213,7 +217,7 @@ protected:
+   void AttachMetricGradientPointSetAtSpecificTimePoint( const RealType,
+     VelocityFieldPointSetType *, WeightsContainerType *, const FixedImagesContainerType,
+     const PointSetsContainerType, const TransformBaseType *, const MovingImagesContainerType,
+-    const PointSetsContainerType, const TransformBaseType *, const FixedImageMaskType * );
++    const PointSetsContainerType, const TransformBaseType *, const FixedImageMasksContainerType );
+ 
+ private:
+   TimeVaryingBSplineVelocityFieldImageRegistrationMethod( const Self & ) ITK_DELETE_FUNCTION;
+diff --git a/Modules/Registration/RegistrationMethodsv4/include/itkTimeVaryingBSplineVelocityFieldImageRegistrationMethod.hxx b/Modules/Registration/RegistrationMethodsv4/include/itkTimeVaryingBSplineVelocityFieldImageRegistrationMethod.hxx
+index f259504..00d917a 100644
+--- a/Modules/Registration/RegistrationMethodsv4/include/itkTimeVaryingBSplineVelocityFieldImageRegistrationMethod.hxx
++++ b/Modules/Registration/RegistrationMethodsv4/include/itkTimeVaryingBSplineVelocityFieldImageRegistrationMethod.hxx
+@@ -561,7 +561,7 @@ TimeVaryingBSplineVelocityFieldImageRegistrationMethod<TFixedImage, TMovingImage
+         velocityFieldPointSet, velocityFieldWeights,
+         this->m_FixedSmoothImages, this->m_FixedPointSets, fixedComposite,
+         this->m_MovingSmoothImages, this->m_MovingPointSets, movingComposite,
+-        ITK_NULLPTR );
++        this->m_FixedImageMasks );
+       }
+ 
+     // After calculating the velocity field points for a specific parameterized time point,
+@@ -608,8 +608,9 @@ TimeVaryingBSplineVelocityFieldImageRegistrationMethod<TFixedImage, TMovingImage
+ ::AttachMetricGradientPointSetAtSpecificTimePoint( const RealType normalizedTimePoint,
+   VelocityFieldPointSetType *velocityFieldPoints, WeightsContainerType *velocityFieldWeights,
+   const FixedImagesContainerType fixedImages, const PointSetsContainerType fixedPointSets,
+-  const TransformBaseType * fixedTransform, const MovingImagesContainerType movingImages, const PointSetsContainerType movingPointSets,
+-  const TransformBaseType * movingTransform, const FixedImageMaskType * fixedImageMask )
++  const TransformBaseType * fixedTransform, const MovingImagesContainerType movingImages,
++  const PointSetsContainerType movingPointSets, const TransformBaseType * movingTransform,
++  const FixedImageMasksContainerType fixedImageMasks )
+ {
+   VirtualImageBaseConstPointer virtualDomainImage = this->GetCurrentLevelVirtualDomainImage();
+ 
+@@ -731,12 +732,12 @@ TimeVaryingBSplineVelocityFieldImageRegistrationMethod<TFixedImage, TMovingImage
+     }
+ 
+   typename WeightedMaskImageType::Pointer  fixedWeightedImageMask = ITK_NULLPTR;
+-  if( fixedImageMask )
++  if( fixedImageMasks[0] )
+     {
+     typedef ResampleImageFilter<MaskImageType, WeightedMaskImageType, RealType> FixedMaskResamplerType;
+     typename FixedMaskResamplerType::Pointer fixedMaskResampler = FixedMaskResamplerType::New();
+     fixedMaskResampler->SetTransform( fixedTransform );
+-    fixedMaskResampler->SetInput( dynamic_cast<ImageMaskSpatialObjectType *>( const_cast<FixedImageMaskType *>( fixedImageMask) )->GetImage() );
++    fixedMaskResampler->SetInput( dynamic_cast<ImageMaskSpatialObjectType *>( const_cast<FixedImageMaskType *>( fixedImageMasks[0].GetPointer() ) )->GetImage() );
+     fixedMaskResampler->SetSize( virtualDomainImage->GetRequestedRegion().GetSize() );
+     fixedMaskResampler->SetOutputOrigin( virtualDomainImage->GetOrigin() );
+     fixedMaskResampler->SetOutputSpacing( virtualDomainImage->GetSpacing() );
+-- 
+1.9.1
+
