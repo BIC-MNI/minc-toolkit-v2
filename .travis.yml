@@ -18,7 +18,6 @@ env:
       - OS=debian DIST=wheezy PACK=deb
       - OS=debian DIST=stretch PACK=deb
       - OS=debian DIST=sid PACK=deb
-      - PACK=none
 
 script:
   - git clone https://github.com/tarantool/build.git
