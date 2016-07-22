@@ -21,7 +21,7 @@ BuildRequires:  libXmu-devel
 BuildRequires:  bzip2
 BuildRequires:  gcc-c++
 BuildRequires:  git
-BuildRequires:  Mesa-libGL-devel
+BuildRequires:  mesa-libGL-devel
 
 Prefix:         /opt/minc/%{version}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
