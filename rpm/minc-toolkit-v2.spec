@@ -3,10 +3,10 @@
 #
 Summary: minc toolkit version 2
 Name: minc-toolkit-v2
-Version: 1.9.11
+Version: 1.9.10
 Release: 1
 Group: XXX/XXX
-Source: http://packages.bic.mni.mcgill.ca/minc-toolkit/minc-toolkit-v2-1.9.11-20160202.tar.bz2
+Source: minc-toolkit-v2-1.9.10.tar.gz
 URL: http://bic-mni.github.io
 Packager: Vladimir Fonov <vladimir.fonov@gmail.com>
 License: GPL-2.0
