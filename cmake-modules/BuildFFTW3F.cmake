@@ -24,9 +24,9 @@ macro(build_fftw3f install_prefix staging_prefix)
         URL_MD5 "2edab8c06b24feeb3b82bbb3ebf3e7b3"
         BUILD_IN_SOURCE 1
         INSTALL_DIR     "${staging_prefix}"
-        BUILD_COMMAND   $(MAKE)
-        INSTALL_COMMAND $(MAKE) DESTDIR=${staging_prefix} install
-        CONFIGURE_COMMAND  ./configure ${FFTW3F_CONFIG} --libdir=${install_prefix}/lib${LIB_SUFFIX}  --prefix=${install_prefix} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} "CXXFLAGS=${EXT_CXX_FLAGS}" "CFLAGS=${EXT_C_FLAGS}"
+        BUILD_COMMAND   $(MAKE) -s V=0
+        INSTALL_COMMAND $(MAKE) -s V=0 DESTDIR=${staging_prefix} install
+        CONFIGURE_COMMAND  ./configure --enable-silent-rules --silent ${FFTW3F_CONFIG} --libdir=${install_prefix}/lib${LIB_SUFFIX}  --prefix=${install_prefix} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} "CXXFLAGS=${EXT_CXX_FLAGS}" "CFLAGS=${EXT_C_FLAGS}"
 #        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
       )
 

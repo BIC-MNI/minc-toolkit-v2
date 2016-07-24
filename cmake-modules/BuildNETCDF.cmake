@@ -52,12 +52,18 @@ macro(build_netcdf install_prefix staging_prefix)
       -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
     )
   endif()
+  
+  #SET(PATCH_QUIET "")
+  #if(MT_BUILD_QUIET)
+    SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake.patch)
+  #endif(MT_BUILD_QUIET)
 
   ExternalProject_Add(NETCDF 
     URL "ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.3.3.1.tar.gz"
     URL_MD5 "5c9dad3705a3408d27f696e5b31fb88c"
   SOURCE_DIR NETCDF
   BINARY_DIR NETCDF-build
+  PATCH_COMMAND ${PATCH_QUIET}
   LIST_SEPARATOR :::
   CMAKE_GENERATOR ${CMAKE_GEN}
   CMAKE_ARGS
@@ -84,7 +90,8 @@ macro(build_netcdf install_prefix staging_prefix)
       -DCMAKE_INSTALL_LIBDIR:PATH=${install_prefix}/lib${LIB_SUFFIX} # DISABLING Multiarch support for now ?
   INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
   INSTALL_DIR ${staging_prefix}/${install_prefix}
-  )
+  # disable some output
+)
 
   SET(NETCDF_LIBRARY     ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libnetcdf.a )
   SET(NETCDF_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )

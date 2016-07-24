@@ -62,11 +62,17 @@ macro(build_hdf5 install_prefix staging_prefix)
   SET(HDF_CMAKE_CXX_FLAGS "-fPIC ${CMAKE_CXX_FLAGS}")
   SET(HDF_CMAKE_C_FLAGS   "-fPIC ${CMAKE_C_FLAGS}")
   
+  #SET(PATCH_QUIET "")
+  #if(MT_BUILD_QUIET)
+    SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake.patch)
+  #endif(MT_BUILD_QUIET)
+  
 ExternalProject_Add(HDF5
   URL "https://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.17/src/hdf5-1.8.17.tar.bz2"
   URL_MD5 "34bd1afa5209259201a41964100d6203"
   SOURCE_DIR HDF5
   BINARY_DIR HDF5-build
+  PATCH_COMMAND ${PATCH_QUIET}
   CMAKE_GENERATOR ${CMAKE_GEN}
   CMAKE_ARGS
       -DBUILD_TESTING:BOOL=OFF #${BUILD_TESTING}

@@ -53,6 +53,12 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
     )
   endif(APPLE)
 
+  #SET(PATCH_QUIET "")
+  #if(MT_BUILD_QUIET)
+    SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake.patch)
+  #endif(MT_BUILD_QUIET)
+
+
   SET(HDF5_LIB_SUFFIX ".a")
   
   IF(MT_BUILD_SHARED_LIBS) 
@@ -69,15 +75,14 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
       SET(ITK_SHARED_LIBRARY "OFF")
   ENDIF(MT_BUILD_SHARED_LIBS)
   
-  message("1")
   IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
-    message("Using release version of HDF5")
+    #message("Using release version of HDF5")
     SET(HDF5_LIBRARY ${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX})
     SET(HDF5_CPP_LIBRARY ${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX})
     SET(HDF5_HL_LIBRARY ${hdf_library_dir}/libhdf5_hl${HDF5_LIB_SUFFIX})
     SET(HDF5_HL_CPP_LIBRARY ${hdf_library_dir}/libhdf5_hl_cpp${HDF5_LIB_SUFFIX})
   ELSE(${CMAKE_BUILD_TYPE} STREQUAL Release)
-    message("Using debug version of HDF5")
+    #message("Using debug version of HDF5")
     SET(HDF5_LIBRARY ${hdf_library_dir}/libhdf5_debug${HDF5_LIB_SUFFIX})
     SET(HDF5_CPP_LIBRARY ${hdf_library_dir}/libhdf5_cpp_debug${HDF5_LIB_SUFFIX})
     SET(HDF5_HL_LIBRARY ${hdf_library_dir}/libhdf5_hl_debug${HDF5_LIB_SUFFIX})
@@ -85,10 +90,10 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
   ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release)
 
 
-   message("HDF5_LIBRARY=${HDF5_LIBRARY}")
-   message("HDF5_CPP_LIBRARY=${HDF5_CPP_LIBRARY}")
-   message("HDF5_HL_LIBRARY=${HDF5_HL_LIBRARY}")
-   message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
+   #message("HDF5_LIBRARY=${HDF5_LIBRARY}")
+   #message("HDF5_CPP_LIBRARY=${HDF5_CPP_LIBRARY}")
+   #message("HDF5_HL_LIBRARY=${HDF5_HL_LIBRARY}")
+   #message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
 
 
   ExternalProject_Add(ITKv4
@@ -100,6 +105,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
+    PATCH_COMMAND ${PATCH_QUIET}
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}

@@ -26,9 +26,9 @@ ExternalProject_Add(FREEGLUT
   URL_MD5 "39f0f2de89f399529d2b981188082218"
   BUILD_IN_SOURCE 1
   INSTALL_DIR     "${staging_prefix}"
-  BUILD_COMMAND   $(MAKE)
-  INSTALL_COMMAND $(MAKE) DESTDIR=${staging_prefix} install 
-  CONFIGURE_COMMAND ./configure --prefix=${install_prefix} --with-pic --disable-shared --libdir=${install_prefix}/lib${LIB_SUFFIX} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} "CXXFLAGS=${EXT_CXX_FLAGS}" "CFLAGS=${EXT_C_FLAGS}"
+  BUILD_COMMAND   $(MAKE) -s V=0
+  INSTALL_COMMAND $(MAKE) -s V=0 DESTDIR=${staging_prefix} install 
+  CONFIGURE_COMMAND ./configure --enable-silent-rules --silent  --prefix=${install_prefix} --with-pic --disable-shared --libdir=${install_prefix}/lib${LIB_SUFFIX} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} "CXXFLAGS=${EXT_CXX_FLAGS}" "CFLAGS=${EXT_C_FLAGS}"
 )
 
 SET(GLUT_LIBRARY     ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libglut.a )
