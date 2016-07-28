@@ -1,0 +1,10 @@
+--- CMakeLists.txt.orig	2016-07-24 11:17:47.000000000 -0400
++++ CMakeLists.txt	2016-07-24 11:17:52.000000000 -0400
+@@ -0,0 +1,6 @@
++set_property(GLOBAL PROPERTY RULE_MESSAGES OFF)
++find_program(CCACHE_FOUND ccache)
++if(CCACHE_FOUND)
++    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE_FOUND})
++    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK    ${CCACHE_FOUND})
++endif(CCACHE_FOUND)
++

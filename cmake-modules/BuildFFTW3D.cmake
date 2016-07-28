@@ -8,6 +8,14 @@ macro(build_fftw3d install_prefix staging_prefix)
     SET(EXT_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}")
   ENDIF()
 
+
+  SET(EXT_C_COMPILER ${CMAKE_C_COMPILER})
+  SET(EXT_CXX_COMPILER ${CMAKE_CXX_COMPILER})
+  IF(CCACHE_FOUND)
+    SET(EXT_C_COMPILER   "${CCACHE_FOUND} ${CMAKE_C_COMPILER}")
+    SET(EXT_CXX_COMPILER "${CCACHE_FOUND} ${CMAKE_CXX_COMPILER}")
+  ENDIF(CCACHE_FOUND)
+
   SET(FFTW3D_CONFIG  --with-pic --disable-shared --enable-threads --disable-fortran )
   
   IF(NOT APPLE)
@@ -26,7 +34,7 @@ macro(build_fftw3d install_prefix staging_prefix)
         INSTALL_DIR     "${staging_prefix}"
         BUILD_COMMAND   $(MAKE) -s V=0
         INSTALL_COMMAND $(MAKE) -s V=0 DESTDIR=${staging_prefix} install
-        CONFIGURE_COMMAND  ./configure --enable-silent-rules --silent ${FFTW3D_CONFIG} --libdir=${install_prefix}/lib${LIB_SUFFIX} --prefix=${install_prefix} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} "CXXFLAGS=${EXT_CXX_FLAGS}" "CFLAGS=${EXT_C_FLAGS}"
+        CONFIGURE_COMMAND  ./configure --enable-silent-rules --silent ${FFTW3D_CONFIG} --libdir=${install_prefix}/lib${LIB_SUFFIX} --prefix=${install_prefix} "CC=${EXT_C_COMPILER}" "CXX=${EXT_CXX_COMPILER}" "CXXFLAGS=${EXT_CXX_FLAGS}" "CFLAGS=${EXT_C_FLAGS}"
 #        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
       )
 

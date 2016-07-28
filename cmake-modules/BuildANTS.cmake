@@ -53,7 +53,7 @@ macro(build_ANTS install_prefix staging_prefix itk_dir ) #boost_dir
   endif()
   #SET(PATCH_QUIET "")
   #if(MT_BUILD_QUIET)
-    SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake.patch)
+    SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake_ccache.patch)
   #endif(MT_BUILD_QUIET)
 
   ExternalProject_Add(ANTS

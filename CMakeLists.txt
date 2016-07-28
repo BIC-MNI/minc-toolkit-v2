@@ -1,3 +1,9 @@
+find_program(CCACHE_FOUND ccache)
+if(CCACHE_FOUND)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE_FOUND})
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK    ${CCACHE_FOUND})
+endif(CCACHE_FOUND)
+
 project(minc-toolkit-v2)
 enable_language(C)
 enable_language(CXX)
