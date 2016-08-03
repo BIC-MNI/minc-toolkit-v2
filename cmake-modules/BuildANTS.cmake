@@ -51,6 +51,10 @@ macro(build_ANTS install_prefix staging_prefix itk_dir ) #boost_dir
       -DCMAKE_CXX_COMPILER:FILEPATH=${ITK_CXX_COMPILER}
     )
   endif()
+  #SET(PATCH_QUIET "")
+  #if(MT_BUILD_QUIET)
+    SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake_ccache.patch)
+  #endif(MT_BUILD_QUIET)
 
   ExternalProject_Add(ANTS
     #GIT_REPOSITORY "https://github.com/vfonov/ANTs.git"
@@ -58,6 +62,7 @@ macro(build_ANTS install_prefix staging_prefix itk_dir ) #boost_dir
     #UPDATE_COMMAND ""
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/ANTs
     BINARY_DIR ANTS-build
+    #PATCH_COMMAND ${PATCH_QUIET}
     LIST_SEPARATOR :::  
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
