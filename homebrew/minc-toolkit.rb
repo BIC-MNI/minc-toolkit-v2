@@ -2,11 +2,11 @@ require 'formula'
 
 
 class MincToolkit < Formula
-  homepage "https://github.com/BIC-MNI/minc-toolkit"
+  homepage "https://github.com/BIC-MNI/minc-toolkit-v2.git"
   #url "https://github.com/BIC-MNI/minc-toolkit/archive/release-1.9.07.tar.gz"
   #version "1.9.07"
   #sha256 "f1a4b86b72b9b8e42b034b9c05a4de8b2c3ee8951b56c9fb0fb2f8a380ca9312"
-  head 'git@github.com:BIC-MNI/minc-toolkit.git',  :branch => "ITK4v2", :using => :git
+  head 'git@github.com:BIC-MNI/minc-toolkit-v2.git',  :branch => "master", :using => :git
   
 
   depends_on "cmake" => :build
