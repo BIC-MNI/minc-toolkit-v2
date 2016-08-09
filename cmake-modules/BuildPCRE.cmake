@@ -18,8 +18,8 @@ macro(build_pcre install_prefix staging_prefix)
   ExternalProject_Add(PCRE
     SOURCE_DIR PCRE
     BINARY_DIR PCRE-build
-    URL "ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.37.tar.bz2"
-    URL_MD5 "ed91be292cb01d21bc7e526816c26981"
+    URL "https://sourceforge.net/projects/pcre/files/pcre/8.39/pcre-8.39.tar.bz2"
+    URL_MD5 "e3fca7650a0556a2647821679d81f585"
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
         -DBUILD_TESTING:BOOL=OFF #${BUILD_TESTING}
