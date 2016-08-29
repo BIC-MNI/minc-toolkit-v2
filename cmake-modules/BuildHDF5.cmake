@@ -63,8 +63,8 @@ macro(build_hdf5 install_prefix staging_prefix)
   SET(HDF_CMAKE_C_FLAGS   "-fPIC ${CMAKE_C_FLAGS}")
   
 ExternalProject_Add(HDF5
-  URL "https://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.15-patch1/src/hdf5-1.8.15-patch1.tar.bz2"
-  URL_MD5 "3c0d7a8c38d1abc7b40fc12c1d5f2bb8"
+  URL "https://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.17/src/hdf5-1.8.17.tar.bz2"
+  URL_MD5 "34bd1afa5209259201a41964100d6203"
   SOURCE_DIR HDF5
   BINARY_DIR HDF5-build
   CMAKE_GENERATOR ${CMAKE_GEN}
@@ -83,7 +83,7 @@ ExternalProject_Add(HDF5
       -DHDF5_BUILD_TOOLS:BOOL=ON
       -DHDF5_BUILD_EXAMPLES:BOOL=OFF
       -DZLIB_USE_EXTERNAL:BOOL=ON
-      -DHDF5_EXTERNALLY_CONFIGURED:BOOL=OFF
+      -DHDF5_EXTERNALLY_CONFIGURED:BOOL=ON
       -DHDF5_ENABLE_Z_LIB_SUPPORT:BOOL=ON
       -DH5_ZLIB_HEADER:STRING=zlib.h
       -DH5_HAVE_ZLIB_H:BOOL=ON

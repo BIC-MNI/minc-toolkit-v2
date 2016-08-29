@@ -3,9 +3,9 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
 
   if(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
-  else()
+  else(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_GENERATOR}")
-  endif()
+  endif(CMAKE_EXTRA_GENERATOR)
 
   set(CMAKE_EXTERNAL_PROJECT_ARGS
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
@@ -51,54 +51,50 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
       -DCMAKE_C_COMPILER:FILEPATH=${ITK_C_COMPILER}
       -DCMAKE_CXX_COMPILER:FILEPATH=${ITK_CXX_COMPILER}
     )
-  endif()
+  endif(APPLE)
 
   SET(HDF5_LIB_SUFFIX ".a")
+  
   IF(MT_BUILD_SHARED_LIBS) 
     SET(ITK_SHARED_LIBRARY "ON")
-    IF(MT_BUILD_SHARED_LIBS)
-      IF(APPLE)
+    
+    IF(APPLE)
         SET(HDF5_LIB_SUFFIX ".dylib")
-      ELSE(APPLE)
-          SET(HDF5_LIB_SUFFIX ".so")
-      ENDIF(APPLE)
+    ELSE(APPLE)
+        SET(HDF5_LIB_SUFFIX ".so")
+    ENDIF(APPLE)
+    
   ELSE(MT_BUILD_SHARED_LIBS)
-      SET(HDF5_LIB_SUFFIX ".a")
+      SET(HDF5_LIB_SUFFIX    ".a")
+      SET(ITK_SHARED_LIBRARY "OFF")
   ENDIF(MT_BUILD_SHARED_LIBS)
   
   IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
-    message("Using release version of HDF5")
+    #message("Using release version of HDF5")
     SET(HDF5_LIBRARY ${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX})
     SET(HDF5_CPP_LIBRARY ${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX})
     SET(HDF5_HL_LIBRARY ${hdf_library_dir}/libhdf5_hl${HDF5_LIB_SUFFIX})
     SET(HDF5_HL_CPP_LIBRARY ${hdf_library_dir}/libhdf5_hl_cpp${HDF5_LIB_SUFFIX})
-  ELSE()
-    message("Using debug version of HDF5")
+  ELSE(${CMAKE_BUILD_TYPE} STREQUAL Release)
+    #message("Using debug version of HDF5")
     SET(HDF5_LIBRARY ${hdf_library_dir}/libhdf5_debug${HDF5_LIB_SUFFIX})
     SET(HDF5_CPP_LIBRARY ${hdf_library_dir}/libhdf5_cpp_debug${HDF5_LIB_SUFFIX})
     SET(HDF5_HL_LIBRARY ${hdf_library_dir}/libhdf5_hl_debug${HDF5_LIB_SUFFIX})
     SET(HDF5_HL_CPP_LIBRARY ${hdf_library_dir}/libhdf5_hl_cpp_debug${HDF5_LIB_SUFFIX})
-  ENDIF()
-  
-  
-  else(MT_BUILD_SHARED_LIBS) 
-    SET(ITK_SHARED_LIBRARY "OFF")
-  endif(MT_BUILD_SHARED_LIBS) 
+  ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release)
 
 
-#   message("HDF5_LIBRARY=${HDF5_LIBRARY}")
-#   message("HDF5_CPP_LIBRARY=${HDF5_CPP_LIBRARY}")
-#   message("HDF5_HL_LIBRARY=${HDF5_HL_LIBRARY}")
-#   message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
-
+   message("HDF5_LIBRARY=${HDF5_LIBRARY}")
+   message("HDF5_CPP_LIBRARY=${HDF5_CPP_LIBRARY}")
+   message("HDF5_HL_LIBRARY=${HDF5_HL_LIBRARY}")
+   message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
 
   ExternalProject_Add(ITKv4
     #GIT_REPOSITORY "http://itk.org/ITK.git"
     #GIT_TAG "421d314ff85ad542ad5c0f3d3c115fa7427b1c64"
     
-    URL "https://github.com/InsightSoftwareConsortium/ITK/archive/v4.9.0.tar.gz"
-    URL_MD5 "5a3f39723c132e752acc2f8c82f4c06b"
-    PATCH_COMMAND patch -p 1 -d ${CMAKE_CURRENT_BINARY_DIR}/ITKv4 -u -i ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/ITK-4.9-ants-mask-fix.patch
+    URL "https://sourceforge.net/projects/itk/files/itk/4.10/InsightToolkit-4.10.0.tar.gz/download"
+    URL_MD5 "8c67ba296da3835fb67bb29d98dcff3e"
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
