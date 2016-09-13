@@ -456,7 +456,7 @@ IF(MT_BUILD_ITK_TOOLS)
   
   INCLUDE(BuildPatchMorphology)
   build_PatchMorphology(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX} ${ITK_DIR})
-  ADD_DEPENDENCIES(patch_morphology ITKv4)
+  ADD_DEPENDENCIES(patch_morphology ITKv4 minc_io)
    
   IF(MT_BUILD_ABC)
    INCLUDE(BuildABC)
