@@ -42,11 +42,11 @@ Installing from github, need CMake >= 3.1
   mkdir build && cd build
   ccmake .. # Enter configuration details, recommend not to use any system-provided libraries that are included in minc-toolkit-v2
 </code></pre>
-Following command will configure build system to build all the tools and install them into `/opt/minc-itk4` on Linux 
+Following command will configure build system to build all the tools and install them into `/opt/minc/1.9.13` on Linux 
 <code><pre>
  cmake .. \
 -DCMAKE_BUILD_TYPE:STRING=Release   \
--DCMAKE_INSTALL_PREFIX:PATH=/opt/minc-itk4   \
+-DCMAKE_INSTALL_PREFIX:PATH=/opt/minc/1.9.13   \
 -DMT_BUILD_ABC:BOOL=ON   \
 -DMT_BUILD_ANTS:BOOL=ON   \
 -DMT_BUILD_C3D:BOOL=ON   \
@@ -102,5 +102,6 @@ sudo apt-get install \
  bison flex \
  libx11-dev x11proto-core-dev \
  libxi6 libxi-dev \
- libxmu6 libxmu-dev libxmu-headers
+ libxmu6 libxmu-dev libxmu-headers \
+ libgl1-mesa-dev libglu1-mesa-dev
 </code></pre>
