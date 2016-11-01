@@ -223,6 +223,10 @@ FIND_PACKAGE( BISON )
 FIND_PACKAGE( FLEX )
 FIND_PACKAGE( Threads )
 
+#optional for minctools
+FIND_PACKAGE( JPEG )
+FIND_PACKAGE( OpenJPEG )
+
 #required for bicpl
 IF( USE_SYSTEM_NETPBM ) # else we will use bundled libppm
   FIND_PACKAGE( NETPBM QUIET )
