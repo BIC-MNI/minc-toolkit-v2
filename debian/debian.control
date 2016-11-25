@@ -1,0 +1,11 @@
+Source: minc-toolkit-v2
+Section: XXX
+Priority: optional
+Maintainer: Vladimir S. FONOV <vladimir.fonov@gmail.com>
+Build-Depends: debhelper (>= 4.1.16), cmake, bison, flex, libxi-dev, libxmu-dev, libxmu-headers, cmake (>= 3.0), git, libgl1-mesa-dev
+
+Package: minc-toolkit-v2
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: MINC toolkit v2
+ MINC toolkit version 2
