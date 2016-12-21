@@ -9,6 +9,8 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
 
 
   message("HDF5_DIR=${HDF5_DIR}")
+  message("CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
+  message("CMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
   
   set(CMAKE_EXTERNAL_PROJECT_ARGS
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
@@ -51,14 +53,14 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
       -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
       -DCMAKE_OSX_SYSROOT:STRING=${CMAKE_OSX_SYSROOT}
       -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
-      -DCMAKE_C_COMPILER:FILEPATH=${ITK_C_COMPILER}
-      -DCMAKE_CXX_COMPILER:FILEPATH=${ITK_CXX_COMPILER}
     )
   endif(APPLE)
 
-  #SET(PATCH_QUIET "")
+  SET(PATCH_QUIET "")
   #if(MT_BUILD_QUIET)
+  IF(NOT APPLE)
     SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake_ccache.patch)
+  ENDIF(NOT APPLE)
   #endif(MT_BUILD_QUIET)
 
   SET(HDF5_LIB_SUFFIX ".a")
