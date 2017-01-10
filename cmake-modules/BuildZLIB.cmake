@@ -5,7 +5,7 @@ macro(build_zlib install_prefix staging_prefix)
 
 SET (ZLIB_VERSION_STRING 1.2)
 SET (ZLIB_VERSION_MAJOR  1.2)
-SET (ZLIB_VERSION_MINOR  8)
+SET (ZLIB_VERSION_MINOR  10)
 
   if(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
@@ -54,8 +54,8 @@ SET (ZLIB_VERSION_MINOR  8)
   endif()
 
 ExternalProject_Add(ZLIB
-  URL  "http://zlib.net/zlib-1.2.8.tar.gz"
-  URL_MD5 "44d667c142d7cda120332623eab69f40"
+  URL  "http://zlib.net/zlib-1.2.10.tar.gz"
+  URL_MD5 "d9794246f853d15ce0fcbf79b9a3cf13"
   UPDATE_COMMAND ""
   SOURCE_DIR ZLIB
   BINARY_DIR ZLIB-build
@@ -71,6 +71,8 @@ ExternalProject_Add(ZLIB
       -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
       -DMACOSX_RPATH:BOOL=ON
       -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
+      -DINSTALL_LIB_DIR:PATH=${install_prefix}/lib${LIB_SUFFIX}
+      -DINSTALL_INC_DIR:PATH=${install_prefix}/include
       ${CMAKE_EXTERNAL_PROJECT_ARGS}
   INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix} 
   INSTALL_DIR ${staging_prefix}/${install_prefix}
