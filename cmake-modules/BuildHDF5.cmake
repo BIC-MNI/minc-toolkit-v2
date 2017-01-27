@@ -68,8 +68,8 @@ macro(build_hdf5 install_prefix staging_prefix)
   #endif(MT_BUILD_QUIET)
   
 ExternalProject_Add(HDF5
-  URL "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.17/src/hdf5-1.8.17.tar.bz2"
-  URL_MD5 "34bd1afa5209259201a41964100d6203"
+  URL "https://support.hdfgroup.org/ftp/HDF5/current18/src/hdf5-1.8.18.tar.bz2"
+  URL_MD5 "29117bf488887f89888f9304c8ebea0b"
   SOURCE_DIR HDF5
   BINARY_DIR HDF5-build
   PATCH_COMMAND ${PATCH_QUIET}
