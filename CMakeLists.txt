@@ -4,9 +4,12 @@ if(CCACHE_FOUND)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK    ${CCACHE_FOUND})
 endif(CCACHE_FOUND)
 
-project(minc-toolkit-v2)
+project(minc-toolkit-v2 )
+
 enable_language(C)
 enable_language(CXX)
+#enable_language(Fortran)
+
 
 cmake_minimum_required(VERSION 3.1)
 
@@ -14,7 +17,6 @@ IF(COMMAND CMAKE_POLICY)
   IF(POLICY CMP0026)
       CMAKE_POLICY(SET CMP0026 OLD)
   ENDIF(POLICY CMP0026)
-  
   IF(POLICY CMP0046)
       CMAKE_POLICY(SET CMP0046 OLD)
   ENDIF(POLICY CMP0046)
@@ -25,7 +27,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 SET(MINC_TOOLKIT_PACKAGE_VERSION_MAJOR 1)
 SET(MINC_TOOLKIT_PACKAGE_VERSION_MINOR 9)
 SET(MINC_TOOLKIT_PACKAGE_VERSION_PATCH 15)
-SET(MINC_TOOLKIT_RELEASE_DATE "20170303")
+SET(MINC_TOOLKIT_RELEASE_DATE "20170305")
 
 SET(MINC_TOOLKIT_VERSION_FULL "${MINC_TOOLKIT_PACKAGE_VERSION_MAJOR}.${MINC_TOOLKIT_PACKAGE_VERSION_MINOR}.${MINC_TOOLKIT_PACKAGE_VERSION_PATCH}-${MINC_TOOLKIT_RELEASE_DATE}")
 
@@ -107,13 +109,15 @@ OPTION(USE_SYSTEM_GSL        "Use System GSL "         OFF)
 OPTION(USE_SYSTEM_FFTW3F     "Use System FFTW3F "      OFF)
 OPTION(USE_SYSTEM_FFTW3D     "Use System FFTW3D "      OFF)
 OPTION(USE_SYSTEM_GLUT       "Use System GLUT  "       ON)
+
 OPTION(MT_BUILD_ITK_TOOLS    "Build ITK-based tools"  OFF)
 OPTION(MT_BUILD_VISUAL_TOOLS "Build visual tools (Display, Register, postf, ray_trace) requires OpenGL & Glut"  OFF)
 
 OPTION(USE_SYSTEM_ITK        "Use System ITK" OFF)
-OPTION(MT_USE_OPENMP         "Use OpenMP multi-threading, right now applies only to FFTW" OFF)
+OPTION(MT_USE_OPENMP         "Use OpenMP multi-threading" OFF)
 OPTION(MT_BUILD_IM           "Build ImageMagick and dependent libraries" OFF)
 OPTION(MT_BUILD_QUIET        "Build quetly" OFF)
+OPTION(MT_BUILD_OPENBLAS     "Build OpenBLAS: will require fortran" OFF)
 
 
 # trying to reduce verbosity
@@ -394,6 +398,11 @@ ADD_SUBDIRECTORY(mrisim)
 ADD_SUBDIRECTORY(bic-pipelines)
 ADD_SUBDIRECTORY(perl-modules)
 ADD_SUBDIRECTORY(ILT)
+
+IF(MT_BUILD_OPENBLAS)
+  INCLUDE(BuildOpenBLAS)
+  build_open_blas(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX} MT_USE_OPENMP)
+ENDIF(MT_BUILD_OPENBLAS)
 
 #required for EZminc
 IF(USE_SYSTEM_GSL)
