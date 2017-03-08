@@ -1,4 +1,4 @@
-macro(build_open_blas install_prefix staging_prefix parallel)
+macro(build_open_blas install_prefix staging_prefix build_parallel)
 
   set_property(DIRECTORY PROPERTY EP_STEP_TARGETS configure build test)
 
@@ -15,10 +15,13 @@ macro(build_open_blas install_prefix staging_prefix parallel)
     message("Fortran compiler not found! OpenBLAS will not work as expected!")
   endif(NOT CMAKE_Fortran_COMPILER)
   
-  SET(BLAS_PARALLEL "NO_AFFINITY=1 USE_THREAD=0 USE_OPENMP=0")
-  if(parallel)
+  #SET(BLAS_PARALLEL "NO_AFFINITY=1 USE_THREAD=0 USE_OPENMP=0")
+
+  if(${build_parallel})
     SET(BLAS_PARALLEL "NO_AFFINITY=1 USE_OPENMP=1")
-  endif(parallel)
+  else(${build_parallel})
+    SET(BLAS_PARALLEL "NO_AFFINITY=1 USE_THREAD=0 USE_OPENMP=0")
+  endif(${build_parallel})
   
   ExternalProject_Add(OpenBLAS
         URL "http://github.com/xianyi/OpenBLAS/archive/v0.2.18.tar.gz"
@@ -27,8 +30,8 @@ macro(build_open_blas install_prefix staging_prefix parallel)
         BUILD_IN_SOURCE 1
         #BINARY_DIR OpenBLAS-build
         INSTALL_DIR       "${CMAKE_BINARY_DIR}/external"
-        BUILD_COMMAND      $(MAKE) PREFIX=${install_prefix} USE_THREAD=0 USE_OPENMP=0 CC=${CMAKE_C_COMPILER} FC=${CMAKE_Fortran_COMPILER} MAKE_NB_JOBS=1
-        CONFIGURE_COMMAND  $(MAKE) PREFIX=${install_prefix} USE_THREAD=0 USE_OPENMP=0 CC=${CMAKE_C_COMPILER} FC=${CMAKE_Fortran_COMPILER} MAKE_NB_JOBS=1
+        BUILD_COMMAND      $(MAKE) PREFIX=${install_prefix} ${BLAS_PARALLEL} CC=${CMAKE_C_COMPILER} FC=${CMAKE_Fortran_COMPILER} MAKE_NB_JOBS=1
+        CONFIGURE_COMMAND  $(MAKE) PREFIX=${install_prefix} ${BLAS_PARALLEL} CC=${CMAKE_C_COMPILER} FC=${CMAKE_Fortran_COMPILER} MAKE_NB_JOBS=1
         INSTALL_COMMAND    $(MAKE) DESTDIR=${CMAKE_BINARY_DIR}/external install PREFIX=${install_prefix}
       )
   
