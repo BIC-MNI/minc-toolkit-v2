@@ -43,7 +43,7 @@ SET(FFTW3D_INCLUDE_DIR      ${install_prefix}/include )
 SET(FFTW3D_LIBRARY          ${install_prefix}/lib${LIB_SUFFIX}/libfftw3.a )
 SET(FFTW3D_THREADS_LIBRARY  ${install_prefix}/lib${LIB_SUFFIX}/libfftw3_threads.a )
 SET(FFTW3D_OMP_LIBRARY      ${install_prefix}/lib${LIB_SUFFIX}/libfftw3_omp.a )
-configure_file(FFTW3DConfig.cmake.in ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/FFTW3DConfig.cmake.in @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake-modules/FFTW3DConfig.cmake.in ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/FFTW3DConfig.cmake @ONLY)
 
 SET(FFTW3D_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
 SET(FFTW3D_LIBRARY  ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libfftw3.a )

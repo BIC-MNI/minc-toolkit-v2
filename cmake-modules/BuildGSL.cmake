@@ -29,7 +29,7 @@ SET(GSL_CBLAS_LIBRARY ${install_prefix}/lib${LIB_SUFFIX}/libgslcblas.a )
 SET(GSL_VERSION "2.3")
 SET(GSL_FOUND ON)
       
-configure_file(GSLConfig.cmake.in ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/GSLConfig.cmake.in @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake-modules/GSLConfig.cmake.in ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/GSLConfig.cmake @ONLY)
       
 SET(GSL_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
 SET(GSL_LIBRARY  ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libgsl.a )
