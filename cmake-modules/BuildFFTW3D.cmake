@@ -38,10 +38,17 @@ macro(build_fftw3d install_prefix staging_prefix)
 #        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
       )
 
+      
+SET(FFTW3D_INCLUDE_DIR      ${install_prefix}/include )
+SET(FFTW3D_LIBRARY          ${install_prefix}/lib${LIB_SUFFIX}/libfftw3.a )
+SET(FFTW3D_THREADS_LIBRARY  ${install_prefix}/lib${LIB_SUFFIX}/libfftw3_threads.a )
+SET(FFTW3D_OMP_LIBRARY      ${install_prefix}/lib${LIB_SUFFIX}/libfftw3_omp.a )
+configure_file(FFTW3DConfig.cmake.in ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/FFTW3DConfig.cmake.in @ONLY)
+
 SET(FFTW3D_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
 SET(FFTW3D_LIBRARY  ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libfftw3.a )
 SET(FFTW3D_THREADS_LIBRARY  ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libfftw3_threads.a )
+SET(FFTW3D_OMP_LIBRARY  ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libfftw3_omp.a )
 SET(FFTW3D_FOUND ON)
-
 
 endmacro(build_fftw3d)

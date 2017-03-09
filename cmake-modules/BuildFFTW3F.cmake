@@ -37,9 +37,19 @@ macro(build_fftw3f install_prefix staging_prefix)
 #        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
       )
 
-SET(FFTW3F_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
-SET(FFTW3F_LIBRARY  ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libfftw3f.a )
+      
+SET(FFTW3F_INCLUDE_DIR      ${install_prefix}/include )
+SET(FFTW3F_LIBRARY          ${install_prefix}/lib${LIB_SUFFIX}/libfftw3f.a )
+SET(FFTW3F_THREADS_LIBRARY  ${install_prefix}/lib${LIB_SUFFIX}/libfftw3f_threads.a )
+SET(FFTW3F_OMP_LIBRARY      ${install_prefix}/lib${LIB_SUFFIX}/libfftw3f_omp.a )
+configure_file(FFTW3FConfig.cmake.in ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/FFTW3FConfig.cmake.in @ONLY)
+
+      
+SET(FFTW3F_INCLUDE_DIR      ${staging_prefix}/${install_prefix}/include )
+SET(FFTW3F_LIBRARY          ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libfftw3f.a )
 SET(FFTW3F_THREADS_LIBRARY  ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libfftw3f_threads.a )
+SET(FFTW3F_OMP_LIBRARY      ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libfftw3f_omp.a )
+
 
 SET(FFTW3F_FOUND ON)
 
