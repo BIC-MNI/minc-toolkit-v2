@@ -5,7 +5,7 @@ macro(build_zlib install_prefix staging_prefix)
 
 SET (ZLIB_VERSION_STRING 1.2)
 SET (ZLIB_VERSION_MAJOR  1.2)
-SET (ZLIB_VERSION_MINOR  8)
+SET (ZLIB_VERSION_MINOR  11)
 
   if(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
@@ -54,23 +54,22 @@ SET (ZLIB_VERSION_MINOR  8)
   endif()
 
 ExternalProject_Add(ZLIB
-  URL  "http://zlib.net/zlib-1.2.8.tar.gz"
-  URL_MD5 "44d667c142d7cda120332623eab69f40"
+  URL  "http://zlib.net/zlib-1.2.11.tar.gz"
+  URL_MD5 "1c9f62f0778697a09d36121ead88e08e"
   UPDATE_COMMAND ""
   SOURCE_DIR ZLIB
   BINARY_DIR ZLIB-build
   LIST_SEPARATOR :::
   CMAKE_GENERATOR ${CMAKE_GEN}
   CMAKE_ARGS
-      -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
       -DBUILD_SHARED_LIBS:BOOL=OFF
-      -DCMAKE_SKIP_RPATH:BOOL=ON
       -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
-      -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
       -DCMAKE_SKIP_RPATH:BOOL=OFF
       -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
       -DMACOSX_RPATH:BOOL=ON
       -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
+      -DINSTALL_LIB_DIR:PATH=${install_prefix}/lib${LIB_SUFFIX}
+      -DINSTALL_INC_DIR:PATH=${install_prefix}/include
       ${CMAKE_EXTERNAL_PROJECT_ARGS}
   INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix} 
   INSTALL_DIR ${staging_prefix}/${install_prefix}
@@ -90,7 +89,7 @@ SET(ZLIB_DIR                ${staging_prefix}/${install_prefix}/share/cmake/ZLIB
 SET(ZLIB_FOUND ON)
 
 IF(MT_BUILD_SHARED_LIBS)
-  SET(ZLIB_LIBRARY ${ZLIB_SHARED_LIBRARY} )
+  SET(ZLIB_LIBRARY ${ZLIB_STATIC_LIBRARY} ) # FIXED to avoid issues with restricted paths in MacOSX
 ELSE(MT_BUILD_SHARED_LIBS)
   SET(ZLIB_LIBRARY ${ZLIB_STATIC_LIBRARY} )
 ENDIF(MT_BUILD_SHARED_LIBS)

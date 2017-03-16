@@ -18,8 +18,8 @@ macro(build_pcre install_prefix staging_prefix)
   ExternalProject_Add(PCRE
     SOURCE_DIR PCRE
     BINARY_DIR PCRE-build
-    URL "https://sourceforge.net/projects/pcre/files/pcre/8.39/pcre-8.39.tar.bz2"
-    URL_MD5 "e3fca7650a0556a2647821679d81f585"
+    URL "https://sourceforge.net/projects/pcre/files/pcre/8.40/pcre-8.40.tar.bz2"
+    URL_MD5 "41a842bf7dcecd6634219336e2167d1d"
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
         -DBUILD_TESTING:BOOL=OFF #${BUILD_TESTING}
@@ -52,6 +52,7 @@ SET(PCRE_LIB_SUFFIX ".a")
 SET(PCRE_INCLUDE_DIR  ${staging_prefix}/${install_prefix}/include )
 SET(PCRE_LIBRARY      ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libpcre${PCRE_LIB_SUFFIX} )
 SET(PCRECPP_LIBRARY   ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libpcrecpp${PCRE_LIB_SUFFIX} )
+
 SET(PCRE_FOUND ON)
  
 

@@ -12,8 +12,8 @@ macro(build_png install_prefix staging_prefix  zlib_include_dir zlib_library zli
 
   ExternalProject_Add(PNG
           SOURCE_DIR PNG
-          URL "http://downloads.sourceforge.net/project/libpng/libpng16/1.6.21/libpng-1.6.21.tar.gz"
-          URL_MD5 "aca36ec8e0a3b406a5912243bc243717"
+          URL "https://sourceforge.net/projects/libpng/files/libpng16/1.6.28/libpng-1.6.28.tar.gz/download"
+          URL_MD5 "425354f86c392318d31aedca71019372"
           BUILD_IN_SOURCE 1
           INSTALL_DIR     "${CMAKE_BINARY_DIR}/external"
           BUILD_COMMAND   $(MAKE) 
