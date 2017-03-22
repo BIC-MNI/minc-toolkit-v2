@@ -8,9 +8,9 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
   endif(CMAKE_EXTRA_GENERATOR)
 
 
-  message("HDF5_DIR=${HDF5_DIR}")
-  message("CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
-  message("CMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
+  #message("HDF5_DIR=${HDF5_DIR}")
+  #message("CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
+  #message("CMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
   
   set(CMAKE_EXTERNAL_PROJECT_ARGS
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
@@ -147,7 +147,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
         -DHDF5_hdf5_cpp_LIBRARY_RELEASE:FILEPATH=${HDF5_CPP_LIBRARY}
         -DHDF5_hdf5_LIBRARY_DEBUG:FILEPATH=${HDF5_LIBRARY}
         -DHDF5_hdf5_cpp_LIBRARY_DEBUG:FILEPATH=${HDF5_CPP_LIBRARY}
-        -DHDF5_DIR:PATH=${staging_prefix}/${install_prefix}/share/cmake
+        -DHDF5_DIR:PATH=HDF5_DIR-NOTFOUND
         -DHDF5_Fortran_COMPILER_EXECUTABLE:FILEPATH=''
         -DZLIB_LIBRARY:PATH=${zlib_library}
         -DZLIB_INCLUDE_DIR:PATH=${zlib_include_dir}
