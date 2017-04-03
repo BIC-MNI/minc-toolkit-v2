@@ -43,7 +43,7 @@ Installing from github, need CMake >= 3.1
   ccmake .. # Enter configuration details, recommend not to use any system-provided libraries that are included in minc-toolkit-v2
 </code></pre>
 Following command will configure build system to build all the tools and install them into `/opt/minc/1.9.13` on Linux 
-<code><pre>
+<pre><code>
  cmake .. \
 -DCMAKE_BUILD_TYPE:STRING=Release   \
 -DCMAKE_INSTALL_PREFIX:PATH=/opt/minc/1.9.13   \
@@ -69,7 +69,7 @@ Following command will configure build system to build all the tools and install
 -DUSE_SYSTEM_ZLIB:BOOL=OFF 
 
 make && make install
-</code></pre>
+</pre></code>
 ##Dependencies
 
 ###Following packages are needed to compile all tools:
@@ -83,6 +83,7 @@ make && make install
    * X11  development libraries
    * libxi 
    * libxmu
+   * libjpeg-dev
 
 ###Following packages are built internally :
  * zlib   - http://zlib.net/
@@ -103,5 +104,6 @@ sudo apt-get install \
  libx11-dev x11proto-core-dev \
  libxi6 libxi-dev \
  libxmu6 libxmu-dev libxmu-headers \
- libgl1-mesa-dev libglu1-mesa-dev
+ libgl1-mesa-dev libglu1-mesa-dev \
+ libjpeg-dev
 </code></pre>
