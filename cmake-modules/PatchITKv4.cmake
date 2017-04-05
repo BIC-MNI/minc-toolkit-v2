@@ -1,11 +1,12 @@
 message("Running PatchITKv4")
+message("staging_prefix=${staging_prefix}")
 
 macro(patch_itk_config file to_remove)
   file(READ "${file}" config_file)
   STRING(REPLACE "${to_remove}//" "/" config_file "${config_file}")
   STRING(REPLACE "${to_remove}" "" config_file "${config_file}")
   message("patched ${file} ")
-  #file(WRITE "${file}" "${config_file}")
+  file(WRITE "${file}" "${config_file}")
 endmacro(patch_itk_config)
 
 
