@@ -5,6 +5,14 @@
 This metaproject bundles multiple MINC-based packages that historically have been developed somewhat independently.
 
 Here is a list of bundled packages:
+ * zlib    - data compression library
+ * NetCDF  - file format library ( used for MINC1)
+ * HDF5    - another file format library  (used for MINC2)
+ * FFTW    - FFT library
+ * GSL     - Gnu Scientific library
+ * openblas - fast library for linear algebra
+ * ITK     - Insight Toolkti version 4.11
+ * pcre    - perl-compatible regular expressions
  * libminc - base Medical Imaging NetCDF package, file IO library
  * minc-tools - low-level image manipulation tools
  * bicpl - BIC programming library, adds supports for 3D objects in terms of io-library and low-level tools
@@ -32,17 +40,16 @@ Here is a list of bundled packages:
  * ANTS     - ANTS nonlinear registration tool from UPENN  https://github.com/stnava/ANTs
  * Elastix  - Elastix a toolbox for rigid and nonrigid registration of images. http://elastix.isi.uu.nl/ 
 
-##Installation
+## Installation
 
-Installing from github, need CMake >= 3.1 
-=======
+### Installing from github, need CMake >= 3.1 
 <pre><code>
   git clone --recursive https://github.com/BIC-MNI/minc-toolkit-v2.git minc-toolkit-v2
   cd minc-toolkit-v2
   mkdir build && cd build
   ccmake .. # Enter configuration details, recommend not to use any system-provided libraries that are included in minc-toolkit-v2
 </code></pre>
-Following command will configure build system to build all the tools and install them into `/opt/minc/1.9.13` on Linux 
+Following command will configure build system to build all the tools and install them into `/opt/minc/1.9.15` on Linux 
 <code><pre>
  cmake .. \
 -DCMAKE_BUILD_TYPE:STRING=Release   \
@@ -83,6 +90,8 @@ make && make install
    * X11  development libraries
    * libxi 
    * libxmu
+   * libgl
+   * libglu
 
 ### Following packages are built internally :
  * zlib   - http://zlib.net/
@@ -91,10 +100,12 @@ make && make install
  * PCRE   - http://www.pcre.org/
  * GSL    - http://www.gnu.org/software/gsl/
  * FFTW3  - http://www.fftw.org/
- * ITK 4.9- http://www.itk.org/
+ * ITK 4.11- http://www.itk.org/
  * NIFTI  - http://niftilib.sourceforge.net/
+ * OpenBLAS  - http://www.openblas.net/
  
-## Installing Build Dependencies on Ubuntu:
+ 
+### Installing Build Dependencies on Ubuntu:
 <pre><code>
 sudo apt-get install \
  build-essential g++ bc \
