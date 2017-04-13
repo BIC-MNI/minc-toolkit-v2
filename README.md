@@ -46,7 +46,7 @@ Following command will configure build system to build all the tools and install
 <code><pre>
  cmake .. \
 -DCMAKE_BUILD_TYPE:STRING=Release   \
--DCMAKE_INSTALL_PREFIX:PATH=/opt/minc/1.9.13   \
+-DCMAKE_INSTALL_PREFIX:PATH=/opt/minc/1.9.15 \
 -DMT_BUILD_ABC:BOOL=ON   \
 -DMT_BUILD_ANTS:BOOL=ON   \
 -DMT_BUILD_C3D:BOOL=ON   \
@@ -70,9 +70,9 @@ Following command will configure build system to build all the tools and install
 
 make && make install
 </code></pre>
-##Dependencies
+## Dependencies
 
-###Following packages are needed to compile all tools:
+### Following packages are needed to compile all tools:
  * Tools without GUI
    * Cmake - https://cmake.org/
    * Perl  - http://www.perl.org/
@@ -84,7 +84,7 @@ make && make install
    * libxi 
    * libxmu
 
-###Following packages are built internally :
+### Following packages are built internally :
  * zlib   - http://zlib.net/
  * NETCDF - http://www.unidata.ucar.edu/software/netcdf/
  * HDF5   - http://www.hdfgroup.org/HDF5/
@@ -94,7 +94,7 @@ make && make install
  * ITK 4.9- http://www.itk.org/
  * NIFTI  - http://niftilib.sourceforge.net/
  
-##Installing Build Dependencies on Ubuntu:
+## Installing Build Dependencies on Ubuntu:
 <pre><code>
 sudo apt-get install \
  build-essential g++ bc \
