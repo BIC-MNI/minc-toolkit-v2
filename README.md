@@ -50,7 +50,7 @@ Here is a list of bundled packages:
   ccmake .. # Enter configuration details, recommend not to use any system-provided libraries that are included in minc-toolkit-v2
 </code></pre>
 Following command will configure build system to build all the tools and install them into `/opt/minc/1.9.15` on Linux 
-<code><pre>
+<pre><code>
  cmake .. \
 -DCMAKE_BUILD_TYPE:STRING=Release   \
 -DCMAKE_INSTALL_PREFIX:PATH=/opt/minc/1.9.15 \
