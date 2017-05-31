@@ -116,3 +116,18 @@ sudo apt-get install \
  libxmu6 libxmu-dev libxmu-headers \
  libgl1-mesa-dev libglu1-mesa-dev
 </code></pre>
+
+### Installing Build Dependencies on CentOS:
+<pre><code>
+  yum groupinstall 'Development Tools' 
+  yum install libX11-devel libXmu-devel  mesa-libGL-devel libjpeg-turbo-devel openjpeg-devel 
+  
+sudo yum install \
+ build-essential g++ bc \
+ cmake cmake-curses-gui \
+ bison flex \
+ libx11-dev x11proto-core-dev \
+ libxi6 libxi-dev \
+ libxmu6 libxmu-dev libxmu-headers \
+ libgl1-mesa-dev libglu1-mesa-dev
+</code></pre>
