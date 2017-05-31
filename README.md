@@ -81,11 +81,12 @@ make && make install
 
 ### Following packages are needed to compile all tools:
  * Tools without GUI
-   * Cmake - https://cmake.org/
+   * cmake - https://cmake.org/
    * Perl  - http://www.perl.org/
    * BISON - http://www.gnu.org/software/bison/
    * FLEX  - http://flex.sf.net/
    * bc    - http://ftp.gnu.org/gnu/bc/ 
+   * libjpeg or libjpeg-turbo
  * More packages for tools with GUI
    * X11  development libraries
    * libxi 
@@ -104,12 +105,11 @@ make && make install
  * NIFTI  - http://niftilib.sourceforge.net/
  * OpenBLAS  - http://www.openblas.net/
  
- 
 ### Installing Build Dependencies on Ubuntu:
 <pre><code>
 sudo apt-get install \
  build-essential g++ bc \
- cmake cmake-curses-gui \
+ cmake \
  bison flex \
  libx11-dev x11proto-core-dev \
  libxi6 libxi-dev \
@@ -117,17 +117,12 @@ sudo apt-get install \
  libgl1-mesa-dev libglu1-mesa-dev
 </code></pre>
 
-### Installing Build Dependencies on CentOS:
+### Installing Build Dependencies on CentOS 7:
 <pre><code>
-  yum groupinstall 'Development Tools' 
-  yum install libX11-devel libXmu-devel  mesa-libGL-devel libjpeg-turbo-devel openjpeg-devel 
-  
-sudo yum install \
- build-essential g++ bc \
- cmake cmake-curses-gui \
- bison flex \
- libx11-dev x11proto-core-dev \
- libxi6 libxi-dev \
- libxmu6 libxmu-dev libxmu-headers \
- libgl1-mesa-dev libglu1-mesa-dev
+yum groupinstall 'Development Tools'  && \
+yum install libX11-devel libXmu-devel libXi-devel \
+ mesa-libGL-devel mesa-libGLU-devel \
+ libjpeg-turbo-devel \
+ openssl-devel bc \
+ rpm-build-libs rpm-devel redhat-lsb-core
 </code></pre>
