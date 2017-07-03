@@ -1,15 +1,16 @@
 message("Running PatchITKv4")
+message("staging_prefix=${staging_prefix}")
 
 macro(patch_itk_config file to_remove)
   file(READ "${file}" config_file)
   STRING(REPLACE "${to_remove}//" "/" config_file "${config_file}")
   STRING(REPLACE "${to_remove}" "" config_file "${config_file}")
   message("patched ${file} ")
-  #file(WRITE "${file}" "${config_file}")
+  file(WRITE "${file}" "${config_file}")
 endmacro(patch_itk_config)
 
 
-FOREACH(conf "ITKTargets-release.cmake" "Modules/ITKZLIB.cmake" "Modules/ITKZLIB.cmake" "Modules/ITKMINC.cmake" "Modules/ITKHDF5.cmake" "Modules/ITKIOTransformMINC.cmake")
+FOREACH(conf "ITKConfig.cmake" "ITKTargets-release.cmake" "Modules/ITKZLIB.cmake" "Modules/ITKZLIB.cmake" "Modules/ITKMINC.cmake" "Modules/ITKHDF5.cmake" "Modules/ITKIOTransformMINC.cmake")
   if (EXISTS "${staging_prefix}/${install_prefix}/lib/cmake/ITK-4.11/${conf}")
     patch_itk_config("${staging_prefix}/${install_prefix}/lib/cmake/ITK-4.11/${conf}" "${staging_prefix}")
   endif()

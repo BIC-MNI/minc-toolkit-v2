@@ -59,7 +59,7 @@ macro(build_netcdf install_prefix staging_prefix)
   #endif(MT_BUILD_QUIET)
 
   ExternalProject_Add(NETCDF 
-    URL "ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.3.3.1.tar.gz"
+    URL "https://github.com/Unidata/netcdf-c/archive/v4.3.3.1.tar.gz"
     URL_MD5 "5c9dad3705a3408d27f696e5b31fb88c"
   SOURCE_DIR NETCDF
   BINARY_DIR NETCDF-build
