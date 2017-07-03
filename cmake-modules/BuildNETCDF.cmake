@@ -59,8 +59,8 @@ macro(build_netcdf install_prefix staging_prefix)
   #endif(MT_BUILD_QUIET)
 
   ExternalProject_Add(NETCDF 
-    URL "https://github.com/Unidata/netcdf-c/archive/v4.3.3.1.tar.gz"
-    URL_MD5 "5c9dad3705a3408d27f696e5b31fb88c"
+    URL "https://github.com/Unidata/netcdf-c/archive/v4.4.1.1.tar.gz"
+    URL_MD5 "9210fd5355bee868684d9b8f83064aa6"
   SOURCE_DIR NETCDF
   BINARY_DIR NETCDF-build
   PATCH_COMMAND ${PATCH_QUIET}

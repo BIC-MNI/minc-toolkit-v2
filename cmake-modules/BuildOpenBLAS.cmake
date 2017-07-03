@@ -2,15 +2,6 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
 
   set_property(DIRECTORY PROPERTY EP_STEP_TARGETS configure build test)
 
-  SET(EXT_CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-  SET(EXT_CMAKE_C_FLAGS_RELEASE   ${CMAKE_C_FLAGS_RELEASE})
-  
-  SET(EXT_CMAKE_CXX_FLAGS_DEBUG   ${CMAKE_CXX_FLAGS_DEBUG})
-  SET(EXT_CMAKE_C_FLAGS_DEBUG     ${CMAKE_C_FLAGS_DEBUG})
-  
-  SET(EXT_CMAKE_CXX_FLAGS "-fPIC ${CMAKE_CXX_FLAGS}")
-  SET(EXT_CMAKE_C_FLAGS   "-fPIC ${CMAKE_C_FLAGS}")
-  
   if(NOT CMAKE_Fortran_COMPILER)
     message("Fortran compiler not found! OpenBLAS will not work as expected!")
   endif(NOT CMAKE_Fortran_COMPILER)
@@ -24,8 +15,8 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
   endif(${build_parallel})
   
   ExternalProject_Add(OpenBLAS
-        URL "http://github.com/xianyi/OpenBLAS/archive/v0.2.18.tar.gz"
-        URL_MD5 "805e7f660877d588ea7e3792cda2ee65"
+        URL "http://github.com/xianyi/OpenBLAS/archive/v0.2.19.tar.gz"
+        URL_MD5 "28c998054fd377279741c6f0b9ea7941"
         SOURCE_DIR OpenBLAS
         BUILD_IN_SOURCE 1
         #BINARY_DIR OpenBLAS-build
@@ -39,7 +30,8 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
   
   #find_library( GFORTRAN_LIBRARY NAMES gfortran )
   SET(OpenBLAS_INCLUDE_DIRS ${staging_prefix}/${install_prefix}/include )
-  SET(OpenBLAS_LIBRARY    ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libopenblas.so  ) # ${GFORTRAN_LIBRARY}
+  SET(OpenBLAS_LIBRARY      ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libopenblas.so  ) # ${GFORTRAN_LIBRARY}
+  SET(OpenBLAS_DIR          ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/cmake/openblas )
   SET(OpenBLAS_FOUND ON)
 
 endmacro(build_open_blas)

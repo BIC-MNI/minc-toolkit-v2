@@ -68,8 +68,8 @@ macro(build_hdf5 install_prefix staging_prefix)
   #endif(MT_BUILD_QUIET)
   
 ExternalProject_Add(HDF5
-  URL "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.18/src/hdf5-1.8.18.tar.bz2"
-  URL_MD5 "29117bf488887f89888f9304c8ebea0b"
+  URL "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.19/src/hdf5-1.8.19.tar.bz2"
+  URL_MD5 "6f0353ee33e99089c110a1c8d2dd1b22"
   SOURCE_DIR HDF5
   BINARY_DIR HDF5-build
   PATCH_COMMAND ${PATCH_QUIET}
@@ -140,4 +140,5 @@ SET(HDF5_INCLUDE_DIRS ${HDF5_INCLUDE_DIR})
 
 SET(HDF5_DIR         ${staging_prefix}/${install_prefix}/share/cmake/hdf5)
 SET(HDF5_FOUND ON)
+
 endmacro(build_hdf5)
