@@ -13,8 +13,8 @@ macro(build_gsl install_prefix staging_prefix)
 
 ExternalProject_Add(GSL
         SOURCE_DIR GSL
-        URL "http://mirrors.ibiblio.org/gnu/ftp/gnu/gsl/gsl-2.3.tar.gz"
-        URL_MD5 "905fcbbb97bc552d1037e34d200931a0"
+        URL "http://mirrors.ibiblio.org/gnu/ftp/gnu/gsl/gsl-2.4.tar.gz"
+        URL_MD5 "dba736f15404807834dc1c7b93e83b92"
         BUILD_IN_SOURCE 1
         INSTALL_DIR     "${CMAKE_BINARY_DIR}/external"
         BUILD_COMMAND   $(MAKE) -s V=0 
