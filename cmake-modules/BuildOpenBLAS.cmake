@@ -2,6 +2,23 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
 
   set_property(DIRECTORY PROPERTY EP_STEP_TARGETS configure build test)
 
+  IF(CMAKE_BUILD_TYPE STREQUAL Release)
+    SET(EXT_C_FLAGS   "${CMAKE_C_FLAGS}   ${CMAKE_C_FLAGS_RELEASE}")
+    SET(EXT_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
+  ELSE()
+    SET(EXT_C_FLAGS   "${CMAKE_C_FLAGS}    ${CMAKE_C_FLAGS_DEBUG}")
+    SET(EXT_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}")
+  ENDIF()
+
+  SET(EXT_C_COMPILER ${CMAKE_C_COMPILER})
+  SET(EXT_CXX_COMPILER ${CMAKE_CXX_COMPILER})
+  
+  IF(CCACHE_FOUND)
+    SET(EXT_C_COMPILER   "${CCACHE_FOUND} ${CMAKE_C_COMPILER}")
+    SET(EXT_CXX_COMPILER "${CCACHE_FOUND} ${CMAKE_CXX_COMPILER}")
+  ENDIF(CCACHE_FOUND)
+  
+  
   if(NOT CMAKE_Fortran_COMPILER)
     message("Fortran compiler not found! OpenBLAS will not work as expected!")
   endif(NOT CMAKE_Fortran_COMPILER)
@@ -21,8 +38,8 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
         BUILD_IN_SOURCE 1
         #BINARY_DIR OpenBLAS-build
         INSTALL_DIR       "${CMAKE_BINARY_DIR}/external"
-        BUILD_COMMAND      $(MAKE) PREFIX=${install_prefix} ${BLAS_PARALLEL} CC=${CMAKE_C_COMPILER} FC=${CMAKE_Fortran_COMPILER} MAKE_NB_JOBS=1
-        CONFIGURE_COMMAND  $(MAKE) PREFIX=${install_prefix} ${BLAS_PARALLEL} CC=${CMAKE_C_COMPILER} FC=${CMAKE_Fortran_COMPILER} MAKE_NB_JOBS=1
+        BUILD_COMMAND      $(MAKE) PREFIX=${install_prefix} ${BLAS_PARALLEL} CC=${EXT_C_COMPILER} FC=${CMAKE_Fortran_COMPILER} MAKE_NB_JOBS=1
+        CONFIGURE_COMMAND  $(MAKE) PREFIX=${install_prefix} ${BLAS_PARALLEL} CC=${EXT_C_COMPILER} FC=${CMAKE_Fortran_COMPILER} MAKE_NB_JOBS=1
         INSTALL_COMMAND    $(MAKE) DESTDIR=${CMAKE_BINARY_DIR}/external install PREFIX=${install_prefix}
       )
   
