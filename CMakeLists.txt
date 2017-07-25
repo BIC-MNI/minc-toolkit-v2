@@ -398,6 +398,7 @@ ADD_SUBDIRECTORY(mrisim)
 ADD_SUBDIRECTORY(bic-pipelines)
 ADD_SUBDIRECTORY(perl-modules)
 ADD_SUBDIRECTORY(ILT)
+ADD_SUBDIRECTORY(minc_gco)
 
 IF(MT_BUILD_OPENBLAS)
   enable_language(Fortran)
