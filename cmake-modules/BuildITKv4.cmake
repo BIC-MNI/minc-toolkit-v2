@@ -103,8 +103,8 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
    message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
 
   ExternalProject_Add(ITKv4
-    URL "https://downloads.sourceforge.net/project/itk/itk/4.12/InsightToolkit-4.12.0.tar.xz"
-    URL_MD5 "a2350cbafd74f2cec10a3de220e75264"
+    URL "https://downloads.sourceforge.net/project/itk/itk/4.12/InsightToolkit-4.12.1.tar.xz"
+    URL_MD5 "5eb35af6a645680235c36390d864e77f"
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
