@@ -10,9 +10,11 @@ macro(build_im install_prefix staging_prefix  zlib_include_dir zlib_library zlib
     SET(EXT_LDFLAGS   "-L${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX} ${CMAKE_MODULE_LINKER_FLAGS} ${CMAKE_MODULE_LINKER_FLAGS_DEBUG}")
   ENDIF()
 
+  GET_PACKAGE("http://mirrors-usa.go-parts.com/mirrors/ImageMagick/ImageMagick-7.0.5-0.tar.gz" "b16408790de8c98df51b34efded7952d" "ImageMagick-7.0.5-0.tar.gz" IM_PATH ) 
+  
   ExternalProject_Add(IM
           SOURCE_DIR IM
-          URL "http://mirrors-usa.go-parts.com/mirrors/ImageMagick/ImageMagick-7.0.5-0.tar.gz"
+          URL "${IM_PATH}"
           URL_MD5 "b16408790de8c98df51b34efded7952d"
           BUILD_IN_SOURCE 1
           INSTALL_DIR     "${CMAKE_BINARY_DIR}/external"

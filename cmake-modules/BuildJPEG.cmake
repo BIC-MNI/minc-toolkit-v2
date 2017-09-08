@@ -10,9 +10,11 @@ macro(build_jpeg install_prefix staging_prefix)
     SET(EXT_LDFLAGS   "-L${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX} ${CMAKE_MODULE_LINKER_FLAGS} ${CMAKE_MODULE_LINKER_FLAGS_DEBUG}")
   ENDIF()
 
+  GET_PACKAGE("http://ijg.org/files/jpegsrc.v9a.tar.gz" "3353992aecaee1805ef4109aadd433e7" "pegsrc.v9a.tar.gz" LIBJPEG_PATH ) 
+
   ExternalProject_Add(JPEG
           SOURCE_DIR JPEG
-          URL "http://ijg.org/files/jpegsrc.v9a.tar.gz"
+          URL "${LIBJPEG_PATH}"
           URL_MD5 "3353992aecaee1805ef4109aadd433e7"
           BUILD_IN_SOURCE 1
           INSTALL_DIR     "${CMAKE_BINARY_DIR}/external"

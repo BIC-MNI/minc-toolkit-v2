@@ -19,10 +19,11 @@ macro(build_freeglut install_prefix staging_prefix)
   find_library( GLUT_X11_LIBRARY X11
     /usr/openwin/lib
   )
+GET_PACKAGE("http://downloads.sourceforge.net/project/freeglut/freeglut/2.6.0/freeglut-2.6.0.tar.gz" "39f0f2de89f399529d2b981188082218" "freeglut-2.6.0.tar.gz" FREEGLUT_PATH ) 
 
 ExternalProject_Add(FREEGLUT 
   SOURCE_DIR FREEGLUT
-  URL "http://downloads.sourceforge.net/project/freeglut/freeglut/2.6.0/freeglut-2.6.0.tar.gz"
+  URL "${FREEGLUT_PATH}"
   URL_MD5 "39f0f2de89f399529d2b981188082218"
   BUILD_IN_SOURCE 1
   INSTALL_DIR     "${staging_prefix}"
