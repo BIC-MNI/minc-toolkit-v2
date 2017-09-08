@@ -14,11 +14,13 @@ macro(build_pcre install_prefix staging_prefix)
       -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
     )
   endif()
+  
+  GET_PACKAGE("https://sourceforge.net/projects/pcre/files/pcre/8.40/pcre-8.40.tar.bz2" "41a842bf7dcecd6634219336e2167d1d" "pcre-8.40.tar.bz2" PCRE_PATH ) 
 
   ExternalProject_Add(PCRE
     SOURCE_DIR PCRE
     BINARY_DIR PCRE-build
-    URL "https://sourceforge.net/projects/pcre/files/pcre/8.40/pcre-8.40.tar.bz2"
+    URL "${PCRE_PATH}"
     URL_MD5 "41a842bf7dcecd6634219336e2167d1d"
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS

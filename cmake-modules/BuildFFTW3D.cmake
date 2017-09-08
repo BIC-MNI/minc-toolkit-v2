@@ -26,9 +26,11 @@ macro(build_fftw3d install_prefix staging_prefix)
     LIST(APPEND FFTW3D_CONFIG --enable-openmp  )
   ENDIF(MT_USE_OPENMP)
   
+  GET_PACKAGE("http://www.fftw.org/fftw-3.3.6-pl2.tar.gz" "927e481edbb32575397eb3d62535a856" "fftw-3.3.6-pl2.tar.gz" FFTW_PATH ) 
+  
   ExternalProject_Add(FFTW3D
         SOURCE_DIR FFTW3D
-        URL "http://www.fftw.org/fftw-3.3.6-pl2.tar.gz"
+        URL "${FFTW_PATH}"
         URL_MD5 "927e481edbb32575397eb3d62535a856"
         BUILD_IN_SOURCE 1
         INSTALL_DIR     "${staging_prefix}"

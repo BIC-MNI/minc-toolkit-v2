@@ -66,9 +66,10 @@ macro(build_hdf5 install_prefix staging_prefix)
   #if(MT_BUILD_QUIET)
   SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake_ccache.patch)
   #endif(MT_BUILD_QUIET)
-  
+  GET_PACKAGE("https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.19/src/hdf5-1.8.19.tar.bz2" "6f0353ee33e99089c110a1c8d2dd1b22" "hdf5-1.8.19.tar.bz2" HDF5_PATH ) 
+
 ExternalProject_Add(HDF5
-  URL "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.19/src/hdf5-1.8.19.tar.bz2"
+  URL "${HDF5_PATH}"
   URL_MD5 "6f0353ee33e99089c110a1c8d2dd1b22"
   SOURCE_DIR HDF5
   BINARY_DIR HDF5-build

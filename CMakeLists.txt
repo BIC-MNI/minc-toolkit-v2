@@ -82,6 +82,7 @@ AssureOutOfSourceBuilds(minc-toolkit-v2)
 # a hack to disable internal man pages per project
 SET(DISABLE_MAN_PAGES_INSTALL ON)
 INCLUDE(InstallManPages)
+INCLUDE(DownloadPackage)
 
 # default install directories
 SET(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR} CACHE PATH "Install path prefix, prepended onto install directories.")
@@ -119,6 +120,7 @@ OPTION(MT_BUILD_IM           "Build ImageMagick and dependent libraries" OFF)
 OPTION(MT_BUILD_QUIET        "Build quetly" OFF)
 OPTION(MT_BUILD_OPENBLAS     "Build OpenBLAS: will require fortran" OFF)
 
+SET(MT_PACKAGES_PATH "${CMAKE_BINARY_DIR}/cache" CACHE PATH  "Directory containing 3rd party packages")
 
 # trying to reduce verbosity
 IF(MT_BUILD_QUIET)
