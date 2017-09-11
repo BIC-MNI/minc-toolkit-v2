@@ -57,8 +57,8 @@ macro(build_ABC install_prefix staging_prefix)
   GET_PACKAGE("https://github.com/vfonov/abc/archive/ABC-REL1.4.1-minc-lite.tar.gz" "b8a9af818501bb3a503304c5f0c44e4a" "ABC-REL1.4.1-minc-lite.tar.gz" ABC_PATH ) 
   
   ExternalProject_Add(ABC
-    GIT_REPOSITORY "${ABC_PATH}"
-    GIT_TAG "b8a9af818501bb3a503304c5f0c44e4a"
+    URL "${ABC_PATH}"
+    URL_MD5 "b8a9af818501bb3a503304c5f0c44e4a"
     UPDATE_COMMAND ""
     SOURCE_DIR ABC
     BINARY_DIR ABC-build
