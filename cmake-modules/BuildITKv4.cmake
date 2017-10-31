@@ -97,7 +97,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
     SET(HDF5_CPP_LIBRARY ${hdf_library_dir}/libhdf5_cpp_debug${HDF5_LIB_SUFFIX})
     SET(HDF5_HL_LIBRARY ${hdf_library_dir}/libhdf5_hl_debug${HDF5_LIB_SUFFIX})
     SET(HDF5_HL_CPP_LIBRARY ${hdf_library_dir}/libhdf5_hl_cpp_debug${HDF5_LIB_SUFFIX})
-  ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release)
+  ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo) OR (CMAKE_BUILD_TYPE STREQUAL MinSizeRel))
 
    message("HDF5_LIBRARY=${HDF5_LIBRARY}")
    message("HDF5_CPP_LIBRARY=${HDF5_CPP_LIBRARY}")
