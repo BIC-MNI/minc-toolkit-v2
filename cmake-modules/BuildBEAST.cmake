@@ -46,6 +46,7 @@ macro(build_BEAST install_prefix staging_prefix )
         -DOpenBLAS_DIR:PATH=${OpenBLAS_DIR}
         -DBUILD_TESTING:BOOL=${BUILD_TESTING}
         -DUSE_NIFTI:BOOL=OFF
+        -DMT_USE_OPENMP:BOOL=${MT_USE_OPENMP}
   )
   if(APPLE)
     list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
