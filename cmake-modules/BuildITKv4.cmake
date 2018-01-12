@@ -104,11 +104,11 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
    message("HDF5_HL_LIBRARY=${HDF5_HL_LIBRARY}")
    message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
 
-  GET_PACKAGE("https://downloads.sourceforge.net/project/itk/itk/4.12/InsightToolkit-4.12.1.tar.xz" "5eb35af6a645680235c36390d864e77f" "InsightToolkit-4.12.1.tar.xz" ITKv4_PATH ) 
+  GET_PACKAGE("https://sourceforge.net/projects/itk/files/itk/4.13/InsightToolkit-4.13.0.tar.xz" "3badf70cfb0093054453f66c5974c5a4" "InsightToolkit-4.13.0.tar.xz" ITKv4_PATH ) 
   
   ExternalProject_Add(ITKv4
     URL "${ITKv4_PATH}"
-    URL_MD5 "5eb35af6a645680235c36390d864e77f"
+    URL_MD5 "3badf70cfb0093054453f66c5974c5a4"
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
