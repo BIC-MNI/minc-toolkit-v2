@@ -11,7 +11,7 @@ enable_language(CXX)
 #enable_language(Fortran)
 
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.6.1)
 
 IF(COMMAND CMAKE_POLICY)
   IF(POLICY CMP0026)
