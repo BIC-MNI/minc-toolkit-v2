@@ -31,11 +31,11 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
     SET(BLAS_PARALLEL "NO_AFFINITY=1 USE_THREAD=0 USE_OPENMP=0")
   endif(${build_parallel})
   
-  GET_PACKAGE("http://github.com/xianyi/OpenBLAS/archive/v0.2.19.tar.gz" "28c998054fd377279741c6f0b9ea7941" "openblas_v0.2.19.tar.gz" OPENBLAS_PATH ) 
+  GET_PACKAGE("http://github.com/xianyi/OpenBLAS/archive/v0.2.20.tar.gz" "48637eb29f5b492b91459175dcc574b1" "openblas_v0.2.20.tar.gz" OPENBLAS_PATH ) 
   
   ExternalProject_Add(OpenBLAS
         URL "${OPENBLAS_PATH}"
-        URL_MD5 "28c998054fd377279741c6f0b9ea7941"
+        URL_MD5 "48637eb29f5b492b91459175dcc574b1"
         SOURCE_DIR OpenBLAS
         BUILD_IN_SOURCE 1
         #BINARY_DIR OpenBLAS-build
