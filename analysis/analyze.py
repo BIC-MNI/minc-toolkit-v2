@@ -16,69 +16,55 @@
 
 from __future__ import print_function
 import argparse, git, datetime, numpy, pygments.lexers, traceback, time, os, fnmatch, json, progressbar
+import pandas as pd
 
 # Some filetypes in Pygments are not necessarily computer code, but configuration/documentation. Let's not include those.
 IGNORE_PYGMENTS_FILETYPES = ['*.json', '*.md', '*.ps', '*.eps', '*.txt', '*.xml', '*.xsl', '*.rss', '*.xslt', '*.xsd', '*.wsdl', '*.wsf', '*.yaml', '*.yml']
 
 
-def analyze():
+def analyze(repos, interval=7*24*60*60, ignore=[], only=[],branch=None,rename={},cohortfm='%Y',all_filetypes=False,prefix='.'):
     default_filetypes = set()
     for _, _, filetypes, _ in pygments.lexers.get_all_lexers():
         default_filetypes.update(filetypes)
     default_filetypes.difference_update(IGNORE_PYGMENTS_FILETYPES)
-
-    parser = argparse.ArgumentParser(description='Analyze git repo')
-    parser.add_argument('--cohortfm', default='%Y', help='A Python datetime format string such as "%%Y" for creating cohorts (default: %(default)s)')
-    parser.add_argument('--interval', default=7*24*60*60, type=int, help='Min difference between commits to analyze (default: %(default)s)')
-    parser.add_argument('--ignore', default=[], action='append', help='File patterns that should be ignored (can provide multiple, will each subtract independently)')
-    parser.add_argument('--only', default=[], action='append', help='File patterns that have to match (can provide multiple, will all have to match)')
-    parser.add_argument('--outdir', default='.', help='Output directory to store results (default: %(default)s)')
-    parser.add_argument('--branch', default=None, help='Branch to track (default: %(default)s)')
-    parser.add_argument('--all-filetypes', action='store_true', help='Include all files (if not set then will only analyze %s' % ','.join(default_filetypes))
-    parser.add_argument('--authors',default=None, help='Author DB (default: %(default)s)')
-    parser.add_argument('repos', nargs=1)
-    args = parser.parse_args()
-
-    repo = git.Repo(args.repos[0])
-    commit2cohort = {}
-    code_commits = [] # only stores a subset
-    master_commits = []
-    commit2timestamp = {}
+    
     curves_set = set()
-    rename = {}
-    
-    if args.authors is not None:
-        with open(args.authors,'r') as f:
-            for ln in f:
-                ll=ln.split('|')
-                if len(ll)>1:
-                    for j in range(1,len(ll)):
-                        rename[ll[j]]=ll[0]
-                else:
-                    rename[ll[0]]=ll[0]
-    
-    
-    if not os.path.exists(args.outdir):
-        os.makedirs(args.outdir)
+    curves = {}
+    ts = []
+    commit_history = {}
+    master_commits = []
+    code_commits = [] # only stores a subset
+    commit2cohort = {}
+    commit2timestamp = {}
 
+    def rename_author(author):
+        if author.email in rename:
+            return rename[author.email]
+        elif author.name in rename:
+            return rename[author.name]
+        else:
+            return author.name
+    
+    repo = git.Repo(os.path.join(prefix,repos))
+               
+    print("Analyzing {}".format(repos))
+    
     print('Listing all commits')
     bar = progressbar.ProgressBar(max_value=progressbar.UnknownLength)
-    for i, commit in enumerate(repo.iter_commits(args.branch)):
+    for i, commit in enumerate(repo.iter_commits(branch)):
         bar.update(i)
-        cohort = datetime.datetime.utcfromtimestamp(commit.committed_date).strftime(args.cohortfm)
-        commit2cohort[commit.hexsha] = cohort
+        cohort = datetime.datetime.utcfromtimestamp(commit.committed_date).strftime(cohortfm)
         curves_set.add(('cohort', cohort))
-        
-        if commit.author.email in rename:
-            curves_set.add(('author', rename[commit.author.email]))
-        elif commit.author.name in rename:
-            curves_set.add(('author', rename[commit.author.name]))
+        curves_set.add(('author', rename_author(commit.author)))
+        commit2cohort[commit.hexsha] = cohort
         
         if len(commit.parents) == 1:
             code_commits.append(commit)
             last_date = commit.committed_date
             commit2timestamp[commit.hexsha] = commit.committed_date
+            
 
+    print('')
     print('Backtracking the master branch')
     bar = progressbar.ProgressBar(max_value=progressbar.UnknownLength)
     i, commit = 0, repo.head.commit
@@ -87,28 +73,30 @@ def analyze():
         bar.update(i)
         if not commit.parents:
             break
-        if last_date is None or commit.committed_date < last_date - args.interval:
+        if last_date is None or commit.committed_date < last_date - interval:
             master_commits.append(commit)
             last_date = commit.committed_date
         i, commit = i+1, commit.parents[0]
 
-    ok_entry_paths = {}
+    print('')
+    print('Counting total entries to analyze + caching filenames')
+    entries_total = 0
+    bar = progressbar.ProgressBar(max_value=len(master_commits))
+    
+    ok_entry_paths = {} 
     def entry_path_ok(path):
         # All this matching is slow so let's cache it
         if path not in ok_entry_paths:
             ok_entry_paths[path] = (
-                (args.all_filetypes or any(fnmatch.fnmatch(os.path.split(path)[-1], filetype) for filetype in default_filetypes))
-                and all([fnmatch.fnmatch(path, pattern) for pattern in args.only])
-                and not any([fnmatch.fnmatch(path, pattern) for pattern in args.ignore]))
+                (all_filetypes or any(fnmatch.fnmatch(os.path.split(path)[-1], filetype) for filetype in default_filetypes))
+                and all([fnmatch.fnmatch(path, pattern) for pattern in only])
+                and not any([fnmatch.fnmatch(path, pattern) for pattern in ignore]))
         return ok_entry_paths[path]
 
     def get_entries(commit):
         return [entry for entry in commit.tree.traverse()
                 if entry.type == 'blob' and entry_path_ok(entry.path)]
-
-    print('Counting total entries to analyze + caching filenames')
-    entries_total = 0
-    bar = progressbar.ProgressBar(max_value=len(master_commits))
+    
     for i, commit in enumerate(reversed(master_commits)):
         bar.update(i)
         n = 0
@@ -125,14 +113,7 @@ def analyze():
                 cohort = commit2cohort.get(old_commit.hexsha, "MISSING")
                 _, ext = os.path.splitext(path)
                 
-                old_author=old_commit.author.name
-                if old_commit.author.email in rename:
-                    old_author=rename[old_commit.author.email]
-                elif old_commit.author.name in rename:
-                    old_author=rename[old_commit.author.name]
-                
-                
-                keys = [('cohort', cohort), ('ext', ext), ('author', old_author)]
+                keys = [('cohort', cohort), ('ext', ext), ('author', rename_author(old_commit.author))]
 
                 if old_commit.hexsha in commit2timestamp:
                     keys.append(('sha', old_commit.hexsha))
@@ -145,12 +126,9 @@ def analyze():
             traceback.print_exc()
         return h
 
-    curves = {}
-    ts = []
     file_histograms = {}
     last_commit = None
-    commit_history = {}
-
+    print('')
     print('Analyzing commit history')
     bar = progressbar.ProgressBar(max_value=entries_total, widget_kwargs=dict(samples=10000))
     entries_processed = 0
@@ -183,29 +161,76 @@ def analyze():
         for key in curves_set:
             curves.setdefault(key, []).append(histogram.get(key, 0))
 
-    def dump_json(output_fn, key_type, label_fmt=lambda x: x):
-        key_items = sorted(k for t, k in curves_set if t == key_type)
-        fn = os.path.join(args.outdir, output_fn)
-        print('Writing %s data to %s' % (key_type, fn))
-        f = open(fn, 'w')
-        json.dump({'y': [curves[(key_type, key_item)] for key_item in key_items],
-                   'ts': [t.isoformat() for t in ts],
-                   'labels': [label_fmt(key_item) for key_item in key_items]
-        }, f)
-        f.close()
-
-    # Dump accumulated stuff
-    dump_json('cohorts.json', 'cohort', lambda c: 'Code added in %s' % c)
-    dump_json('exts.json', 'ext')
-    dump_json('authors.json', 'author')
-
-    # Dump survival data
-    fn = os.path.join(args.outdir, 'survival.json')
-    f = open(fn, 'w')
-    print('Writing survival data to %s' % fn)
-    json.dump(commit_history, f)
-    f.close()
+    return curves, commit_history, curves_set, ts
 
 
 if __name__ == '__main__':
-    analyze()
+    authors='identitites'
+    outdir='.'
+    
+    repos=[
+        'bic-pipelines','patch_morphology','xdisp','arguments','BEaST','bicgl','Display','bicpl','classify','conglomerate', 
+        'EBTKS','EZminc','glim_image','ILT','inormalize','libminc','minc_gco','minctools',
+        'minc-widgets','mni_autoreg','mni-perllib','mrisim','N3','oobicpl',
+        'postf', 'ray_trace','Register'
+        ]
+    repo_prefix='..'
+    rename = {}
+    interval= 7*24*60*60 # 1 week
+    with open(authors,'r') as f:
+        for ln in f:
+            ll=ln.rstrip("\n").split('|')
+            if len(ll)>1:
+                for j in range(1,len(ll)):
+                    rename[ll[j]]=ll[0]
+            else:
+                rename[ll[0]]=ll[0]
+    
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+    
+    
+    authors={}
+    cohorts={}
+    exts={}
+    
+    for r in repos[0:2] :
+        curves,commit_history,curves_set,ts=analyze('xdisp',prefix=repo_prefix,rename=rename,interval=interval)
+    
+        
+        def to_pandas(key_type, label_fmt=lambda x: x):
+            key_items = sorted(k for t, k in curves_set if t == key_type)
+            
+            return {key_item:pd.Series(curves[(key_type, key_item)],index=ts,name=label_fmt(key_item)) for key_item in key_items}
+            
+        authors[r]=pd.DataFrame(to_pandas('author'))
+        cohorts[r]=pd.DataFrame(to_pandas('cohort',lambda c: 'Year %s' % c))
+        exts[r]=   pd.DataFrame(to_pandas('ext'))
+        
+    # resample to the same date range
+    range_start=None
+    range_end=None
+    all_authors=set()
+    for k,a in authors.items():
+        if range_start is None or range_start>a.index.min():range_start=a.index.min()
+        if range_end   is None or   range_end<a.index.max():range_end=a.index.max()
+        all_authors.update(a.columns)
+        
+    print('')
+    print("Overall range:{} - {}".format(range_start,range_end))
+    
+    # resampling by week
+    rng = pd.date_range(start=range_start, end=range_end, freq='W')
+    r_authors={}
+    for k,a in authors.items():
+        r_authors[k]=a.resample(rng)
+    # join different authors into a single DataFrame
+    
+    
+    
+    
+    
+    
+    
+    
+    
