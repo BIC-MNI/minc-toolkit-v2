@@ -18,11 +18,16 @@ from __future__ import print_function
 import argparse, git, datetime, numpy, pygments.lexers, traceback, time, os, fnmatch, json, progressbar
 import pandas as pd
 
+
+#import matplotlib
+#matplotlib.use('Agg')
+#from matplotlib import pyplot
+
 # Some filetypes in Pygments are not necessarily computer code, but configuration/documentation. Let's not include those.
 IGNORE_PYGMENTS_FILETYPES = ['*.json', '*.md', '*.ps', '*.eps', '*.txt', '*.xml', '*.xsl', '*.rss', '*.xslt', '*.xsd', '*.wsdl', '*.wsf', '*.yaml', '*.yml']
 
 
-def analyze(repos, interval=7*24*60*60, ignore=[], only=[],branch=None,rename={},cohortfm='%Y',all_filetypes=False,prefix='.'):
+def analyze(repos, interval=7*24*60*60, ignore=[], only=[],branch=None,rename={},cohortfm='%Y',all_filetypes=False,prefix='.',earliest=None):
     default_filetypes = set()
     for _, _, filetypes, _ in pygments.lexers.get_all_lexers():
         default_filetypes.update(filetypes)
@@ -63,9 +68,9 @@ def analyze(repos, interval=7*24*60*60, ignore=[], only=[],branch=None,rename={}
             last_date = commit.committed_date
             commit2timestamp[commit.hexsha] = commit.committed_date
             
-
-    print('')
-    print('Backtracking the master branch')
+    bar.finish()
+    
+    print('Backtracking current branch')
     bar = progressbar.ProgressBar(max_value=progressbar.UnknownLength)
     i, commit = 0, repo.head.commit
     last_date = None
@@ -73,12 +78,18 @@ def analyze(repos, interval=7*24*60*60, ignore=[], only=[],branch=None,rename={}
         bar.update(i)
         if not commit.parents:
             break
+        
         if last_date is None or commit.committed_date < last_date - interval:
             master_commits.append(commit)
             last_date = commit.committed_date
+            
+        if earliest is not None and commit.hexsha==earliest:
+            break
+        
         i, commit = i+1, commit.parents[0]
 
-    print('')
+    bar.finish()
+    
     print('Counting total entries to analyze + caching filenames')
     entries_total = 0
     bar = progressbar.ProgressBar(max_value=len(master_commits))
@@ -105,7 +116,8 @@ def analyze(repos, interval=7*24*60*60, ignore=[], only=[],branch=None,rename={}
             _, ext = os.path.splitext(entry.path)
             curves_set.add(('ext', ext))
         entries_total += n
-
+    bar.finish()
+    
     def get_file_histogram(commit, path):
         h = {}
         try:
@@ -128,7 +140,6 @@ def analyze(repos, interval=7*24*60*60, ignore=[], only=[],branch=None,rename={}
 
     file_histograms = {}
     last_commit = None
-    print('')
     print('Analyzing commit history')
     bar = progressbar.ProgressBar(max_value=entries_total, widget_kwargs=dict(samples=10000))
     entries_processed = 0
@@ -160,7 +171,7 @@ def analyze(repos, interval=7*24*60*60, ignore=[], only=[],branch=None,rename={}
 
         for key in curves_set:
             curves.setdefault(key, []).append(histogram.get(key, 0))
-
+    bar.finish()
     return curves, commit_history, curves_set, ts
 
 
@@ -169,14 +180,17 @@ if __name__ == '__main__':
     outdir='.'
     
     repos=[
-        'bic-pipelines','patch_morphology','xdisp','arguments','BEaST','bicgl','Display','bicpl','classify','conglomerate', 
-        'EBTKS','EZminc','glim_image','ILT','inormalize','libminc','minc_gco','minctools',
+        'bic-pipelines','patch_morphology','xdisp','arguments','BEaST','bicgl',
+        'Display','bicpl','classify','conglomerate', 
+        'EBTKS','EZminc','glim_image','ILT','inormalize','libminc','minctools',
         'minc-widgets','mni_autoreg','mni-perllib','mrisim','N3','oobicpl',
-        'postf', 'ray_trace','Register'
+        'postf', 'ray_trace','Register','.'
         ]
+    #repos=['.','patch_morphology']
     repo_prefix='..'
     rename = {}
     interval= 7*24*60*60 # 1 week
+    
     with open(authors,'r') as f:
         for ln in f:
             ll=ln.rstrip("\n").split('|')
@@ -194,9 +208,11 @@ if __name__ == '__main__':
     cohorts={}
     exts={}
     
-    for r in repos[0:2] :
-        curves,commit_history,curves_set,ts=analyze('xdisp',prefix=repo_prefix,rename=rename,interval=interval)
-    
+    for r in repos :
+        earliest=None
+        if r=='minctools': earliest='cc7477c7e7bf46a45a1959a7030fd65863e79062' # don't analyze beyond that (libminc & minctools split)
+        
+        curves,commit_history,curves_set,ts=analyze(r,prefix=repo_prefix,rename=rename,interval=interval,earliest=earliest)
         
         def to_pandas(key_type, label_fmt=lambda x: x):
             key_items = sorted(k for t, k in curves_set if t == key_type)
@@ -206,31 +222,55 @@ if __name__ == '__main__':
         authors[r]=pd.DataFrame(to_pandas('author'))
         cohorts[r]=pd.DataFrame(to_pandas('cohort',lambda c: 'Year %s' % c))
         exts[r]=   pd.DataFrame(to_pandas('ext'))
-        
+    
     # resample to the same date range
     range_start=None
     range_end=None
-    all_authors=set()
-    for k,a in authors.items():
+    
+    for k, a in authors.items():
         if range_start is None or range_start>a.index.min():range_start=a.index.min()
-        if range_end   is None or   range_end<a.index.max():range_end=a.index.max()
-        all_authors.update(a.columns)
+        if range_end   is None or   range_end<a.index.max():range_end  =a.index.max()
         
-    print('')
     print("Overall range:{} - {}".format(range_start,range_end))
     
-    # resampling by week
+    # FIX for broken time in some packages
+    force_start=pd.Timestamp(1991,1,1)
+    
+    if range_start<force_start:
+        range_start=force_start
+    # resample by week
     rng = pd.date_range(start=range_start, end=range_end, freq='W')
-    r_authors={}
-    for k,a in authors.items():
-        r_authors[k]=a.resample(rng)
-    # join different authors into a single DataFrame
+        
+    def pool_results(samples,rng):
+        all_samples=set()
+        # gather all keys
+        for k, c in samples.items():
+            all_samples.update(c.columns.tolist())
+        all_samples = pd.DataFrame(columns=all_samples,index=rng).fillna(0.0)
+        
+        # resample all data 
+        for k, c in samples.items():
+            r=c.reindex(rng, method='ffill').fillna(0.0)
+            # add columns
+            for an in r.columns.tolist():
+                all_samples[an]+=r[an]
+        return all_samples
     
     
+    # resampling by week
+    # and join different authors into a single DataFrame
+    all_authors = pool_results(authors,rng)
+    all_cohorts = pool_results(cohorts,rng)
+    all_exts    = pool_results(exts,rng)
     
+    # save to HDF file
+    store = pd.HDFStore('statistics.h5')
+    store['all_authors']=all_authors
+    store['all_cohorts']=all_cohorts
+    store['all_exts']   =all_exts
     
+    # save libminc authors
+    store['libminc'] = authors['libminc']
     
-    
-    
-    
+    store.close()
     
