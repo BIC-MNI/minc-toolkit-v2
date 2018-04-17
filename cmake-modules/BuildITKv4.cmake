@@ -125,7 +125,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
         ${CMAKE_EXTERNAL_PROJECT_ARGS}
         -DBUILD_EXAMPLES:BOOL=OFF
         -DBUILD_TESTING:BOOL=OFF
-        -DITK_USE_REVIEW:BOOL=ON
+        -DModule_ITKReview:BOOL=ON
         -DModule_ITKIOMINC:BOOL=ON
         -DModule_ITKIOTransformMINC:BOOL=ON
         -DITK_USE_SYSTEM_MINC:BOOL=ON
