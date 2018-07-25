@@ -111,6 +111,7 @@ OPTION(USE_SYSTEM_FFTW3F     "Use System FFTW3F "      OFF)
 OPTION(USE_SYSTEM_FFTW3D     "Use System FFTW3D "      OFF)
 OPTION(USE_SYSTEM_GLUT       "Use System GLUT  "       ON)
 OPTION(USE_SYSTEM_OPENJPEG   "Use System OpenJPEG  "   ON)
+OPTION(USE_SYSTEM_JPEG   "Use System JPEG  "   OFF)
 
 OPTION(MT_BUILD_ITK_TOOLS    "Build ITK-based tools"  OFF)
 OPTION(MT_BUILD_VISUAL_TOOLS "Build visual tools (Display, Register, postf, ray_trace) requires OpenGL & Glut"  OFF)
@@ -223,6 +224,7 @@ ENDIF(USE_SYSTEM_NIFTI)
 #   ENDIF(NOT USE_SYSTEM_NIFTI)
 # ENDIF(USE_SYSTEM_GIFTI)
 
+# for minctools (dcm2mnc)
 IF(USE_SYSTEM_OPENJPEG)
 FIND_PACKAGE( OpenJPEG )
 ELSE(USE_SYSTEM_OPENJPEG)
@@ -230,13 +232,17 @@ ELSE(USE_SYSTEM_OPENJPEG)
   build_openjpeg( ${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
 ENDIF(USE_SYSTEM_OPENJPEG)
 
+IF(USE_SYSTEM_JPEG)
+FIND_PACKAGE( JPEG )
+ELSE(USE_SYSTEM_JPEG)
+  INCLUDE(BuildJPEG)
+  build_jpeg( ${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
+ENDIF(USE_SYSTEM_JPEG)
+
 #required for some minc tools
 FIND_PACKAGE( BISON )
 FIND_PACKAGE( FLEX )
 FIND_PACKAGE( Threads )
-
-#optional for minctools
-FIND_PACKAGE( JPEG )
 
 #required for bicpl
 IF( USE_SYSTEM_NETPBM ) # else we will use bundled libppm
