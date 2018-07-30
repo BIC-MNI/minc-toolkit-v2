@@ -65,6 +65,7 @@ macro(build_openjpeg install_prefix staging_prefix)
       -DBUILD_STATIC_LIBS:BOOL=ON
       -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
       -DMACOSX_RPATH:BOOL=ON
+      -DBUILD_CODEC:BOOL=OFF
       -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
       -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
       ${CMAKE_EXTERNAL_PROJECT_ARGS}
