@@ -110,10 +110,10 @@ OPTION(USE_SYSTEM_GSL        "Use System GSL "         OFF)
 OPTION(USE_SYSTEM_FFTW3F     "Use System FFTW3F "      OFF)
 OPTION(USE_SYSTEM_FFTW3D     "Use System FFTW3D "      OFF)
 OPTION(USE_SYSTEM_GLUT       "Use System GLUT  "       ON)
-OPTION(USE_SYSTEM_OPENJPEG   "Use System OpenJPEG  "   ON)
-OPTION(USE_SYSTEM_JPEG   "Use System JPEG  "   OFF)
+OPTION(USE_SYSTEM_OPENJPEG   "Use System OpenJPEG  "   OFF)
+OPTION(USE_SYSTEM_JPEG       "Use System JPEG  "   OFF)
 
-OPTION(MT_BUILD_ITK_TOOLS    "Build ITK-based tools"  OFF)
+OPTION(MT_BUILD_ITK_TOOLS    "Build ITK-based tools"  ON)
 OPTION(MT_BUILD_VISUAL_TOOLS "Build visual tools (Display, Register, postf, ray_trace) requires OpenGL & Glut"  OFF)
 
 OPTION(USE_SYSTEM_ITK        "Use System ITK" OFF)
@@ -121,6 +121,7 @@ OPTION(MT_USE_OPENMP         "Use OpenMP multi-threading" OFF)
 OPTION(MT_BUILD_IM           "Build ImageMagick and dependent libraries" OFF)
 OPTION(MT_BUILD_QUIET        "Build quetly" OFF)
 OPTION(MT_BUILD_OPENBLAS     "Build OpenBLAS: will require fortran" OFF)
+#OPTION(MT_USE_OPENMP_BLAS    "Use Build OpenBLAS with OpenMP support" OFF) # TODO: finish this to compile on some platforms
 
 SET(MT_PACKAGES_PATH "${CMAKE_BINARY_DIR}/cache" CACHE PATH  "Directory containing 3rd party packages")
 
@@ -450,9 +451,9 @@ ENDIF(USE_SYSTEM_FFTW3D)
 # build tools that require ITK
 IF(MT_BUILD_ITK_TOOLS)
 
-  OPTION(MT_BUILD_ANTS     "Build ANTS " OFF)
-  OPTION(MT_BUILD_C3D      "Build convert3D " OFF)
-  OPTION(MT_BUILD_ELASTIX  "Build Elastix " OFF)
+  OPTION(MT_BUILD_ANTS     "Build ANTS " ON)
+  OPTION(MT_BUILD_C3D      "Build convert3D " ON)
+  OPTION(MT_BUILD_ELASTIX  "Build Elastix " ON)
   OPTION(MT_BUILD_ABC      "Build ABC " OFF)
 
   IF(USE_SYSTEM_ITK)

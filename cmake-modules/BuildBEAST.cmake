@@ -60,7 +60,7 @@ macro(build_BEAST install_prefix staging_prefix )
 
   ExternalProject_Add(BEAST
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/BEaST
-    BINARY_DIR BEaST-build
+    BINARY_DIR BEAST-build
     LIST_SEPARATOR :::  
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
