@@ -71,6 +71,7 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
         URL_MD5 "686f30a234f81fd768dbad5bbd41ca4f"
         SOURCE_DIR OpenBLAS
         BINARY_DIR OpenBLAS-build
+        PATCH_COMMAND patch -p1 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/0001-Fix-1705-where-we-incorrectly-calculate-page-locatio.patch
         LIST_SEPARATOR :::
         CMAKE_GENERATOR ${CMAKE_GEN}
         CMAKE_ARGS
@@ -80,13 +81,14 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
         -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
         -DMACOSX_RPATH:BOOL=ON
         -DDYNAMIC_ARCH:BOOL=ON
+        -DNO_WARMAP:BOOL=ON
         -DUSE_THREAD:BOOL=OFF
         -DUSE_OPENMP:BOOL=OFF
         -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
         ${CMAKE_EXTERNAL_PROJECT_ARGS}
-        "-DCMAKE_CXX_FLAGS:STRING=-fPIC ${CMAKE_CXX_FLAGS} -DUSE_SIMPLE_THREADED_LEVEL3=1"
-        "-DCMAKE_C_FLAGS:STRING=-fPIC ${CMAKE_C_FLAGS} -DUSE_SIMPLE_THREADED_LEVEL3=1"
+        "-DCMAKE_CXX_FLAGS:STRING=-fPIC ${CMAKE_CXX_FLAGS}"
+        "-DCMAKE_C_FLAGS:STRING=-fPIC ${CMAKE_C_FLAGS}"
         -DCMAKE_INSTALL_LIBDIR:PATH=${install_prefix}/lib${LIB_SUFFIX} 
             INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
             INSTALL_DIR ${staging_prefix}/${install_prefix}
