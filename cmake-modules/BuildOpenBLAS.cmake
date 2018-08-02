@@ -95,7 +95,7 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
   SET(OpenBLAS_INCLUDE_DIRS ${staging_prefix}/${install_prefix}/include )
   SET(OpenBLAS_LIBRARY      ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libopenblas.so  ) # ${GFORTRAN_LIBRARY}
   SET(OpenBLAS_DIR          ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/cmake/openblas )
-  SET(OpenBLAS_FOUND ON)
+  SET(OpenBLAS_FOUND        ON)
 
 endmacro(build_open_blas)
 
