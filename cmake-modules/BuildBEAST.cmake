@@ -82,7 +82,7 @@ macro(build_BEAST install_prefix staging_prefix )
   
   IF(BUILD_TESTING)
     ADD_TEST(NAME TEST_BEAST COMMAND ${CTEST_COMMAND} --output-on-failure 
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/BEaST-build 
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/BEAST-build
     )
       
   ENDIF(BUILD_TESTING)
