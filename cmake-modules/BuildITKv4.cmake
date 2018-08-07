@@ -1,4 +1,4 @@
-macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include_dir hdf_library_dir zlib_include_dir zlib_library)
+macro(build_itkv4 install_prefix staging_prefix minc_dir)
   find_package(Threads REQUIRED)
 
   if(CMAKE_EXTRA_GENERATOR)
@@ -84,7 +84,8 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
       SET(HDF5_LIB_SUFFIX    ".a")
       SET(ITK_SHARED_LIBRARY "OFF")
   ENDIF(MT_BUILD_SHARED_LIBS)
-  
+
+  IF(FALSE) # OUTDATED
   IF(${CMAKE_BUILD_TYPE} STREQUAL Release OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo) OR (CMAKE_BUILD_TYPE STREQUAL MinSizeRel))
     #message("Using release version of HDF5")
     SET(HDF5_LIBRARY ${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX})
@@ -99,10 +100,32 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
     SET(HDF5_HL_CPP_LIBRARY ${hdf_library_dir}/libhdf5_hl_cpp_debug${HDF5_LIB_SUFFIX})
   ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo) OR (CMAKE_BUILD_TYPE STREQUAL MinSizeRel))
 
-   message("HDF5_LIBRARY=${HDF5_LIBRARY}")
-   message("HDF5_CPP_LIBRARY=${HDF5_CPP_LIBRARY}")
-   message("HDF5_HL_LIBRARY=${HDF5_HL_LIBRARY}")
-   message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
+  ENDIF()
+
+  # HACKS to generate directories for HDF5
+
+  IF(HDF5_CXX_LIBRARY)
+   SET(HDF5_CPP_LIBRARY "${HDF5_CXX_LIBRARY}")
+  ELSE()
+   STRING(REPLACE "libhdf5" "libhdf5_cpp" HDF5_CPP_LIBRARY "${HDF5_LIBRARY}")
+  ENDIF()
+
+  IF(NOT HDF5_HL_LIBRARY)
+   STRING(REPLACE "libhdf5" "libhdf5_hl"  HDF5_HL_LIBRARY "${HDF5_LIBRARY}")
+  ENDIF()
+
+  IF(NOT HDF5_HL_CPP_LIBRARY)
+   STRING(REPLACE "libhdf5" "libhdf5_hl_cpp" HDF5_HL_CPP_LIBRARY "${HDF5_LIBRARY}")
+  ENDIF()
+
+  IF(NOT HDF5_BIN_DIR)
+    STRING(REPLACE "include" "bin" HDF5_BIN_DIR  "${HDF5_INCLUDE_DIR}")
+  ENDIF()
+
+  message("HDF5_LIBRARY=${HDF5_LIBRARY}")
+  message("HDF5_CPP_LIBRARY=${HDF5_CPP_LIBRARY}")
+  message("HDF5_HL_LIBRARY=${HDF5_HL_LIBRARY}")
+  message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
 
   GET_PACKAGE("https://sourceforge.net/projects/itk/files/itk/4.13/InsightToolkit-4.13.0.tar.xz" "3badf70cfb0093054453f66c5974c5a4" "InsightToolkit-4.13.0.tar.xz" ITKv4_PATH ) 
   
@@ -135,17 +158,17 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
         -DITK_USE_FFTWD:BOOL=ON
         -DITK_USE_FFTWF:BOOL=ON
         -DITK_USE_SYSTEM_FFTW:BOOL=ON
-        -DFFTWD_LIB:FILEPATH=${FFTW3D_LIBRARY}
-        -DFFTWD_THREADS_LIB:FILEPATH=${FFTW3D_THREADS_LIBRARY}
+        -DFFTWD_LIB:FILEPATH=${FFTW3_LIBRARY}
+        -DFFTWD_THREADS_LIB:FILEPATH=${FFTW3_THREADS_LIBRARY}
         -DFFTWF_LIB:FILEPATH=${FFTW3F_LIBRARY}
         -DFFTWF_THREADS_LIB:FILEPATH=${FFTW3F_THREADS_LIBRARY}
-        -DFFTW_INCLUDE_PATH:PATH=${FFTW3D_INCLUDE_DIR}
+        -DFFTW_INCLUDE_PATH:PATH=${FFTW3_INCLUDE_DIR}
         -DLIBMINC_DIR:PATH=${minc_dir}
-        -DHDF5_CXX_COMPILER_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5c++
-        -DHDF5_C_COMPILER_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5cc
-        -DHDF5_DIFF_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5diff
-        -DHDF5_CXX_INCLUDE_DIR:PATH=${hdf_include_dir}
-        -DHDF5_C_INCLUDE_DIR:PATH=${hdf_include_dir}
+        -DHDF5_CXX_COMPILER_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5c++
+        -DHDF5_C_COMPILER_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5cc
+        -DHDF5_DIFF_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5diff
+        -DHDF5_CXX_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
+        -DHDF5_C_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
         -DHDF5_hdf5_LIBRARY:FILEPATH=${HDF5_LIBRARY}
         -DHDF5_hdf5_cpp_LIBRARY:FILEPATH=${HDF5_CPP_LIBRARY}
         -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${HDF5_LIBRARY}
@@ -154,8 +177,8 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
         -DHDF5_hdf5_cpp_LIBRARY_DEBUG:FILEPATH=${HDF5_CPP_LIBRARY}
         -DHDF5_DIR:PATH=HDF5_DIR-NOTFOUND
         -DHDF5_Fortran_COMPILER_EXECUTABLE:FILEPATH=''
-        -DZLIB_LIBRARY:PATH=${zlib_library}
-        -DZLIB_INCLUDE_DIR:PATH=${zlib_include_dir}
+        -DZLIB_LIBRARY:PATH=${ZLIB_LIBRARY}
+        -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
         -DITK_LEGACY_REMOVE:BOOL=OFF
     INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
