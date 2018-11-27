@@ -8,10 +8,11 @@ macro(build_BOOST install_prefix staging_prefix)
     SET(EXT_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}")
   ENDIF()
 
+  GET_PACKAGE("http://sourceforge.net/projects/boost/files/boost/1.56.0/boost_1_56_0.tar.gz" "8c54705c424513fa2be0042696a3a162" "boost_1_56_0.tar.gz" BOOST_PATH ) 
+  
   ExternalProject_Add(BOOST
-    URL  "http://sourceforge.net/projects/boost/files/boost/1.56.0/boost_1_56_0.tar.gz"
-    URL_MD5 ""
-    GIT_TAG "master"
+    URL  "${BOOST_PATH}"
+    URL_MD5 "8c54705c424513fa2be0042696a3a162"
     UPDATE_COMMAND ""
     SOURCE_DIR BOOST
     LIST_SEPARATOR :::  

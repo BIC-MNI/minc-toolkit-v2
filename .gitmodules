@@ -85,3 +85,6 @@
 [submodule "patch_morphology"]
 	path = patch_morphology
 	url = https://github.com/vfonov/patch_morphology.git
+[submodule "minc_gco"]
+	path = minc_gco
+	url = https://github.com/BIC-MNI/minc_gco.git

@@ -47,8 +47,8 @@ macro(build_C3D install_prefix staging_prefix)
       -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
       -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
       -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
-      -DCMAKE_C_COMPILER:FILEPATH=${ITK_C_COMPILER}
-      -DCMAKE_CXX_COMPILER:FILEPATH=${ITK_CXX_COMPILER}
+#      -DCMAKE_C_COMPILER:FILEPATH=${ITK_C_COMPILER}
+#      -DCMAKE_CXX_COMPILER:FILEPATH=${ITK_CXX_COMPILER}
     )
   endif()
 
@@ -57,10 +57,11 @@ macro(build_C3D install_prefix staging_prefix)
     SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake_ccache.patch)
   #endif(MT_BUILD_QUIET)
 
+  GET_PACKAGE("https://github.com/vfonov/Convert3D/archive/v0.0.tar.gz" "a9f346f14171297dc28b530590be8754" "c3d-v0.0.tar.gz" C3D_PATH ) 
 
   ExternalProject_Add(C3D
-    GIT_REPOSITORY "https://github.com/vfonov/Convert3D.git"
-    GIT_TAG "a94e3a385a4369589557adf21e9780b5ed3bb370"
+    URL "${C3D_PATH}"
+    URL_MD5 "a9f346f14171297dc28b530590be8754"
     UPDATE_COMMAND ""
     SOURCE_DIR C3D
     BINARY_DIR C3D-build

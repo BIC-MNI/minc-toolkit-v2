@@ -64,12 +64,13 @@ macro(build_hdf5 install_prefix staging_prefix)
   
   #SET(PATCH_QUIET "")
   #if(MT_BUILD_QUIET)
-    SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake_ccache.patch)
+  SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake_ccache.patch)
   #endif(MT_BUILD_QUIET)
-  
+  GET_PACKAGE("https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.20/src/hdf5-1.8.20.tar.bz2" "23078d57975903e9536d1e7b299cc39c" "hdf5-1.8.20.tar.bz2" HDF5_PATH ) 
+
 ExternalProject_Add(HDF5
-  URL "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.17/src/hdf5-1.8.17.tar.bz2"
-  URL_MD5 "34bd1afa5209259201a41964100d6203"
+  URL "${HDF5_PATH}"
+  URL_MD5 "23078d57975903e9536d1e7b299cc39c"
   SOURCE_DIR HDF5
   BINARY_DIR HDF5-build
   PATCH_COMMAND ${PATCH_QUIET}
@@ -97,7 +98,7 @@ ExternalProject_Add(HDF5
       -DZLIB_INCLUDE_DIR:STRING=${ZLIB_INCLUDE_DIR}
       -DZLIB_LIBRARIES:STRING=${ZLIB_STATIC_LIBRARY}
       -DZLIB_STATIC_LIBRARY:STRING=${ZLIB_STATIC_LIBRARY}
-      -DZLIB_SHARED_LIBRARY:STRING=${ZLIB_SHARED_LIBRARY}
+      -DZLIB_SHARED_LIBRARY:STRING=${ZLIB_STATIC_LIBRARY}  # for fixing error with restricted binaries on MacOSX
       -DSKIP_HDF5_FORTRAN_SHARED:BOOL=ON
       ${CMAKE_EXTERNAL_PROJECT_ARGS}
   INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
@@ -109,24 +110,24 @@ SET(HDF5_LIB_SUFFIX ".a")
 
 IF(MT_BUILD_SHARED_LIBS)
   IF(APPLE)
-    IF(CMAKE_BUILD_TYPE STREQUAL Release)
+    IF( (CMAKE_BUILD_TYPE STREQUAL Release) OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo) OR (CMAKE_BUILD_TYPE STREQUAL MinSizeRel))
       SET(HDF5_LIB_SUFFIX ".dylib")
-    ELSE(CMAKE_BUILD_TYPE STREQUAL Release)
+    ELSE()
       SET(HDF5_LIB_SUFFIX "_debug.dylib")
-    ENDIF(CMAKE_BUILD_TYPE STREQUAL Release)
+    ENDIF()
   ELSE(APPLE)
-    IF(CMAKE_BUILD_TYPE STREQUAL Release)
+    IF((CMAKE_BUILD_TYPE STREQUAL Release) OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo) OR (CMAKE_BUILD_TYPE STREQUAL MinSizeRel))
       SET(HDF5_LIB_SUFFIX ".so")
-    ELSE(CMAKE_BUILD_TYPE STREQUAL Release)
+    ELSE()
       SET(HDF5_LIB_SUFFIX "_debug.so")
-    ENDIF(CMAKE_BUILD_TYPE STREQUAL Release)
+    ENDIF()
   ENDIF(APPLE)
 ELSE(MT_BUILD_SHARED_LIBS)
-  IF(CMAKE_BUILD_TYPE STREQUAL Release)
+  IF((CMAKE_BUILD_TYPE STREQUAL Release) OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo) OR (CMAKE_BUILD_TYPE STREQUAL MinSizeRel))
     SET(HDF5_LIB_SUFFIX ".a")
-  ELSE(CMAKE_BUILD_TYPE STREQUAL Release)
+  ELSE()
     SET(HDF5_LIB_SUFFIX "_debug.a")
-  ENDIF(CMAKE_BUILD_TYPE STREQUAL Release)
+  ENDIF()
 ENDIF(MT_BUILD_SHARED_LIBS)
 
 SET(HDF5_BIN_DIR     ${staging_prefix}/${install_prefix}/bin )
@@ -140,4 +141,5 @@ SET(HDF5_INCLUDE_DIRS ${HDF5_INCLUDE_DIR})
 
 SET(HDF5_DIR         ${staging_prefix}/${install_prefix}/share/cmake/hdf5)
 SET(HDF5_FOUND ON)
+
 endmacro(build_hdf5)

@@ -47,8 +47,8 @@ macro(build_Elastix install_prefix staging_prefix)
       -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
       -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
       -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
-      -DCMAKE_C_COMPILER:FILEPATH=${ITK_C_COMPILER}
-      -DCMAKE_CXX_COMPILER:FILEPATH=${ITK_CXX_COMPILER}
+#      -DCMAKE_C_COMPILER:FILEPATH=${ITK_C_COMPILER}
+#      -DCMAKE_CXX_COMPILER:FILEPATH=${ITK_CXX_COMPILER}
     )
   endif()
   
@@ -82,6 +82,13 @@ macro(build_Elastix install_prefix staging_prefix)
         -DUSE_NormalizedGradientCorrelationMetric:BOOL=ON
         -DUSE_CMAEvolutionStrategy:BOOL=ON
         -DUSE_MissingStructurePenalty:BOOL=ON
+        -DUSE_AffineLogTransformElastix:BOOL=ON
+        -DUSE_LinearResampleInterpolator:BOOL=ON
+        -DUSE_MutualInformationHistogramMetric:BOOL=ON
+        -DUSE_NearestNeighborInterpolator:BOOL=ON
+        -DUSE_NearestNeighborResampleInterpolator:BOOL=ON
+        -DUSE_Simplex:BOOL=ON
+        -DUSE_ViolaWellsMutualInformationMetric:BOOL=ON
         -DFFTW_LIB:FILEPATH=${FFTW3F_LIBRARY}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DITK_DIR:PATH=${ITK_DIR}

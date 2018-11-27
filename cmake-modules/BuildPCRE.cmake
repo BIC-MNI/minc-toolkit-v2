@@ -14,12 +14,22 @@ macro(build_pcre install_prefix staging_prefix)
       -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
     )
   endif()
+  
+  SET(EXT_CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
+  SET(EXT_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+  IF(NOT APPLE)
+  LIST(APPEND EXT_CMAKE_C_FLAGS -D_XOPEN_SOURCE=600)
+  LIST(APPEND EXT_CMAKE_CXX_FLAGS -D_XOPEN_SOURCE=600)
+  ENDIF(NOT APPLE)
+  
+  
+  GET_PACKAGE("https://sourceforge.net/projects/pcre/files/pcre/8.40/pcre-8.40.tar.bz2" "41a842bf7dcecd6634219336e2167d1d" "pcre-8.40.tar.bz2" PCRE_PATH ) 
 
   ExternalProject_Add(PCRE
     SOURCE_DIR PCRE
     BINARY_DIR PCRE-build
-    URL "https://sourceforge.net/projects/pcre/files/pcre/8.39/pcre-8.39.tar.bz2"
-    URL_MD5 "e3fca7650a0556a2647821679d81f585"
+    URL "${PCRE_PATH}"
+    URL_MD5 "41a842bf7dcecd6634219336e2167d1d"
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
         -DBUILD_TESTING:BOOL=OFF #${BUILD_TESTING}
@@ -37,8 +47,8 @@ macro(build_pcre install_prefix staging_prefix)
         -DPCRE_SUPPORT_UTF:BOOL=OFF
         -DPCRE_BUILD_TESTS:BOOL=OFF
         ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
-        "-DCMAKE_CXX_FLAGS:STRING=-fPIC ${CMAKE_CXX_FLAGS}"
-        "-DCMAKE_C_FLAGS:STRING=-fPIC ${CMAKE_C_FLAGS}"
+        "-DCMAKE_CXX_FLAGS:STRING=-fPIC ${EXT_CMAKE_CXX_FLAGS}"
+        "-DCMAKE_C_FLAGS:STRING=-fPIC ${EXT_CMAKE_C_FLAGS}"
         -DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
         -DCMAKE_MODULE_LINKER_FLAGS:STRING=${CMAKE_MODULE_LINKER_FLAGS}
         -DCMAKE_SHARED_LINKER_FLAGS:STRING=${CMAKE_SHARED_LINKER_FLAGS}
@@ -52,6 +62,7 @@ SET(PCRE_LIB_SUFFIX ".a")
 SET(PCRE_INCLUDE_DIR  ${staging_prefix}/${install_prefix}/include )
 SET(PCRE_LIBRARY      ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libpcre${PCRE_LIB_SUFFIX} )
 SET(PCRECPP_LIBRARY   ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libpcrecpp${PCRE_LIB_SUFFIX} )
+
 SET(PCRE_FOUND ON)
  
 

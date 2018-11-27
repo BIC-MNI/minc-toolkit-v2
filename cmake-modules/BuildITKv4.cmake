@@ -1,4 +1,4 @@
-macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include_dir hdf_library_dir zlib_include_dir zlib_library)
+macro(build_itkv4 install_prefix staging_prefix minc_dir)
   find_package(Threads REQUIRED)
 
   if(CMAKE_EXTRA_GENERATOR)
@@ -8,18 +8,26 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
   endif(CMAKE_EXTRA_GENERATOR)
 
 
-  message("HDF5_DIR=${HDF5_DIR}")
+  #message("HDF5_DIR=${HDF5_DIR}")
+  #message("CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
+  #message("CMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
+  SET(EXT_CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
+  SET(EXT_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+  IF(NOT APPLE)
+  LIST(APPEND EXT_CMAKE_C_FLAGS -D_XOPEN_SOURCE=600)
+  LIST(APPEND EXT_CMAKE_CXX_FLAGS -D_XOPEN_SOURCE=600)
+  ENDIF(NOT APPLE)
   
   set(CMAKE_EXTERNAL_PROJECT_ARGS
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
         -DCMAKE_LINKER:FILEPATH=${CMAKE_LINKER}
-        -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
+        -DCMAKE_CXX_FLAGS:STRING=${EXT_CMAKE_CXX_FLAGS} 
         -DCMAKE_CXX_FLAGS_DEBUG:STRING=${CMAKE_CXX_FLAGS_DEBUG}
         -DCMAKE_CXX_FLAGS_MINSIZEREL:STRING=${CMAKE_CXX_FLAGS_MINSIZEREL}
         -DCMAKE_CXX_FLAGS_RELEASE:STRING=${CMAKE_CXX_FLAGS_RELEASE}
         -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_CXX_FLAGS_RELWITHDEBINFO}
-        -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
+        -DCMAKE_C_FLAGS:STRING=${EXT_CMAKE_C_FLAGS} 
         -DCMAKE_C_FLAGS_DEBUG:STRING=${CMAKE_C_FLAGS_DEBUG}
         -DCMAKE_C_FLAGS_MINSIZEREL:STRING=${CMAKE_C_FLAGS_MINSIZEREL}
         -DCMAKE_C_FLAGS_RELEASE:STRING=${CMAKE_C_FLAGS_RELEASE}
@@ -51,14 +59,22 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
       -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
       -DCMAKE_OSX_SYSROOT:STRING=${CMAKE_OSX_SYSROOT}
       -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
-      -DCMAKE_C_COMPILER:FILEPATH=${ITK_C_COMPILER}
-      -DCMAKE_CXX_COMPILER:FILEPATH=${ITK_CXX_COMPILER}
     )
   endif(APPLE)
 
-  #SET(PATCH_QUIET "")
+  IF(USE_SYSTEM_EXPAT_ITK)
+   list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
+    -DITK_USE_SYSTEM_EXPAT:BOOL=${USE_SYSTEM_EXPAT_ITK}
+    -DEXPAT_INCLUDE_DIR:PATH=${EXPAT_INCLUDE_DIR}
+    -DEXPAT_LIBRARY:PATH=${EXPAT_LIBRARY}
+    )
+  ENDIF()
+
+  SET(PATCH_QUIET "")
   #if(MT_BUILD_QUIET)
+  IF(NOT APPLE)
     SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake_ccache.patch)
+  ENDIF(NOT APPLE)
   #endif(MT_BUILD_QUIET)
 
   SET(HDF5_LIB_SUFFIX ".a")
@@ -76,32 +92,57 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
       SET(HDF5_LIB_SUFFIX    ".a")
       SET(ITK_SHARED_LIBRARY "OFF")
   ENDIF(MT_BUILD_SHARED_LIBS)
-  
-  IF(${CMAKE_BUILD_TYPE} STREQUAL Release)
+
+  IF(FALSE) # OUTDATED
+  IF(${CMAKE_BUILD_TYPE} STREQUAL Release OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo) OR (CMAKE_BUILD_TYPE STREQUAL MinSizeRel))
     #message("Using release version of HDF5")
     SET(HDF5_LIBRARY ${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX})
     SET(HDF5_CPP_LIBRARY ${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX})
     SET(HDF5_HL_LIBRARY ${hdf_library_dir}/libhdf5_hl${HDF5_LIB_SUFFIX})
     SET(HDF5_HL_CPP_LIBRARY ${hdf_library_dir}/libhdf5_hl_cpp${HDF5_LIB_SUFFIX})
-  ELSE(${CMAKE_BUILD_TYPE} STREQUAL Release)
+  ELSE(${CMAKE_BUILD_TYPE} STREQUAL Release OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo) OR (CMAKE_BUILD_TYPE STREQUAL MinSizeRel))
     #message("Using debug version of HDF5")
     SET(HDF5_LIBRARY ${hdf_library_dir}/libhdf5_debug${HDF5_LIB_SUFFIX})
     SET(HDF5_CPP_LIBRARY ${hdf_library_dir}/libhdf5_cpp_debug${HDF5_LIB_SUFFIX})
     SET(HDF5_HL_LIBRARY ${hdf_library_dir}/libhdf5_hl_debug${HDF5_LIB_SUFFIX})
     SET(HDF5_HL_CPP_LIBRARY ${hdf_library_dir}/libhdf5_hl_cpp_debug${HDF5_LIB_SUFFIX})
-  ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release)
+  ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo) OR (CMAKE_BUILD_TYPE STREQUAL MinSizeRel))
 
-   message("HDF5_LIBRARY=${HDF5_LIBRARY}")
-   message("HDF5_CPP_LIBRARY=${HDF5_CPP_LIBRARY}")
-   message("HDF5_HL_LIBRARY=${HDF5_HL_LIBRARY}")
-   message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
+  ENDIF()
+
+  # HACKS to generate directories for HDF5
+
+  IF(HDF5_CXX_LIBRARY)
+   SET(HDF5_CPP_LIBRARY "${HDF5_CXX_LIBRARY}")
+  ELSE()
+   STRING(REPLACE "libhdf5" "libhdf5_cpp" HDF5_CPP_LIBRARY "${HDF5_LIBRARY}")
+  ENDIF()
+
+  IF(NOT HDF5_HL_LIBRARY)
+   STRING(REPLACE "libhdf5" "libhdf5_hl"  HDF5_HL_LIBRARY "${HDF5_LIBRARY}")
+  ENDIF()
+
+  IF(NOT HDF5_HL_CPP_LIBRARY)
+   STRING(REPLACE "libhdf5" "libhdf5_hl_cpp" HDF5_HL_CPP_LIBRARY "${HDF5_LIBRARY}")
+  ENDIF()
+
+  IF(NOT HDF5_BIN_DIR)
+    STRING(REPLACE "include" "bin" HDF5_BIN_DIR  "${HDF5_INCLUDE_DIR}")
+  ENDIF()
+
+  message("HDF5_LIBRARY=${HDF5_LIBRARY}")
+  message("HDF5_CPP_LIBRARY=${HDF5_CPP_LIBRARY}")
+  message("HDF5_HL_LIBRARY=${HDF5_HL_LIBRARY}")
+  message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
+  message("HDF5_BIN_DIR=${HDF5_BIN_DIR}")
+
+  GET_PACKAGE("https://sourceforge.net/projects/itk/files/itk/4.13/InsightToolkit-4.13.0.tar.xz" "3badf70cfb0093054453f66c5974c5a4" "InsightToolkit-4.13.0.tar.xz" ITKv4_PATH ) 
+  
+
 
   ExternalProject_Add(ITKv4
-    #GIT_REPOSITORY "http://itk.org/ITK.git"
-    #GIT_TAG "421d314ff85ad542ad5c0f3d3c115fa7427b1c64"
-    
-    URL "https://sourceforge.net/projects/itk/files/itk/4.10/InsightToolkit-4.10.1.tar.gz/download"
-    URL_MD5 "f7e7fb92ea3e11c78685c7977e0433d8"
+    URL "${ITKv4_PATH}"
+    URL_MD5 "3badf70cfb0093054453f66c5974c5a4"
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
@@ -118,7 +159,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
         ${CMAKE_EXTERNAL_PROJECT_ARGS}
         -DBUILD_EXAMPLES:BOOL=OFF
         -DBUILD_TESTING:BOOL=OFF
-        -DITK_USE_REVIEW:BOOL=ON
+        -DModule_ITKReview:BOOL=ON
         -DModule_ITKIOMINC:BOOL=ON
         -DModule_ITKIOTransformMINC:BOOL=ON
         -DITK_USE_SYSTEM_MINC:BOOL=ON
@@ -128,27 +169,27 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir hdf_bin_dir hdf_include
         -DITK_USE_FFTWD:BOOL=ON
         -DITK_USE_FFTWF:BOOL=ON
         -DITK_USE_SYSTEM_FFTW:BOOL=ON
-        -DFFTWD_LIB:FILEPATH=${FFTW3D_LIBRARY}
-        -DFFTWD_THREADS_LIB:FILEPATH=${FFTW3D_THREADS_LIBRARY}
+        -DFFTWD_LIB:FILEPATH=${FFTW3_LIBRARY}
+        -DFFTWD_THREADS_LIB:FILEPATH=${FFTW3_THREADS_LIBRARY}
         -DFFTWF_LIB:FILEPATH=${FFTW3F_LIBRARY}
         -DFFTWF_THREADS_LIB:FILEPATH=${FFTW3F_THREADS_LIBRARY}
-        -DFFTW_INCLUDE_PATH:PATH=${FFTW3D_INCLUDE_DIR}
+        -DFFTW_INCLUDE_PATH:PATH=${FFTW3_INCLUDE_DIR}
         -DLIBMINC_DIR:PATH=${minc_dir}
-        -DHDF5_CXX_COMPILER_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5c++
-        -DHDF5_C_COMPILER_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5cc
-        -DHDF5_DIFF_EXECUTABLE:FILEPATH=${hdf_bin_dir}/h5diff
-        -DHDF5_CXX_INCLUDE_DIR:PATH=${hdf_include_dir}
-        -DHDF5_C_INCLUDE_DIR:PATH=${hdf_include_dir}
+        -DHDF5_DIFF_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5diff
+        -DHDF5_CXX_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
+        -DHDF5_C_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
         -DHDF5_hdf5_LIBRARY:FILEPATH=${HDF5_LIBRARY}
         -DHDF5_hdf5_cpp_LIBRARY:FILEPATH=${HDF5_CPP_LIBRARY}
         -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${HDF5_LIBRARY}
         -DHDF5_hdf5_cpp_LIBRARY_RELEASE:FILEPATH=${HDF5_CPP_LIBRARY}
         -DHDF5_hdf5_LIBRARY_DEBUG:FILEPATH=${HDF5_LIBRARY}
         -DHDF5_hdf5_cpp_LIBRARY_DEBUG:FILEPATH=${HDF5_CPP_LIBRARY}
-        -DHDF5_DIR:PATH=${staging_prefix}/${install_prefix}/share/cmake
+        -DHDF5_DIR:PATH=HDF5_DIR-NOTFOUND
         -DHDF5_Fortran_COMPILER_EXECUTABLE:FILEPATH=''
-        -DZLIB_LIBRARY:PATH=${zlib_library}
-        -DZLIB_INCLUDE_DIR:PATH=${zlib_include_dir}
+        -DHDF5_CXX_COMPILER_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5c++
+        -DHDF5_C_COMPILER_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5cc
+        -DZLIB_LIBRARY:PATH=${ZLIB_LIBRARY}
+        -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
         -DITK_LEGACY_REMOVE:BOOL=OFF
     INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}

@@ -1,13 +1,19 @@
-macro(build_ANTS install_prefix staging_prefix itk_dir ) #boost_dir
+macro(build_open_blas install_prefix staging_prefix build_parallel)
+
+  if(NOT CMAKE_Fortran_COMPILER)
+    message("Fortran compiler not found! OpenBLAS will not work as expected!")
+  endif(NOT CMAKE_Fortran_COMPILER)
+  
   if(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
   else()
     set(CMAKE_GEN "${CMAKE_GENERATOR}")
   endif()
-  
+
   set(CMAKE_EXTERNAL_PROJECT_ARGS
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
+        -DCMAKE_Fortran_COMPILER:FILEPATH=${CMAKE_Fortran_COMPILER}
         -DCMAKE_LINKER:FILEPATH=${CMAKE_LINKER}
         -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
         -DCMAKE_CXX_FLAGS_DEBUG:STRING=${CMAKE_CXX_FLAGS_DEBUG}
@@ -19,6 +25,11 @@ macro(build_ANTS install_prefix staging_prefix itk_dir ) #boost_dir
         -DCMAKE_C_FLAGS_MINSIZEREL:STRING=${CMAKE_C_FLAGS_MINSIZEREL}
         -DCMAKE_C_FLAGS_RELEASE:STRING=${CMAKE_C_FLAGS_RELEASE}
         -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_C_FLAGS_RELWITHDEBINFO}
+        -DCMAKE_Fortran_FLAGS:STRING=${CMAKE_Fortran_FLAGS}
+        -DCMAKE_Fortran_FLAGS_DEBUG:STRING=${CMAKE_Fortran_FLAGS_DEBUG}
+        -DCMAKE_Fortran_FLAGS_MINSIZEREL:STRING=${CMAKE_Fortran_FLAGS_MINSIZEREL}
+        -DCMAKE_Fortran_FLAGS_RELEASE:STRING=${CMAKE_Fortran_FLAGS_RELEASE}
+        -DCMAKE_Fortran_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_Fortran_FLAGS_RELWITHDEBINFO}
         -DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
         -DCMAKE_EXE_LINKER_FLAGS_DEBUG:STRING=${CMAKE_EXE_LINKER_FLAGS_DEBUG}
         -DCMAKE_EXE_LINKER_FLAGS_MINSIZEREL:STRING=${CMAKE_EXE_LINKER_FLAGS_MINSIZEREL}
@@ -44,44 +55,49 @@ macro(build_ANTS install_prefix staging_prefix itk_dir ) #boost_dir
   
   if(APPLE)
     list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
-      -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
-      -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
-      -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
-#      -DCMAKE_C_COMPILER:FILEPATH=${ITK_C_COMPILER}
-#      -DCMAKE_CXX_COMPILER:FILEPATH=${ITK_CXX_COMPILER}
+      -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
+      -DCMAKE_OSX_SYSROOT:STRING=${CMAKE_OSX_SYSROOT}
+      -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
     )
   endif()
-  #SET(PATCH_QUIET "")
-  #if(MT_BUILD_QUIET)
-    SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake_ccache.patch)
-  #endif(MT_BUILD_QUIET)
-
-  ExternalProject_Add(ANTS
-    #GIT_REPOSITORY "https://github.com/vfonov/ANTs.git"
-    #GIT_TAG "69d3a5a6c7125ccf07a9e9cf6ef29f0b91e9514f"
-    #UPDATE_COMMAND ""
-    SOURCE_DIR ${CMAKE_SOURCE_DIR}/ANTs
-    BINARY_DIR ANTS-build
-    #PATCH_COMMAND ${PATCH_QUIET}
-    LIST_SEPARATOR :::  
-    CMAKE_GENERATOR ${CMAKE_GEN}
-    CMAKE_ARGS
-        -DITK_DIR:PATH=${itk_dir}
-        -DITK_USE_FFTWD:BOOL=OFF # V.F. not sure how to make it work
-        -DITK_USE_FFTWF:BOOL=OFF # V.F. not sure how to make it work
-        -DITK_USE_SYSTEM_FFTW:BOOL=OFF # V.F. not sure how to make it work
-        -DANTS_SUPERBUILD:BOOL=OFF
-        -DBUILD_TESTING:BOOL=OFF
-        -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
-        -DCMAKE_SKIP_RPATH:BOOL=OFF
+  
+  
+  
+ 
+  GET_PACKAGE("https://github.com/xianyi/OpenBLAS/archive/v0.3.2.tar.gz" "686f30a234f81fd768dbad5bbd41ca4f" "openblas_v0.3.2.tar.gz" OPENBLAS_PATH ) 
+  
+  ExternalProject_Add(OpenBLAS
+        URL "${OPENBLAS_PATH}"
+        URL_MD5 "686f30a234f81fd768dbad5bbd41ca4f"
+        SOURCE_DIR OpenBLAS
+        BINARY_DIR OpenBLAS-build
+        PATCH_COMMAND patch -p1 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/0001-Fix-1705-where-we-incorrectly-calculate-page-locatio.patch
+        LIST_SEPARATOR :::
+        CMAKE_GENERATOR ${CMAKE_GEN}
+        CMAKE_ARGS
+        -DBUILD_SHARED_LIBS:BOOL=ON
+        -DBUILD_STATIC_LIBS:BOOL=ON
+        -DBUILD_WITHOUT_CBLAS:BOOL=OFF
         -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
         -DMACOSX_RPATH:BOOL=ON
-        -DITK_USE_FFTWD:BOOL=ON
-        -DITK_USE_FFTWF:BOOL=ON
-        -DITK_USE_SYSTEM_FFTW:BOOL=ON
+        -DDYNAMIC_ARCH:BOOL=ON
+        -DNO_WARMAP:BOOL=ON
+        -DUSE_THREAD:BOOL=OFF
+        -DUSE_OPENMP:BOOL=OFF
         -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
+        -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
         ${CMAKE_EXTERNAL_PROJECT_ARGS}
-    INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
-    INSTALL_DIR ${staging_prefix}/${install_prefix}
-  )
-endmacro(build_ANTS)
+        "-DCMAKE_CXX_FLAGS:STRING=-fPIC ${CMAKE_CXX_FLAGS}"
+        "-DCMAKE_C_FLAGS:STRING=-fPIC ${CMAKE_C_FLAGS}"
+        -DCMAKE_INSTALL_LIBDIR:PATH=${install_prefix}/lib${LIB_SUFFIX} 
+            INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
+            INSTALL_DIR ${staging_prefix}/${install_prefix}
+      )
+  
+  SET(OpenBLAS_INCLUDE_DIRS ${staging_prefix}/${install_prefix}/include )
+  SET(OpenBLAS_LIBRARIES    ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libopenblas.so  )
+  SET(OpenBLAS_DIR          ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/cmake/openblas )
+  SET(OpenBLAS_FOUND        ON)
+
+endmacro(build_open_blas)
+

@@ -10,10 +10,12 @@ macro(build_png install_prefix staging_prefix  zlib_include_dir zlib_library zli
     SET(EXT_LDFLAGS   "-L${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX} ${CMAKE_MODULE_LINKER_FLAGS} ${CMAKE_MODULE_LINKER_FLAGS_DEBUG}")
   ENDIF()
 
+  GET_PACKAGE("https://sourceforge.net/projects/libpng/files/libpng16/1.6.28/libpng-1.6.28.tar.gz/download" "425354f86c392318d31aedca71019372" "libpng-1.6.28.tar.gz" LIBPNG_PATH ) 
+  
   ExternalProject_Add(PNG
           SOURCE_DIR PNG
-          URL "http://downloads.sourceforge.net/project/libpng/libpng16/1.6.21/libpng-1.6.21.tar.gz"
-          URL_MD5 "aca36ec8e0a3b406a5912243bc243717"
+          URL "${LIBPNG_PATH}"
+          URL_MD5 "425354f86c392318d31aedca71019372"
           BUILD_IN_SOURCE 1
           INSTALL_DIR     "${CMAKE_BINARY_DIR}/external"
           BUILD_COMMAND   $(MAKE) 

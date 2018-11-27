@@ -1,0 +1,7 @@
+gitpython
+numpy
+progressbar2
+pygments
+matplotlib
+seaborn
+tables>=3.0.0

@@ -5,6 +5,14 @@
 This metaproject bundles multiple MINC-based packages that historically have been developed somewhat independently.
 
 Here is a list of bundled packages:
+ * zlib    - data compression library
+ * NetCDF  - file format library ( used for MINC1)
+ * HDF5    - another file format library  (used for MINC2)
+ * FFTW    - FFT library
+ * GSL     - Gnu Scientific library
+ * openblas - fast library for linear algebra
+ * ITK     - Insight Toolkti version 4.11
+ * pcre    - perl-compatible regular expressions
  * libminc - base Medical Imaging NetCDF package, file IO library
  * minc-tools - low-level image manipulation tools
  * bicpl - BIC programming library, adds supports for 3D objects in terms of io-library and low-level tools
@@ -32,21 +40,20 @@ Here is a list of bundled packages:
  * ANTS     - ANTS nonlinear registration tool from UPENN  https://github.com/stnava/ANTs
  * Elastix  - Elastix a toolbox for rigid and nonrigid registration of images. http://elastix.isi.uu.nl/ 
 
-##Installation
+## Installation
 
-Installing from github, need CMake >= 3.1 
-=======
+### Installing from github, need CMake >= 3.1 
 <pre><code>
   git clone --recursive https://github.com/BIC-MNI/minc-toolkit-v2.git minc-toolkit-v2
   cd minc-toolkit-v2
   mkdir build && cd build
   ccmake .. # Enter configuration details, recommend not to use any system-provided libraries that are included in minc-toolkit-v2
 </code></pre>
-Following command will configure build system to build all the tools and install them into `/opt/minc/1.9.13` on Linux 
-<code><pre>
+Following command will configure build system to build all the tools and install them into `/opt/minc/1.9.15` on Linux 
+<pre><code>
  cmake .. \
 -DCMAKE_BUILD_TYPE:STRING=Release   \
--DCMAKE_INSTALL_PREFIX:PATH=/opt/minc/1.9.13   \
+-DCMAKE_INSTALL_PREFIX:PATH=/opt/minc/1.9.15 \
 -DMT_BUILD_ABC:BOOL=ON   \
 -DMT_BUILD_ANTS:BOOL=ON   \
 -DMT_BUILD_C3D:BOOL=ON   \
@@ -69,39 +76,55 @@ Following command will configure build system to build all the tools and install
 -DUSE_SYSTEM_ZLIB:BOOL=OFF 
 
 make && make install
-</code></pre>
-##Dependencies
+</pre></code>
+## Dependencies
 
-###Following packages are needed to compile all tools:
+### Following packages are needed to compile all tools:
  * Tools without GUI
-   * Cmake - https://cmake.org/
+   * cmake - https://cmake.org/
    * Perl  - http://www.perl.org/
    * BISON - http://www.gnu.org/software/bison/
    * FLEX  - http://flex.sf.net/
    * bc    - http://ftp.gnu.org/gnu/bc/ 
+   * libjpeg or libjpeg-turbo
  * More packages for tools with GUI
    * X11  development libraries
    * libxi 
    * libxmu
+   * libjpeg-dev
+   * libgl
+   * libglu
 
-###Following packages are built internally :
+### Following packages are built internally :
  * zlib   - http://zlib.net/
  * NETCDF - http://www.unidata.ucar.edu/software/netcdf/
  * HDF5   - http://www.hdfgroup.org/HDF5/
  * PCRE   - http://www.pcre.org/
  * GSL    - http://www.gnu.org/software/gsl/
  * FFTW3  - http://www.fftw.org/
- * ITK 4.9- http://www.itk.org/
+ * ITK 4.11- http://www.itk.org/
  * NIFTI  - http://niftilib.sourceforge.net/
+ * OpenBLAS  - http://www.openblas.net/
  
-##Installing Build Dependencies on Ubuntu:
+### Installing Build Dependencies on Ubuntu:
 <pre><code>
 sudo apt-get install \
  build-essential g++ bc \
- cmake cmake-curses-gui \
+ cmake \
  bison flex \
  libx11-dev x11proto-core-dev \
  libxi6 libxi-dev \
  libxmu6 libxmu-dev libxmu-headers \
- libgl1-mesa-dev libglu1-mesa-dev
+ libgl1-mesa-dev libglu1-mesa-dev \
+ libjpeg-dev
+</code></pre>
+
+### Installing Build Dependencies on CentOS 7:
+<pre><code>
+yum groupinstall 'Development Tools'  && \
+yum install libX11-devel libXmu-devel libXi-devel \
+ mesa-libGL-devel mesa-libGLU-devel \
+ libjpeg-turbo-devel \
+ openssl-devel bc \
+ rpm-build-libs rpm-devel redhat-lsb-core
 </code></pre>

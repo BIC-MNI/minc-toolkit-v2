@@ -47,15 +47,18 @@ macro(build_ABC install_prefix staging_prefix)
       -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
       -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
       -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
-      -DCMAKE_C_COMPILER:FILEPATH=${ITK_C_COMPILER}
-      -DCMAKE_CXX_COMPILER:FILEPATH=${ITK_CXX_COMPILER}
+#      -DCMAKE_C_COMPILER:FILEPATH=${ITK_C_COMPILER}
+#      -DCMAKE_CXX_COMPILER:FILEPATH=${ITK_CXX_COMPILER}
       -DMACOSX_RPATH:BOOL=ON
     )
   endif()
-
+  
+  
+  GET_PACKAGE("https://github.com/vfonov/abc/archive/ABC-REL1.4.1-minc-lite.tar.gz" "b8a9af818501bb3a503304c5f0c44e4a" "ABC-REL1.4.1-minc-lite.tar.gz" ABC_PATH ) 
+  
   ExternalProject_Add(ABC
-    GIT_REPOSITORY "https://github.com/vfonov/abc.git"
-    GIT_TAG "53f7b49fce0d2226667f323cffb1f59cee30c2ee"
+    URL "${ABC_PATH}"
+    URL_MD5 "b8a9af818501bb3a503304c5f0c44e4a"
     UPDATE_COMMAND ""
     SOURCE_DIR ABC
     BINARY_DIR ABC-build
