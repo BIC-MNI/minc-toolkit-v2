@@ -3,7 +3,7 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
   if(NOT CMAKE_Fortran_COMPILER)
     message("Fortran compiler not found! OpenBLAS will not work as expected!")
   endif(NOT CMAKE_Fortran_COMPILER)
-  
+
   if(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
   else()
@@ -52,7 +52,7 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
         -DCMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
   )
-  
+
   if(APPLE)
     list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
       -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
@@ -60,18 +60,17 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
       -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
     )
   endif()
-  
-  
-  
+
+
+
  
-  GET_PACKAGE("https://github.com/xianyi/OpenBLAS/archive/v0.3.2.tar.gz" "686f30a234f81fd768dbad5bbd41ca4f" "openblas_v0.3.2.tar.gz" OPENBLAS_PATH ) 
-  
+  GET_PACKAGE("https://github.com/xianyi/OpenBLAS/archive/v0.3.5.tar.gz" "579bda57f68ea6e9074bf5780e8620bb" "openblas_v0.3.5.tar.gz" OPENBLAS_PATH )
+
   ExternalProject_Add(OpenBLAS
         URL "${OPENBLAS_PATH}"
-        URL_MD5 "686f30a234f81fd768dbad5bbd41ca4f"
+        URL_MD5 "579bda57f68ea6e9074bf5780e8620bb"
         SOURCE_DIR OpenBLAS
         BINARY_DIR OpenBLAS-build
-        PATCH_COMMAND patch -p1 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/0001-Fix-1705-where-we-incorrectly-calculate-page-locatio.patch
         LIST_SEPARATOR :::
         CMAKE_GENERATOR ${CMAKE_GEN}
         CMAKE_ARGS
@@ -89,15 +88,14 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
         ${CMAKE_EXTERNAL_PROJECT_ARGS}
         "-DCMAKE_CXX_FLAGS:STRING=-fPIC ${CMAKE_CXX_FLAGS}"
         "-DCMAKE_C_FLAGS:STRING=-fPIC ${CMAKE_C_FLAGS}"
-        -DCMAKE_INSTALL_LIBDIR:PATH=${install_prefix}/lib${LIB_SUFFIX} 
+        -DCMAKE_INSTALL_LIBDIR:PATH=${install_prefix}/lib${LIB_SUFFIX}
             INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
             INSTALL_DIR ${staging_prefix}/${install_prefix}
       )
-  
+
   SET(OpenBLAS_INCLUDE_DIRS ${staging_prefix}/${install_prefix}/include )
   SET(OpenBLAS_LIBRARIES    ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libopenblas.so  )
   SET(OpenBLAS_DIR          ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/cmake/openblas )
   SET(OpenBLAS_FOUND        ON)
 
 endmacro(build_open_blas)
-
