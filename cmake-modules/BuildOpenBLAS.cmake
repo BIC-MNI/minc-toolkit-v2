@@ -71,6 +71,7 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
         URL_MD5 "579bda57f68ea6e9074bf5780e8620bb"
         SOURCE_DIR OpenBLAS
         BINARY_DIR OpenBLAS-build
+        PATCH_COMMAND patch -p1 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/2058.patch
         LIST_SEPARATOR :::
         CMAKE_GENERATOR ${CMAKE_GEN}
         CMAKE_ARGS
