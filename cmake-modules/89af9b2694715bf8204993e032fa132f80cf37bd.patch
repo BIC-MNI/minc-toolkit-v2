@@ -1,0 +1,25 @@
+From 89af9b2694715bf8204993e032fa132f80cf37bd Mon Sep 17 00:00:00 2001
+From: Martino Pilia <martino.pilia@gmail.com>
+Date: Fri, 1 Jun 2018 18:17:57 +0200
+Subject: [PATCH] BUG: fix a bug in
+ ImageSegmentation/antsAtroposSegmentationImageFilter.h
+
+This should be pretty obvious, the return type of a getter method was
+wrong.
+---
+ ImageSegmentation/antsAtroposSegmentationImageFilter.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ImageSegmentation/antsAtroposSegmentationImageFilter.h b/ImageSegmentation/antsAtroposSegmentationImageFilter.h
+index e4b32a0cf..adeb4baad 100644
+--- a/ImageSegmentation/antsAtroposSegmentationImageFilter.h
++++ b/ImageSegmentation/antsAtroposSegmentationImageFilter.h
+@@ -518,7 +518,7 @@ class AtroposSegmentationImageFilter :
+   /**
+    * Get the prior label parameters.
+    */
+-  void GetPriorLabelParameterMap()
++  LabelParameterMapType GetPriorLabelParameterMap()
+   {
+     return this->m_PriorLabelParameterMap;
+   }
