@@ -78,10 +78,9 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
     INSTALL_DIR ${staging_prefix}/${install_prefix}
     TEST_BEFORE_INSTALL 0 #TODO: figure out how to run test on external project
   )
-  string(REPLACE cmake ctest CTEST_COMMAND "${CMAKE_COMMAND}")
   
   IF(BUILD_TESTING)
-    ADD_TEST(NAME TEST_PATCH_MORPHOLOGY COMMAND ${CTEST_COMMAND} --output-on-failure 
+    ADD_TEST(NAME TEST_PATCH_MORPHOLOGY COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/patch_morphology-build 
     )
       

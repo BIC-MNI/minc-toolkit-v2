@@ -83,10 +83,9 @@ macro(build_BEAST install_prefix staging_prefix )
     INSTALL_DIR ${staging_prefix}/${install_prefix}
     TEST_BEFORE_INSTALL 0 #TODO: figure out how to run test on external project
   )
-  string(REPLACE cmake ctest CTEST_COMMAND "${CMAKE_COMMAND}")
   
   IF(BUILD_TESTING)
-    ADD_TEST(NAME TEST_BEAST COMMAND ${CTEST_COMMAND} --output-on-failure 
+    ADD_TEST(NAME TEST_BEAST COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/BEAST-build
     )
       

@@ -62,6 +62,7 @@ macro(build_ANTS install_prefix staging_prefix itk_dir ) #boost_dir
     #UPDATE_COMMAND ""
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/ANTs
     BINARY_DIR ANTS-build
+    PATCH_COMMAND patch -p1 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/89af9b2694715bf8204993e032fa132f80cf37bd.patch
     #PATCH_COMMAND ${PATCH_QUIET}
     LIST_SEPARATOR :::  
     CMAKE_GENERATOR ${CMAKE_GEN}
