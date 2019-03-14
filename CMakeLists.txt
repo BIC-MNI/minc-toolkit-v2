@@ -10,6 +10,8 @@ enable_language(C)
 enable_language(CXX)
 #enable_language(Fortran)
 
+#Turn on PIC (and PIE if supported)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 cmake_minimum_required(VERSION 3.6.1)
 
@@ -20,6 +22,9 @@ IF(COMMAND CMAKE_POLICY)
   IF(POLICY CMP0046)
       CMAKE_POLICY(SET CMP0046 OLD)
   ENDIF(POLICY CMP0046)
+  if(POLICY CMP0083)
+    cmake_policy(SET CMP0083 NEW)
+  endif()
 ENDIF(COMMAND CMAKE_POLICY)
 
 
