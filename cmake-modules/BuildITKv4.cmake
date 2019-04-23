@@ -17,17 +17,17 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
   LIST(APPEND EXT_CMAKE_C_FLAGS -D_XOPEN_SOURCE=600)
   LIST(APPEND EXT_CMAKE_CXX_FLAGS -D_XOPEN_SOURCE=600)
   ENDIF(NOT APPLE)
-  
+
   set(CMAKE_EXTERNAL_PROJECT_ARGS
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
         -DCMAKE_LINKER:FILEPATH=${CMAKE_LINKER}
-        -DCMAKE_CXX_FLAGS:STRING=${EXT_CMAKE_CXX_FLAGS} 
+        -DCMAKE_CXX_FLAGS:STRING=${EXT_CMAKE_CXX_FLAGS}
         -DCMAKE_CXX_FLAGS_DEBUG:STRING=${CMAKE_CXX_FLAGS_DEBUG}
         -DCMAKE_CXX_FLAGS_MINSIZEREL:STRING=${CMAKE_CXX_FLAGS_MINSIZEREL}
         -DCMAKE_CXX_FLAGS_RELEASE:STRING=${CMAKE_CXX_FLAGS_RELEASE}
         -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_CXX_FLAGS_RELWITHDEBINFO}
-        -DCMAKE_C_FLAGS:STRING=${EXT_CMAKE_C_FLAGS} 
+        -DCMAKE_C_FLAGS:STRING=${EXT_CMAKE_C_FLAGS}
         -DCMAKE_C_FLAGS_DEBUG:STRING=${CMAKE_C_FLAGS_DEBUG}
         -DCMAKE_C_FLAGS_MINSIZEREL:STRING=${CMAKE_C_FLAGS_MINSIZEREL}
         -DCMAKE_C_FLAGS_RELEASE:STRING=${CMAKE_C_FLAGS_RELEASE}
@@ -78,16 +78,16 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
   #endif(MT_BUILD_QUIET)
 
   SET(HDF5_LIB_SUFFIX ".a")
-  
-  IF(MT_BUILD_SHARED_LIBS) 
+
+  IF(MT_BUILD_SHARED_LIBS)
     SET(ITK_SHARED_LIBRARY "ON")
-    
+
     IF(APPLE)
         SET(HDF5_LIB_SUFFIX ".dylib")
     ELSE(APPLE)
         SET(HDF5_LIB_SUFFIX ".so")
     ENDIF(APPLE)
-    
+
   ELSE(MT_BUILD_SHARED_LIBS)
       SET(HDF5_LIB_SUFFIX    ".a")
       SET(ITK_SHARED_LIBRARY "OFF")
@@ -137,7 +137,6 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
   message("HDF5_BIN_DIR=${HDF5_BIN_DIR}")
 
   GET_PACKAGE("https://github.com/InsightSoftwareConsortium/ITK/releases/download/v4.13.2/InsightToolkit-4.13.2.tar.xz" "d140ddabe22428e86bc5053e0d268872" "InsightToolkit-4.13.2.tar.xz" ITKv4_PATH ) 
-  
 
 
   ExternalProject_Add(ITKv4
@@ -195,19 +194,19 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
     INSTALL_DIR ${staging_prefix}/${install_prefix}
     STEP_TARGETS PatchInstall
   )
-  
-  ExternalProject_Add_Step(ITKv4 PatchInstall 
+
+  ExternalProject_Add_Step(ITKv4 PatchInstall
     COMMAND ${CMAKE_COMMAND} -Dstaging_prefix=${staging_prefix} -Dminc_dir=${minc_dir} -Dinstall_prefix=${install_prefix} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/PatchITKv4.cmake
     COMMENT "Patching ITKv4 Build"
     DEPENDEES install
     )
-  
+
   # let's patch targets to remove staging directory
-  
-  
+
+
   SET(ITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build)
-  
-  SET(ITK_INCLUDE_DIRS 
+
+  SET(ITK_INCLUDE_DIRS
         ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build
         ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Code/Algorithms
         ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Code/BasicFilters
@@ -242,18 +241,18 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
 
 # The ITK library directories.
   SET(ITK_LIBRARY_DIRS "${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build/bin")
-  
-  SET(ITK_LIBRARIES  
-          ITKAlgorithms ITKStatistics 
-          ITKNumerics 
-          ITKFEM ITKQuadEdgeMesh 
-          ITKBasicFilters  ITKIO ITKNrrdIO 
+
+  SET(ITK_LIBRARIES
+          ITKAlgorithms ITKStatistics
+          ITKNumerics
+          ITKFEM ITKQuadEdgeMesh
+          ITKBasicFilters  ITKIO ITKNrrdIO
           ITKSpatialObject ITKMetaIO
           ITKDICOMParser ITKEXPAT
-          ITKniftiio ITKTransformIOReview  ITKCommon ITKznz 
-          itkgdcm itkpng itktiff itkzlib itkvcl 
-          itkvcl 
-          itkv3p_lsqr  itkvnl_algo itkvnl_inst itkvnl itkv3p_netlib 
+          ITKniftiio ITKTransformIOReview  ITKCommon ITKznz
+          itkgdcm itkpng itktiff itkzlib itkvcl
+          itkvcl
+          itkv3p_lsqr  itkvnl_algo itkvnl_inst itkvnl itkv3p_netlib
           itksys itkjpeg8 itkjpeg12 itkjpeg16 itkopenjpeg  hdf5_cpp hdf5
           ${CMAKE_THREAD_LIBS_INIT}
           )
