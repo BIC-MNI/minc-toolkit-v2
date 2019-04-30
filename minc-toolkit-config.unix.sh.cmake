@@ -9,3 +9,5 @@ export MINC_FORCE_V2=1
 export MINC_COMPRESS=4
 export VOLUME_CACHE_THRESHOLD=-1
 export MANPATH=${MINC_TOOLKIT}/man:${MANPATH}
+# integrated ANTs tools
+export ANTSPATH=${MINC_TOOLKIT}/bin
