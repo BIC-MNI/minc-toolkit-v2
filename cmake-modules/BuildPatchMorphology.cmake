@@ -4,7 +4,7 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
   else()
     set(CMAKE_GEN "${CMAKE_GENERATOR}")
   endif()
-  
+  message("OpenBLAS_DIR=${OpenBLAS_DIR}")
   set(CMAKE_EXTERNAL_PROJECT_ARGS
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
@@ -42,6 +42,8 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DOpenBLAS_INCLUDE_DIR:PATH=${OpenBLAS_INCLUDE_DIRS}
         -DOpenBLAS_LIBRARY:PATH=${OpenBLAS_LIBRARY}
+        -DCMAKE_DISABLE_FIND_PACKAGE_OpenBLAS:BOOL=ON
+        -DOpenBLAS_DIR:PATH=${OpenBLAS_DIR}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DBUILD_TESTING:BOOL=${BUILD_TESTING}
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
