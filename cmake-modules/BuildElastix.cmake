@@ -96,6 +96,7 @@ macro(build_Elastix install_prefix staging_prefix)
         -DUSE_MultiResolutionRegistrationWithFeatures:BOOL=OFF
         -DUSE_AffineLogTransformElastix:BOOL=OFF
         -DUSE_SimilarityTransformElastix:BOOL=OFF
+        -DUSE_WeightedCombinationTransformElastix:BOOL=OFF
         -DFFTW_LIB:FILEPATH=${FFTW3F_LIBRARY}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DITK_DIR:PATH=${ITK_DIR}
