@@ -1,4 +1,4 @@
-macro(build_itkv4 install_prefix staging_prefix minc_dir)
+macro(build_itkv5 install_prefix staging_prefix minc_dir)
   find_package(Threads REQUIRED)
 
   if(CMAKE_EXTRA_GENERATOR)
@@ -136,15 +136,14 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
   message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
   message("HDF5_BIN_DIR=${HDF5_BIN_DIR}")
 
-  GET_PACKAGE("https://github.com/InsightSoftwareConsortium/ITK/releases/download/v4.13.2/InsightToolkit-4.13.2.tar.xz" "d140ddabe22428e86bc5053e0d268872" "InsightToolkit-4.13.2.tar.xz" ITKv4_PATH ) 
+  GET_PACKAGE("https://github.com/InsightSoftwareConsortium/ITK/archive/v5.0.1.tar.gz" "15f0422aab814309e9d95c55cbf09c22" "InsightToolkit-5.0.1.tar.gz" ITKv5_PATH ) 
 
-
-  ExternalProject_Add(ITKv4
-    URL "${ITKv4_PATH}"
-    URL_MD5 "d140ddabe22428e86bc5053e0d268872"
+  ExternalProject_Add(ITKv5
+    URL "${ITKv5_PATH}"
+    URL_MD5 "15f0422aab814309e9d95c55cbf09c22"
     UPDATE_COMMAND ""
-    SOURCE_DIR ITKv4
-    BINARY_DIR ITKv4-build
+    SOURCE_DIR ITKv5
+    BINARY_DIR ITKv5-build
     PATCH_COMMAND ${PATCH_QUIET}
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
@@ -161,6 +160,14 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
         -DModule_ITKReview:BOOL=ON
         -DModule_ITKIOMINC:BOOL=ON
         -DModule_ITKIOTransformMINC:BOOL=ON
+        -DITK_LEGACY_REMOVE:BOOL=ON
+        -DITK_FUTURE_LEGACY_REMOVE:BOOL=ON
+        -DITKV3_COMPATIBILITY:BOOL=OFF
+        -DITK_BUILD_DEFAULT_MODULES:BOOL=ON
+        -DKWSYS_USE_MD5:BOOL=ON # Required by SlicerExecutionModel
+        -DModule_MGHIO:BOOL=ON
+        -DModule_ITKReview:BOOL=ON
+        -DModule_GenericLabelInterpolator:BOOL=ON
         -DITK_USE_SYSTEM_MINC:BOOL=ON
         -DITK_USE_SYSTEM_HDF5:BOOL=ON
         -DITK_USE_SYSTEM_ZLIB:BOOL=ON
@@ -195,52 +202,52 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
     STEP_TARGETS PatchInstall
   )
 
-  ExternalProject_Add_Step(ITKv4 PatchInstall
-    COMMAND ${CMAKE_COMMAND} -Dstaging_prefix=${staging_prefix} -Dminc_dir=${minc_dir} -Dinstall_prefix=${install_prefix} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/PatchITKv4.cmake
-    COMMENT "Patching ITKv4 Build"
+  ExternalProject_Add_Step(ITKv5 PatchInstall
+    COMMAND ${CMAKE_COMMAND} -Dstaging_prefix=${staging_prefix} -Dminc_dir=${minc_dir} -Dinstall_prefix=${install_prefix} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/PatchITKv5.cmake
+    COMMENT "Patching ITKv5 Build"
     DEPENDEES install
     )
 
   # let's patch targets to remove staging directory
 
 
-  SET(ITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build)
+  SET(ITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/ITKv5-build)
 
   SET(ITK_INCLUDE_DIRS
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Code/Algorithms
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Code/BasicFilters
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Code/Common
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Code/Numerics
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Code/IO
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Code/Numerics/FEM
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Code/Numerics/NeuralNetworks
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Code/SpatialObject
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Utilities/MetaIO
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Utilities/NrrdIO
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build/Utilities/NrrdIO
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Utilities/DICOMParser
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build/Utilities/DICOMParser
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build/Utilities/expat
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Utilities/expat
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Utilities/nifti/niftilib
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Utilities/nifti/znzlib
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Utilities/itkExtHdrs
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build/Utilities
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Utilities
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Utilities/vxl/v3p/netlib
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Utilities/vxl/vcl
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Utilities/vxl/core
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build/Utilities/vxl/v3p/netlib
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build/Utilities/vxl/vcl
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build/Utilities/vxl/core
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build/Utilities/gdcm
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Utilities/gdcm/src
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Code/Review
-        ${CMAKE_CURRENT_BINARY_DIR}/ITKv4/Code/Review/Statistics)
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5-build
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Code/Algorithms
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Code/BasicFilters
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Code/Common
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Code/Numerics
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Code/IO
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Code/Numerics/FEM
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Code/Numerics/NeuralNetworks
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Code/SpatialObject
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Utilities/MetaIO
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Utilities/NrrdIO
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5-build/Utilities/NrrdIO
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Utilities/DICOMParser
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5-build/Utilities/DICOMParser
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5-build/Utilities/expat
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Utilities/expat
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Utilities/nifti/niftilib
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Utilities/nifti/znzlib
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Utilities/itkExtHdrs
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5-build/Utilities
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Utilities
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Utilities/vxl/v3p/netlib
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Utilities/vxl/vcl
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Utilities/vxl/core
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5-build/Utilities/vxl/v3p/netlib
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5-build/Utilities/vxl/vcl
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5-build/Utilities/vxl/core
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5-build/Utilities/gdcm
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Utilities/gdcm/src
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Code/Review
+        ${CMAKE_CURRENT_BINARY_DIR}/ITKv5/Code/Review/Statistics)
 
 # The ITK library directories.
-  SET(ITK_LIBRARY_DIRS "${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build/bin")
+  SET(ITK_LIBRARY_DIRS "${CMAKE_CURRENT_BINARY_DIR}/ITKv5-build/bin")
 
   SET(ITK_LIBRARIES
           ITKAlgorithms ITKStatistics
@@ -261,4 +268,4 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
     SET(ITK_LIBRARIES  ${ITK_LIBRARIES} dl)
   ENDIF(UNIX)
 
-endmacro(build_itkv4)
+endmacro(build_itkv5)

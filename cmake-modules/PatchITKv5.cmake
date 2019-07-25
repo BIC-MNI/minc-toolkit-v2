@@ -1,5 +1,5 @@
-message("Running PatchITKv4")
-SET(ITK_VERSION "ITK-4.13")
+message("Running PatchITKv5")
+SET(ITK_VERSION "ITK-5.0")
 
 message("staging_prefix=${staging_prefix}")
 
@@ -22,7 +22,7 @@ ENDFOREACH(conf)
 # a hack to remove internal minc directories
 file(READ "${staging_prefix}/${install_prefix}/lib/cmake/${ITK_VERSION}/Modules/ITKMINC.cmake" config_file)
 STRING(REPLACE ";${minc_dir}/ezminc" "" config_file "${config_file}")
-STRING(REPLACE "${CMAKE_CURRENT_BINARY_DIR}/ITKv4-build/Modules/ThirdParty/MINC/src;" "" config_file "${config_file}")
+STRING(REPLACE "${CMAKE_CURRENT_BINARY_DIR}/ITKv5-build/Modules/ThirdParty/MINC/src;" "" config_file "${config_file}")
 STRING(REPLACE "${minc_dir}" "${install_prefix}/lib/cmake" config_file "${config_file}")
 STRING(REPLACE "${LIBMINC_INCLUDE_DIRS}" "${install_prefix}/include" config_file "${config_file}")
 file(WRITE "${staging_prefix}/${install_prefix}/lib/cmake/${ITK_VERSION}/Modules/ITKMINC.cmake" "${config_file}")
