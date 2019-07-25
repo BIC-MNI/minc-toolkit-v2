@@ -57,13 +57,14 @@ macro(build_C3D install_prefix staging_prefix)
     SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake_ccache.patch)
   #endif(MT_BUILD_QUIET)
 
-  GET_PACKAGE("https://github.com/vfonov/Convert3D/archive/v0.0.tar.gz" "a9f346f14171297dc28b530590be8754" "c3d-v0.0.tar.gz" C3D_PATH ) 
+  #GET_PACKAGE("https://github.com/vfonov/Convert3D/archive/v0.0.tar.gz" "a9f346f14171297dc28b530590be8754" "c3d-v0.0.tar.gz" C3D_PATH ) 
 
   ExternalProject_Add(C3D
-    URL "${C3D_PATH}"
-    URL_MD5 "a9f346f14171297dc28b530590be8754"
-    UPDATE_COMMAND ""
-    SOURCE_DIR C3D
+    #URL "${C3D_PATH}"
+    #URL_MD5 "a9f346f14171297dc28b530590be8754"
+    #UPDATE_COMMAND ""
+    #SOURCE_DIR C3D
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/Convert3D
     BINARY_DIR C3D-build
     PATCH_COMMAND ${PATCH_QUIET}
     LIST_SEPARATOR :::  
@@ -77,6 +78,9 @@ macro(build_C3D install_prefix staging_prefix)
         -DITK_DIR:PATH=${ITK_DIR}
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
         -DCMAKE_SKIP_RPATH:BOOL=OFF
+#        -DCONVERT3D_BUILD_AS_SUBPROJECT:BOOL=ON
+#        -DCONVERT3D_SUBPROJECT_BUILD_CLI_TOOLS:BOOL=ON
+#        -DCONVERT3D_SUBPROJECT_INSTALL_CLI_TOOLS:BOOL=ON
         -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
         -DMACOSX_RPATH:BOOL=ON
         -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}

@@ -59,7 +59,7 @@
 	path = BEaST
 	url = https://github.com/BIC-MNI/BEaST.git
 [submodule "libminc"]
-	path = libminc
+	elastpath = libminc
 	url = https://github.com/BIC-MNI/libminc.git
 [submodule "minctools"]
 	path = minctools
@@ -72,7 +72,7 @@
 	url = https://github.com/BIC-MNI/xdisp.git
 [submodule "Elastix"]
 	path = Elastix
-	url = https://github.com/vfonov/elastix.git
+	url = https://github.com/vfonov/elastix-1.git
 [submodule "ANTs"]
 	path = ANTs
 	url = https://github.com/vfonov/ANTs.git
@@ -88,3 +88,6 @@
 [submodule "minc_gco"]
 	path = minc_gco
 	url = https://github.com/BIC-MNI/minc_gco.git
+[submodule "Convert3D"]
+	path = Convert3D
+	url = https://github.com/vfonov/Convert3D.git

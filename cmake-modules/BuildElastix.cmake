@@ -61,7 +61,7 @@ macro(build_Elastix install_prefix staging_prefix)
   
 
   ExternalProject_Add(Elastix
-    SOURCE_DIR ${CMAKE_SOURCE_DIR}/Elastix/src
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/Elastix
     BINARY_DIR Elastix-build
     LIST_SEPARATOR :::  
     CMAKE_GENERATOR ${CMAKE_GEN}
@@ -81,7 +81,7 @@ macro(build_Elastix install_prefix staging_prefix)
         -DUSE_DisplacementMagnitudePenalty:BOOL=ON
         -DUSE_NormalizedGradientCorrelationMetric:BOOL=ON
         -DUSE_CMAEvolutionStrategy:BOOL=ON
-        -DUSE_MissingStructurePenalty:BOOL=ON
+        -DUSE_MissingStructurePenalty:BOOL=OFF
         -DUSE_AffineLogTransformElastix:BOOL=ON
         -DUSE_LinearResampleInterpolator:BOOL=ON
         -DUSE_MutualInformationHistogramMetric:BOOL=ON
@@ -89,6 +89,13 @@ macro(build_Elastix install_prefix staging_prefix)
         -DUSE_NearestNeighborResampleInterpolator:BOOL=ON
         -DUSE_Simplex:BOOL=ON
         -DUSE_ViolaWellsMutualInformationMetric:BOOL=ON
+        -DUSE_AdaptiveStochasticLBFGS:BOOL=OFF  # HACKING FOR ITKv5
+        -DUSE_AdaptiveStochasticVarianceReducedGradient:BOOL=OFF
+        -DUSE_PreconditionedStochasticGradientDescent:BOOL=OFF
+        -DUSE_MultiMetricMultiResolutionRegistration:BOOL=OFF
+        -DUSE_MultiResolutionRegistrationWithFeatures:BOOL=OFF
+        -DUSE_AffineLogTransformElastix:BOOL=OFF
+        -DUSE_SimilarityTransformElastix:BOOL=OFF
         -DFFTW_LIB:FILEPATH=${FFTW3F_LIBRARY}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DITK_DIR:PATH=${ITK_DIR}
