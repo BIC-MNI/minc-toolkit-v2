@@ -58,10 +58,11 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
       -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
       -DCMAKE_OSX_SYSROOT:STRING=${CMAKE_OSX_SYSROOT}
       -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
+      # fixing error "argument list too long"
+      -DCMAKE_Fortran_USE_RESPONSE_FILE_FOR_OBJECTS=1
+      -DDYNAMIC_ARCH:BOOL=OFF
     )
   endif()
-
-
 
  
   GET_PACKAGE("https://github.com/xianyi/OpenBLAS/archive/v0.3.5.tar.gz" "579bda57f68ea6e9074bf5780e8620bb" "openblas_v0.3.5.tar.gz" OPENBLAS_PATH )
