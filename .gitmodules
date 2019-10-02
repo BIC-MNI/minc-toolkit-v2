@@ -59,7 +59,7 @@
 	path = BEaST
 	url = https://github.com/BIC-MNI/BEaST.git
 [submodule "libminc"]
-	elastpath = libminc
+	path = libminc
 	url = https://github.com/BIC-MNI/libminc.git
 [submodule "minctools"]
 	path = minctools
