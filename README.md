@@ -45,16 +45,16 @@ Here is a list of bundled packages:
 ### Installing from github, need CMake >= 3.1 
 <pre><code>
   To get the latest supported version of minc-toolkit-v2 (1.9.17) 
-  git clone --recursive --branch release-1.9.17 git@github.com:BIC-MNI/minc-toolkit-v2.git minc-toolkit-v2
+  git clone --recursive --branch release-1.9.17 https://github.com/BIC-MNI/minc-toolkit-v2.git minc-toolkit-v2
   cd minc-toolkit-v2
   mkdir build && cd build
   ccmake .. # Enter configuration details, recommend not to use any system-provided libraries that are included in minc-toolkit-v2
 </code></pre>
-Following command will configure build system to build all the tools and install them into `/opt/minc/1.9.15` on Linux 
+Following command will configure build system to build all the tools and install them into `/opt/minc/1.9.17` on Linux 
 <pre><code>
  cmake .. \
 -DCMAKE_BUILD_TYPE:STRING=Release   \
--DCMAKE_INSTALL_PREFIX:PATH=/opt/minc/1.9.15 \
+-DCMAKE_INSTALL_PREFIX:PATH=/opt/minc/1.9.17 \
 -DMT_BUILD_ABC:BOOL=ON   \
 -DMT_BUILD_ANTS:BOOL=ON   \
 -DMT_BUILD_C3D:BOOL=ON   \
