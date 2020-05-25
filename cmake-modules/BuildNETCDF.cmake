@@ -53,11 +53,6 @@ macro(build_netcdf install_prefix staging_prefix)
     )
   endif()
   
-  #SET(PATCH_QUIET "")
-  #if(MT_BUILD_QUIET)
-  #  SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake_ccache.patch)
-  #endif(MT_BUILD_QUIET)
-
   GET_PACKAGE("https://github.com/Unidata/netcdf-c/archive/v4.6.3.tar.gz" "5456da531d5e3f877e5ea328645b1e68" "netcdf-v4.6.3.tar.gz" NETCDF_PATH ) 
 
   ExternalProject_Add(NETCDF
@@ -65,7 +60,6 @@ macro(build_netcdf install_prefix staging_prefix)
     URL_MD5 "5456da531d5e3f877e5ea328645b1e68"
   SOURCE_DIR NETCDF
   BINARY_DIR NETCDF-build
-  PATCH_COMMAND ${PATCH_QUIET}
   LIST_SEPARATOR :::
   CMAKE_GENERATOR ${CMAKE_GEN}
   CMAKE_ARGS
