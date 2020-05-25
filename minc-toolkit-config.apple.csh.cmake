@@ -21,7 +21,7 @@ else
 setenv MANPATH ${MINC_TOOLKIT}/man:${MANPATH}
 endif
 
-setenv MNI_DATAPATH ${MINC_TOOLKIT}/../share
+setenv MNI_DATAPATH ${MINC_TOOLKIT}/../share:${MINC_TOOLKIT}/share
 
 setenv MINC_FORCE_V2 1
 setenv MINC_COMPRESS 4
