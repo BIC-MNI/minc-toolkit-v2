@@ -138,6 +138,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
+    PATCH_COMMAND patch -p1 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/ITK4.13.2-new-gcc.patch
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
