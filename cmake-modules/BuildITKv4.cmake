@@ -70,13 +70,6 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
     )
   ENDIF()
 
-  SET(PATCH_QUIET "")
-  #if(MT_BUILD_QUIET)
-  IF(NOT APPLE)
-    SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake_ccache.patch)
-  ENDIF(NOT APPLE)
-  #endif(MT_BUILD_QUIET)
-
   SET(HDF5_LIB_SUFFIX ".a")
 
   IF(MT_BUILD_SHARED_LIBS)
@@ -145,7 +138,6 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
-    PATCH_COMMAND ${PATCH_QUIET}
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}

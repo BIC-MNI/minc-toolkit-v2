@@ -124,16 +124,10 @@ OPTION(MT_BUILD_VISUAL_TOOLS "Build visual tools (Display, Register, postf, ray_
 OPTION(USE_SYSTEM_ITK        "Use System ITK" OFF)
 OPTION(MT_USE_OPENMP         "Use OpenMP multi-threading" OFF)
 OPTION(MT_BUILD_IM           "Build ImageMagick and dependent libraries" OFF)
-OPTION(MT_BUILD_QUIET        "Build quetly" OFF)
 OPTION(MT_BUILD_OPENBLAS     "Build OpenBLAS: will require fortran" OFF)
 #OPTION(MT_USE_OPENMP_BLAS    "Use Build OpenBLAS with OpenMP support" OFF) # TODO: finish this to compile on some platforms
 
 SET(MT_PACKAGES_PATH "${CMAKE_BINARY_DIR}/cache" CACHE PATH  "Directory containing 3rd party packages")
-
-# trying to reduce verbosity
-IF(MT_BUILD_QUIET)
-  set_property(GLOBAL PROPERTY RULE_MESSAGES OFF)
-ENDIF(MT_BUILD_QUIET)
 
 IF(MT_BUILD_LITE)
   SET(MT_BUILD_ITK_TOOLS    OFF)
