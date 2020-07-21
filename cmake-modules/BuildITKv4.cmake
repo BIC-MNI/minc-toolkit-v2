@@ -154,6 +154,8 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
         -DModule_ITKReview:BOOL=ON
         -DModule_ITKIOMINC:BOOL=ON
         -DModule_ITKIOTransformMINC:BOOL=ON
+        -DModule_Cuberille:BOOL=ON
+        -DModule_MGHIO:BOOL=ON
         -DITK_USE_SYSTEM_MINC:BOOL=ON
         -DITK_USE_SYSTEM_HDF5:BOOL=ON
         -DITK_USE_SYSTEM_ZLIB:BOOL=ON
