@@ -129,16 +129,15 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
   message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
   message("HDF5_BIN_DIR=${HDF5_BIN_DIR}")
 
-  GET_PACKAGE("https://github.com/InsightSoftwareConsortium/ITK/releases/download/v4.13.2/InsightToolkit-4.13.2.tar.xz" "d140ddabe22428e86bc5053e0d268872" "InsightToolkit-4.13.2.tar.xz" ITKv4_PATH ) 
+  GET_PACKAGE("https://github.com/InsightSoftwareConsortium/ITK/releases/download/v4.13.3/InsightToolkit-4.13.3.tar.gz" "d1c10c8288b47577d718a71190444815" "InsightToolkit-4.13.3.tar.gz" ITKv4_PATH ) 
 
 
   ExternalProject_Add(ITKv4
     URL "${ITKv4_PATH}"
-    URL_MD5 "d140ddabe22428e86bc5053e0d268872"
+    URL_MD5 "d1c10c8288b47577d718a71190444815"
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
-    PATCH_COMMAND patch -p1 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/ITK4.13.2-new-gcc.patch
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
