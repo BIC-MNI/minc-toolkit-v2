@@ -44,8 +44,8 @@ Here is a list of bundled packages:
 
 ### Installing from github, need CMake >= 3.1 
 <pre><code>
-  To get the latest supported version of minc-toolkit-v2 (1.9.17) 
-  git clone --recursive --branch release-1.9.17 https://github.com/BIC-MNI/minc-toolkit-v2.git minc-toolkit-v2
+  To get the latest supported version of minc-toolkit-v2 (1.9.18) 
+  git clone --recursive --branch release-1.9.18 https://github.com/BIC-MNI/minc-toolkit-v2.git minc-toolkit-v2
   cd minc-toolkit-v2
   mkdir build && cd build
   ccmake .. # Enter configuration details, recommend not to use any system-provided libraries that are included in minc-toolkit-v2
@@ -54,7 +54,7 @@ Following command will configure build system to build all the tools and install
 <pre><code>
  cmake .. \
 -DCMAKE_BUILD_TYPE:STRING=Release   \
--DCMAKE_INSTALL_PREFIX:PATH=/opt/minc/1.9.17 \
+-DCMAKE_INSTALL_PREFIX:PATH=/opt/minc/1.9.18 \
 -DMT_BUILD_ABC:BOOL=ON   \
 -DMT_BUILD_ANTS:BOOL=ON   \
 -DMT_BUILD_C3D:BOOL=ON   \
@@ -78,7 +78,7 @@ Following command will configure build system to build all the tools and install
 
 make && make install
 
-If you have installed minc-toolkit-v2 outside of the default installation ( i.e. changing DCMAKE_INSTALL_PREFIX:PATH within the build above). 
+If you have installed minc-toolkit-v2 outside of the default installation ( i.e. changing DCMAKE_INSTALL_PREFIX:PATH within the build above).
 source minc-toolkit-config.sh
 
 </pre></code>
@@ -107,7 +107,7 @@ source minc-toolkit-config.sh
  * PCRE   - http://www.pcre.org/
  * GSL    - http://www.gnu.org/software/gsl/
  * FFTW3  - http://www.fftw.org/
- * ITK 4.11- http://www.itk.org/
+ * ITK 4.13- http://www.itk.org/
  * NIFTI  - http://niftilib.sourceforge.net/
  * OpenBLAS  - http://www.openblas.net/
  
