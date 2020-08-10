@@ -52,11 +52,6 @@ macro(build_C3D install_prefix staging_prefix)
     )
   endif()
 
-  #SET(PATCH_QUIET "")
-  #if(MT_BUILD_QUIET)
-    SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake_ccache.patch)
-  #endif(MT_BUILD_QUIET)
-
   GET_PACKAGE("https://github.com/vfonov/Convert3D/archive/v0.0.tar.gz" "a9f346f14171297dc28b530590be8754" "c3d-v0.0.tar.gz" C3D_PATH ) 
 
   ExternalProject_Add(C3D
@@ -65,7 +60,6 @@ macro(build_C3D install_prefix staging_prefix)
     UPDATE_COMMAND ""
     SOURCE_DIR C3D
     BINARY_DIR C3D-build
-    PATCH_COMMAND ${PATCH_QUIET}
     LIST_SEPARATOR :::  
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS

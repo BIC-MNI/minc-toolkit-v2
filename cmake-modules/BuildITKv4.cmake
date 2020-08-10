@@ -70,13 +70,6 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
     )
   ENDIF()
 
-  SET(PATCH_QUIET "")
-  #if(MT_BUILD_QUIET)
-  IF(NOT APPLE)
-    SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake_ccache.patch)
-  ENDIF(NOT APPLE)
-  #endif(MT_BUILD_QUIET)
-
   SET(HDF5_LIB_SUFFIX ".a")
 
   IF(MT_BUILD_SHARED_LIBS)
@@ -136,17 +129,15 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
   message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
   message("HDF5_BIN_DIR=${HDF5_BIN_DIR}")
 
-  GET_PACKAGE("https://github.com/InsightSoftwareConsortium/ITK/releases/download/v4.13.1/InsightToolkit-4.13.1.tar.xz" "bc7296e7faccdcb5656a7669d4d875d2" "InsightToolkit-4.13.1.tar.xz" ITKv4_PATH )
-
+  GET_PACKAGE("https://github.com/InsightSoftwareConsortium/ITK/releases/download/v4.13.3/InsightToolkit-4.13.3.tar.gz" "d1c10c8288b47577d718a71190444815" "InsightToolkit-4.13.3.tar.gz" ITKv4_PATH ) 
 
 
   ExternalProject_Add(ITKv4
     URL "${ITKv4_PATH}"
-    URL_MD5 "bc7296e7faccdcb5656a7669d4d875d2"
+    URL_MD5 "d1c10c8288b47577d718a71190444815"
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
-    PATCH_COMMAND ${PATCH_QUIET}
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
@@ -162,6 +153,8 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
         -DModule_ITKReview:BOOL=ON
         -DModule_ITKIOMINC:BOOL=ON
         -DModule_ITKIOTransformMINC:BOOL=ON
+        -DModule_Cuberille:BOOL=ON
+        -DModule_MGHIO:BOOL=ON
         -DITK_USE_SYSTEM_MINC:BOOL=ON
         -DITK_USE_SYSTEM_HDF5:BOOL=ON
         -DITK_USE_SYSTEM_ZLIB:BOOL=ON
