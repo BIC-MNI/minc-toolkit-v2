@@ -25,11 +25,10 @@ macro(build_bicgl bicgl_location install_prefix staging_prefix)
         -DLIBMINC_DIR:PATH=${CMAKE_BINARY_DIR}/libminc
         -DBICPL_DIR:PATH=${CMAKE_BINARY_DIR}/bicpl
         -DBUILD_SHARED_LIBS:BOOL=NO
-        -DCMAKE_SKIP_RPATH:BOOL=YES
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
         -DCMAKE_C_COMPILER:FILEPATH=${BICGL_C_COMPILER}
         -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
-        -DCMAKE_SKIP_RPATH:BOOL=OFF
+        -DCMAKE_SKIP_RPATH:BOOL=ON
         -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
         -DMACOSX_RPATH:BOOL=ON
         -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}

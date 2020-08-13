@@ -47,7 +47,7 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DBUILD_TESTING:BOOL=${BUILD_TESTING}
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
-        -DCMAKE_SKIP_RPATH:BOOL=OFF
+        -DCMAKE_SKIP_RPATH:BOOL=ON
         -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
         -DMACOSX_RPATH:BOOL=ON
         -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
