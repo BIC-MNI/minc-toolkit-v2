@@ -54,11 +54,11 @@ macro(build_ABC install_prefix staging_prefix)
   endif()
   
   
-  GET_PACKAGE("https://github.com/vfonov/abc/archive/ABC-REL1.4.1-minc-lite.tar.gz" "b8a9af818501bb3a503304c5f0c44e4a" "ABC-REL1.4.1-minc-lite.tar.gz" ABC_PATH ) 
+  GET_PACKAGE("https://github.com/vfonov/abc/archive/ABC-REL1.4.2-minc.tar.gz" "16684fc20c1101c1622efc0f4cb69de3" "ABC-REL1.4.2-minc.tar.gz" ABC_PATH )
   
   ExternalProject_Add(ABC
     URL "${ABC_PATH}"
-    URL_MD5 "b8a9af818501bb3a503304c5f0c44e4a"
+    URL_MD5 "16684fc20c1101c1622efc0f4cb69de3"
     UPDATE_COMMAND ""
     SOURCE_DIR ABC
     BINARY_DIR ABC-build
