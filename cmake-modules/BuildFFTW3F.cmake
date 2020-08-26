@@ -86,7 +86,7 @@ macro(build_fftw3f install_prefix staging_prefix)
           -DDISABLE_FORTRAN:BOOL=ON
           -DBUILD_SHARED_LIBS:BOOL=OFF
           -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
-          -DCMAKE_SKIP_RPATH:BOOL=ON
+          -DCMAKE_SKIP_RPATH:BOOL=OFF
           -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
           -DMACOSX_RPATH:BOOL=ON
           -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}

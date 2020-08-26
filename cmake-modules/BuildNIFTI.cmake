@@ -74,7 +74,7 @@ macro(build_nifti install_prefix staging_prefix)
     CMAKE_ARGS
             -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
             -DBUILD_SHARED_LIBS:BOOL=OFF
-            -DCMAKE_SKIP_RPATH:BOOL=ON
+            -DCMAKE_SKIP_RPATH:BOOL=OFF
             -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
             -DMACOSX_RPATH:BOOL=ON
             -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}

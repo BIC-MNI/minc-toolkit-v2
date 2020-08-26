@@ -68,7 +68,7 @@ macro(build_ANTS install_prefix staging_prefix itk_dir ) #boost_dir
         -DANTS_SUPERBUILD:BOOL=OFF
         -DBUILD_TESTING:BOOL=OFF
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
-        -DCMAKE_SKIP_RPATH:BOOL=ON
+        -DCMAKE_SKIP_RPATH:BOOL=OFF
         -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
         -DMACOSX_RPATH:BOOL=ON
         -DITK_USE_FFTWD:BOOL=ON

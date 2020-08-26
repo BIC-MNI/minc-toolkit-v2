@@ -47,7 +47,7 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DBUILD_TESTING:BOOL=${BUILD_TESTING}
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
-        -DCMAKE_SKIP_RPATH:BOOL=ON
+        -DCMAKE_SKIP_RPATH:BOOL=OFF
         -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
         -DMACOSX_RPATH:BOOL=ON
         -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
@@ -85,7 +85,12 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
     ADD_TEST(NAME TEST_PATCH_MORPHOLOGY COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/patch_morphology-build 
     )
-      
+
+    IF(MINC_TEST_ENVIRONMENT)
+        message("TEST_PATCH_MORPHOLOGY env: ${MINC_TEST_ENVIRONMENT}")
+        set_tests_properties( TEST_PATCH_MORPHOLOGY PROPERTIES ENVIRONMENT "${MINC_TEST_ENVIRONMENT}")
+    ENDIF()
+
   ENDIF(BUILD_TESTING)
 
 endmacro(build_PatchMorphology)
