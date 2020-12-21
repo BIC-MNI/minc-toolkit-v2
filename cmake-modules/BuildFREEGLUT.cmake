@@ -83,6 +83,7 @@ ExternalProject_Add(FREEGLUT
       -DFREEGLUT_BUILD_DEMOS:BOOL=OFF
       -DFREEGLUT_BUILD_SHARED_LIBS:BOOL=OFF
       -DFREEGLUT_BUILD_STATIC_LIBS:BOOL=ON
+      -DFREEGLUT_REPLACE_GLUT:BOOL=OFF
       -DFREEGLUT_GLES:BOOL=OFF
       -DFREEGLUT_WAYLAND:BOOL=OFF
       -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
@@ -102,7 +103,7 @@ ExternalProject_Add(FREEGLUT
   # disable some output
 )
 
-SET(GLUT_LIBRARY     ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libglut.a )
+SET(GLUT_LIBRARY     ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libfreeglut.a )
 # ${GLUT_Xmu_LIBRARY}  ${GLUT_Xi_LIBRARY} ${GLUT_X11_LIBRARY}
 SET(GLUT_LIBRARIES   ${GLUT_LIBRARY} ${X11_X11_LIB} ${GLUT_GL_LIBRARY} ${X11_Xrandr_LIB}  ${X11_Xi_LIB} )
 SET(GLUT_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
@@ -110,5 +111,7 @@ SET(GLUT_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
 #include(FREEGLUT-build/FreeGLUT/FreeGLUTTargets.cmake)
 #SET(GLUT_LIBRARIES   FreeGLUT::freeglut_static )
 SET(GLUT_FOUND ON)
+SET(FREEGLUT_FOUND ON)
 
 endmacro(build_freeglut)
+
