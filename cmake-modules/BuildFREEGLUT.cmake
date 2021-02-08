@@ -51,18 +51,7 @@ macro(build_freeglut install_prefix staging_prefix)
     )
   endif()
 
-GET_PACKAGE("http://downloads.sourceforge.net/project/freeglut/freeglut/3.2.1/freeglut-3.2.1.tar.gz" "cd5c670c1086358598a6d4a9d166949d" "freeglut-2.6.0.tar.gz" FREEGLUT_PATH ) 
-
-#ExternalProject_Add(FREEGLUT 
-#  SOURCE_DIR FREEGLUT
-#  URL "${FREEGLUT_PATH}"
-#  URL_MD5 "cd5c670c1086358598a6d4a9d166949d"
-#  BUILD_IN_SOURCE 1
-#  INSTALL_DIR     "${staging_prefix}"
-#  BUILD_COMMAND   $(MAKE) -s V=0
-#  INSTALL_COMMAND $(MAKE) -s V=0 DESTDIR=${staging_prefix} install 
-#  CONFIGURE_COMMAND ./configure --enable-silent-rules --silent  --prefix=${install_prefix} --with-pic --disable-shared --libdir=${install_prefix}/lib${LIB_SUFFIX} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} "CXXFLAGS=${EXT_CXX_FLAGS}" "CFLAGS=${EXT_C_FLAGS}"
-#)
+GET_PACKAGE("http://downloads.sourceforge.net/project/freeglut/freeglut/3.2.1/freeglut-3.2.1.tar.gz" "cd5c670c1086358598a6d4a9d166949d" "freeglut-3.2.1.tar.gz" FREEGLUT_PATH ) 
 
 # have to find  GL X11 Xrandr Xi
 FIND_PACKAGE(OpenGL REQUIRED)
