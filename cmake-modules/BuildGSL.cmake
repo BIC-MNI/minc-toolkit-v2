@@ -10,7 +10,7 @@ macro(build_gsl install_prefix staging_prefix)
     SET(EXT_LDFLAGS   "-L${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX} ${CMAKE_MODULE_LINKER_FLAGS} ${CMAKE_MODULE_LINKER_FLAGS_DEBUG}" )
   ENDIF()
 
-GET_PACKAGE("http://mirrors.ibiblio.org/gnu/ftp/gnu/gsl/gsl-2.4.tar.gz" "dba736f15404807834dc1c7b93e83b92" "gsl-2.4.tar.gz" GSL_PATH ) 
+GET_PACKAGE("http://ftp.sun.ac.za/ftp/pub/mirrors/ftp.gnu.org/gsl/gsl-2.4.tar.gz" "53f6f61d91fa73f4cfb820de25fa7708" "gsl-2.4.tar.gz" GSL_PATH ) 
 
 ExternalProject_Add(GSL
         SOURCE_DIR GSL
