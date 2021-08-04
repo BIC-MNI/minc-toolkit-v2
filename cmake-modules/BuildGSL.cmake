@@ -10,7 +10,7 @@ macro(build_gsl install_prefix staging_prefix)
     SET(EXT_LDFLAGS   "-L${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX} ${CMAKE_MODULE_LINKER_FLAGS} ${CMAKE_MODULE_LINKER_FLAGS_DEBUG}" )
   ENDIF()
 
-GET_PACKAGE("http://mirrors.ibiblio.org/gnu/gsl/gsl-2.4.tar.gz" "dba736f15404807834dc1c7b93e83b92" "gsl-2.4.tar.gz" GSL_PATH )
+GET_PACKAGE("https://ftp.gnu.org/gnu/gsl/gsl-2.4.tar.gz" "dba736f15404807834dc1c7b93e83b92" "gsl-2.4.tar.gz" GSL_PATH ) 
 
 ExternalProject_Add(GSL
         SOURCE_DIR GSL
@@ -27,7 +27,7 @@ ExternalProject_Add(GSL
 SET(GSL_INCLUDE_DIR ${install_prefix}/include )
 SET(GSL_LIBRARY  ${install_prefix}/lib${LIB_SUFFIX}/libgsl.a )
 SET(GSL_CBLAS_LIBRARY ${install_prefix}/lib${LIB_SUFFIX}/libgslcblas.a )
-SET(GSL_VERSION "2.3")
+SET(GSL_VERSION "2.4")
 SET(GSL_FOUND ON)
       
 configure_file(${CMAKE_SOURCE_DIR}/cmake-modules/GSLConfig.cmake.in ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/GSLConfig.cmake @ONLY)
@@ -35,8 +35,7 @@ configure_file(${CMAKE_SOURCE_DIR}/cmake-modules/GSLConfig.cmake.in ${staging_pr
 SET(GSL_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
 SET(GSL_LIBRARY  ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libgsl.a )
 SET(GSL_CBLAS_LIBRARY ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libgslcblas.a )
-SET(GSL_VERSION "2.3")
+SET(GSL_VERSION "2.4")
 SET(GSL_FOUND ON)
 
 endmacro(build_gsl)
-  
