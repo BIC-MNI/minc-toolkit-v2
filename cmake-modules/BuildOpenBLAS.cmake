@@ -65,14 +65,13 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
   endif()
 
  
-  GET_PACKAGE("https://github.com/xianyi/OpenBLAS/archive/v0.3.5.tar.gz" "579bda57f68ea6e9074bf5780e8620bb" "openblas_v0.3.5.tar.gz" OPENBLAS_PATH )
+  GET_PACKAGE("https://github.com/xianyi/OpenBLAS/archive/v0.3.9.tar.gz" "28cc19a6acbf636f5aab5f10b9a0dfe1" "openblas_v0.3.9.tar.gz" OPENBLAS_PATH )
 
   ExternalProject_Add(OpenBLAS
         URL "${OPENBLAS_PATH}"
-        URL_MD5 "579bda57f68ea6e9074bf5780e8620bb"
+        URL_MD5 "28cc19a6acbf636f5aab5f10b9a0dfe1"
         SOURCE_DIR OpenBLAS
         BINARY_DIR OpenBLAS-build
-        PATCH_COMMAND patch -p1 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/2058.patch
         LIST_SEPARATOR :::
         CMAKE_GENERATOR ${CMAKE_GEN}
         CMAKE_ARGS

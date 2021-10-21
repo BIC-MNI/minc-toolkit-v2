@@ -36,7 +36,7 @@ ExternalProject_Add(GSL
 SET(GSL_INCLUDE_DIR ${install_prefix}/include )
 SET(GSL_LIBRARY  ${install_prefix}/lib${LIB_SUFFIX}/libgsl.a )
 SET(GSL_CBLAS_LIBRARY ${install_prefix}/lib${LIB_SUFFIX}/libgslcblas.a )
-SET(GSL_VERSION "2.3")
+SET(GSL_VERSION "2.4")
 SET(GSL_FOUND ON)
       
 configure_file(${CMAKE_SOURCE_DIR}/cmake-modules/GSLConfig.cmake.in ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/GSLConfig.cmake @ONLY)
@@ -44,8 +44,7 @@ configure_file(${CMAKE_SOURCE_DIR}/cmake-modules/GSLConfig.cmake.in ${staging_pr
 SET(GSL_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
 SET(GSL_LIBRARY  ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libgsl.a )
 SET(GSL_CBLAS_LIBRARY ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libgslcblas.a )
-SET(GSL_VERSION "2.3")
+SET(GSL_VERSION "2.4")
 SET(GSL_FOUND ON)
 
 endmacro(build_gsl)
-  

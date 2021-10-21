@@ -85,7 +85,12 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
     ADD_TEST(NAME TEST_PATCH_MORPHOLOGY COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/patch_morphology-build 
     )
-      
+
+    IF(MINC_TEST_ENVIRONMENT)
+        message("TEST_PATCH_MORPHOLOGY env: ${MINC_TEST_ENVIRONMENT}")
+        set_tests_properties( TEST_PATCH_MORPHOLOGY PROPERTIES ENVIRONMENT "${MINC_TEST_ENVIRONMENT}")
+    ENDIF()
+
   ENDIF(BUILD_TESTING)
 
 endmacro(build_PatchMorphology)

@@ -51,17 +51,11 @@ macro(build_liblbfgs install_prefix staging_prefix)
     )
   endif()
 
-  #SET(PATCH_QUIET "")
-  #if(MT_BUILD_QUIET)
-    SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake_ccache.patch)
-  #endif(MT_BUILD_QUIET)
-
   GET_PACKAGE("https://github.com/vfonov/liblbfgs/archive/v1.10-cmake.tar.gz" "1261b1c21eed98617e3b92019cf9b1c5" "liblbfgs-v1.10-cmake.tar.gz" LIBLBFGS_PATH ) 
   
   ExternalProject_Add(LIBLBFGS
     SOURCE_DIR LIBLBFGS
     BINARY_DIR LIBLBFGS-build
-    PATCH_COMMAND ${PATCH_QUIET}
     URL "${LIBLBFGS_PATH}"
     URL_MD5 "1261b1c21eed98617e3b92019cf9b1c5"
     CMAKE_GENERATOR ${CMAKE_GEN}

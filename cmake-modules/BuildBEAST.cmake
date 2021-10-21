@@ -88,7 +88,9 @@ macro(build_BEAST install_prefix staging_prefix )
     ADD_TEST(NAME TEST_BEAST COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/BEAST-build
     )
-      
+    IF(MINC_TEST_ENVIRONMENT)
+        set_tests_properties( TEST_BEAST PROPERTIES ENVIRONMENT "${MINC_TEST_ENVIRONMENT}")
+    ENDIF()      
   ENDIF(BUILD_TESTING)
 
 endmacro(build_BEAST)

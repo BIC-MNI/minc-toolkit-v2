@@ -70,13 +70,6 @@ macro(build_itkv5 install_prefix staging_prefix minc_dir)
     )
   ENDIF()
 
-  SET(PATCH_QUIET "")
-  #if(MT_BUILD_QUIET)
-  IF(NOT APPLE)
-    SET(PATCH_QUIET patch -p0 -t -N -i ${CMAKE_SOURCE_DIR}/cmake-modules/quiet_cmake_ccache.patch)
-  ENDIF(NOT APPLE)
-  #endif(MT_BUILD_QUIET)
-
   SET(HDF5_LIB_SUFFIX ".a")
 
   IF(MT_BUILD_SHARED_LIBS)
