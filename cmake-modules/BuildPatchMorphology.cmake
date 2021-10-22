@@ -4,7 +4,7 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
   else()
     set(CMAKE_GEN "${CMAKE_GENERATOR}")
   endif()
-  message("OpenBLAS_DIR=${OpenBLAS_DIR}")
+
   set(CMAKE_EXTERNAL_PROJECT_ARGS
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
@@ -40,10 +40,6 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
         -DCMAKE_STATIC_LINKER_FLAGS_RELEASE:STRING=${CMAKE_STATIC_LINKER_FLAGS_RELEASE}
         -DCMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-        -DOpenBLAS_INCLUDE_DIR:PATH=${OpenBLAS_INCLUDE_DIRS}
-        -DOpenBLAS_LIBRARY:PATH=${OpenBLAS_LIBRARY}
-        -DCMAKE_DISABLE_FIND_PACKAGE_OpenBLAS:BOOL=ON
-        -DOpenBLAS_DIR:PATH=${OpenBLAS_DIR}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DBUILD_TESTING:BOOL=${BUILD_TESTING}
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
@@ -61,6 +57,24 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
 #      -DCMAKE_CXX_COMPILER:FILEPATH=${ITK_CXX_COMPILER}
     )
   endif()
+  IF(MT_USE_BLAS)
+    IF(MT_BUILD_OPENBLAS)
+      list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
+        -DOpenBLAS_INCLUDE_DIR:PATH=${OpenBLAS_INCLUDE_DIRS}
+        -DOpenBLAS_LIBRARY:PATH=${OpenBLAS_LIBRARY}
+        -DCMAKE_DISABLE_FIND_PACKAGE_OpenBLAS:BOOL=ON
+        -DOpenBLAS_DIR:PATH=${OpenBLAS_DIR}
+        -DUSE_BLAS:BOOL=ON
+      )
+    ELSE()
+      list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
+        -DUSE_BLAS:BOOL=ON
+      )
+    ENDIF()
+  ELSE()
+  list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS 
+    -DUSE_BLAS:BOOL=OFF)
+  ENDIF()
 
   ExternalProject_Add(patch_morphology
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/patch_morphology
@@ -68,8 +82,6 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
     LIST_SEPARATOR :::  
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
-#        -DLIBLBFGS_DIR:PATH=${LIBLBFGS_LIBRARY_DIR}
-        -DOpenBLAS_DIR:PATH=${OpenBLAS_DIR}
         -DITK_DIR:PATH=${itk_dir}
         -DPATCH_MORPHOLOGY_BUILD_LEGACY:BOOL=ON
         -DLIBMINC_DIR:PATH=${CMAKE_BINARY_DIR}/libminc

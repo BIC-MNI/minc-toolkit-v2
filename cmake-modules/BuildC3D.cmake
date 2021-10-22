@@ -52,7 +52,7 @@ macro(build_C3D install_prefix staging_prefix)
     )
   endif()
 
-  GET_PACKAGE("https://github.com/vfonov/Convert3D/archive/v0.0.tar.gz" "a9f346f14171297dc28b530590be8754" "c3d-v0.0.tar.gz" C3D_PATH ) 
+#  GET_PACKAGE("https://github.com/vfonov/Convert3D/archive/v0.0.tar.gz" "a9f346f14171297dc28b530590be8754" "c3d-v0.0.tar.gz" C3D_PATH ) 
 
   ExternalProject_Add(C3D
     #URL "${C3D_PATH}"
