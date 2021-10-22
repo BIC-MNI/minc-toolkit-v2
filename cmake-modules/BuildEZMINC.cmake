@@ -41,7 +41,7 @@ macro(build_EZMINC install_prefix staging_prefix libminc_dir bicpl_dir itk_dir)
         -DCMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
   )
-  
+
   if(APPLE)
     list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
       -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
@@ -49,13 +49,13 @@ macro(build_EZMINC install_prefix staging_prefix libminc_dir bicpl_dir itk_dir)
       -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
     )
   endif()
-  
+
   
   
   ExternalProject_Add(EZMINC
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/EZminc
     BINARY_DIR EZMINC-build
-    LIST_SEPARATOR :::  
+    LIST_SEPARATOR :::
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
         -DFFTW3F_FOUND:BOOL=${FFTW3F_FOUND}
