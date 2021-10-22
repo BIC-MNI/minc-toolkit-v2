@@ -129,11 +129,11 @@ macro(build_itkv5 install_prefix staging_prefix minc_dir)
   message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
   message("HDF5_BIN_DIR=${HDF5_BIN_DIR}")
 
-  GET_PACKAGE("https://github.com/InsightSoftwareConsortium/ITK/archive/v5.0.1.tar.gz" "15f0422aab814309e9d95c55cbf09c22" "InsightToolkit-5.0.1.tar.gz" ITKv5_PATH ) 
+  GET_PACKAGE("https://github.com/InsightSoftwareConsortium/ITK/releases/download/v5.2.1/InsightToolkit-5.2.1.tar.gz" "48c1fe49f75fdaa91b31bbf9dda01a42" "InsightToolkit-5.2.1.tar.gz" ITKv5_PATH ) 
 
   ExternalProject_Add(ITKv5
     URL "${ITKv5_PATH}"
-    URL_MD5 "15f0422aab814309e9d95c55cbf09c22"
+    URL_MD5 "48c1fe49f75fdaa91b31bbf9dda01a42"
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv5
     BINARY_DIR ITKv5-build
@@ -157,9 +157,10 @@ macro(build_itkv5 install_prefix staging_prefix minc_dir)
         -DITK_FUTURE_LEGACY_REMOVE:BOOL=ON
         -DITKV3_COMPATIBILITY:BOOL=OFF
         -DITK_BUILD_DEFAULT_MODULES:BOOL=ON
+        -DModule_GenericLabelInterpolator:BOOL=ON
+        -DModule_AdaptiveDenoising:BOOL=ON
         -DKWSYS_USE_MD5:BOOL=ON # Required by SlicerExecutionModel
         -DModule_MGHIO:BOOL=ON
-        -DModule_ITKReview:BOOL=ON
         -DModule_GenericLabelInterpolator:BOOL=ON
         -DITK_USE_SYSTEM_MINC:BOOL=ON
         -DITK_USE_SYSTEM_HDF5:BOOL=ON

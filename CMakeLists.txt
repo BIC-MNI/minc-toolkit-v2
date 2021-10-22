@@ -20,7 +20,7 @@ IF(COMMAND CMAKE_POLICY)
       CMAKE_POLICY(SET CMP0026 NEW)
   ENDIF(POLICY CMP0026)
   IF(POLICY CMP0046)
-      CMAKE_POLICY(SET CMP0046 OLD)
+      CMAKE_POLICY(SET CMP0046 NEW)
   ENDIF(POLICY CMP0046)
   if(POLICY CMP0083)
     cmake_policy(SET CMP0083 NEW)
@@ -124,8 +124,12 @@ OPTION(MT_BUILD_VISUAL_TOOLS "Build visual tools (Display, Register, postf, ray_
 OPTION(USE_SYSTEM_ITK        "Use System ITK" OFF)
 OPTION(MT_USE_OPENMP         "Use OpenMP multi-threading" OFF)
 OPTION(MT_BUILD_IM           "Build ImageMagick and dependent libraries" OFF)
+OPTION(MT_USE_BLAS           "Use BLAS for linear algebra")
+
+IF(MT_USE_BLAS)
 OPTION(MT_BUILD_OPENBLAS     "Build OpenBLAS: will require fortran" OFF)
 #OPTION(MT_USE_OPENMP_BLAS    "Use Build OpenBLAS with OpenMP support" OFF) # TODO: finish this to compile on some platforms
+ENDIF()
 
 SET(MT_PACKAGES_PATH "${CMAKE_BINARY_DIR}/cache" CACHE PATH  "Directory containing 3rd party packages")
 
@@ -423,11 +427,17 @@ ADD_SUBDIRECTORY(bic-pipelines)
 ADD_SUBDIRECTORY(perl-modules)
 ADD_SUBDIRECTORY(minc_gco)
 
-IF(MT_BUILD_OPENBLAS)
-  enable_language(Fortran)
-  INCLUDE(BuildOpenBLAS)
-  build_open_blas(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX} ${MT_USE_OPENMP})
-ENDIF(MT_BUILD_OPENBLAS)
+IF(MT_USE_BLAS)
+  IF(MT_BUILD_OPENBLAS)
+    enable_language(Fortran)
+    INCLUDE(BuildOpenBLAS)
+    build_open_blas(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX} ${MT_USE_OPENMP})
+  ELSE()
+    set(BLA_VENDOR OpenBLAS) # search for OpenBlas for now
+    find_package(BLAS)
+  ENDIF()
+ELSE()
+ENDIF()
 
 #required for EZminc
 IF(USE_SYSTEM_GSL)
@@ -459,8 +469,14 @@ IF(MT_BUILD_ITK_TOOLS)
 
   OPTION(MT_BUILD_ANTS     "Build ANTS " ON)
   OPTION(MT_BUILD_C3D      "Build convert3D " ON)
-  OPTION(MT_BUILD_ELASTIX  "Build Elastix " ON)
-  OPTION(MT_BUILD_ABC      "Build ABC " OFF)
+
+  #OPTION(MT_BUILD_ELASTIX  "Build Elastix " ON)
+  #OPTION(MT_BUILD_ABC      "Build ABC " OFF)
+  # FOR Now old fork of Elastix doesn't work with ITKv5 
+  # TODO: upgrade to the recent version of Elastix
+  SET(MT_BUILD_ELASTIX      OFF) 
+  SET(MT_BUILD_ABC          OFF)
+
 
   IF(USE_SYSTEM_ITK)
     FIND_PACKAGE(ITK)
@@ -516,9 +532,9 @@ IF(MT_BUILD_ITK_TOOLS)
   build_PatchMorphology(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX} ${ITK_DIR})
   ADD_DEPENDENCIES(patch_morphology ITKv5 minc_io)
   
-  IF(MT_BUILD_OPENBLAS)
+  IF(MT_USE_BLAS AND MT_BUILD_OPENBLAS)
     ADD_DEPENDENCIES(patch_morphology OpenBLAS)
-  ENDIF(MT_BUILD_OPENBLAS)
+  ENDIF()
   
   IF(MT_BUILD_ABC)
    INCLUDE(BuildABC)
@@ -533,10 +549,8 @@ INCLUDE(BuildBEAST)
 build_BEAST(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
 ADD_DEPENDENCIES(BEAST minc_io)
 
-IF(MT_BUILD_OPENBLAS)
+IF(MT_USE_BLAS AND MT_BUILD_OPENBLAS)
     ADD_DEPENDENCIES(BEAST OpenBLAS)
-ELSE()
-    FIND_PACKAGE(OpenBLAS )
 ENDIF()
 
 
