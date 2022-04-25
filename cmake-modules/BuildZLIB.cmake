@@ -5,7 +5,7 @@ macro(build_zlib install_prefix staging_prefix)
 
 SET (ZLIB_VERSION_STRING 1.2)
 SET (ZLIB_VERSION_MAJOR  1.2)
-SET (ZLIB_VERSION_MINOR  11)
+SET (ZLIB_VERSION_MINOR  12)
 
   if(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
@@ -53,11 +53,11 @@ SET (ZLIB_VERSION_MINOR  11)
     )
   endif()
 
-  GET_PACKAGE("http://zlib.net/zlib-1.2.11.tar.gz" "1c9f62f0778697a09d36121ead88e08e" "zlib-1.2.11.tar.gz" ZLIB_PATH ) 
+  GET_PACKAGE("http://zlib.net/zlib-1.2.12.tar.gz" "5fc414a9726be31427b440b434d05f78" "zlib-1.2.12.tar.gz" ZLIB_PATH )
   
 ExternalProject_Add(ZLIB
   URL  "${ZLIB_PATH}"
-  URL_MD5 "1c9f62f0778697a09d36121ead88e08e"
+  URL_MD5 "5fc414a9726be31427b440b434d05f78"
   UPDATE_COMMAND ""
   SOURCE_DIR ZLIB
   BINARY_DIR ZLIB-build
