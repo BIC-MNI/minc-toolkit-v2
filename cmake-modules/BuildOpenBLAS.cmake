@@ -93,7 +93,7 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
             INSTALL_DIR ${staging_prefix}/${install_prefix}
       )
 
-  SET(OpenBLAS_INCLUDE_DIRS ${staging_prefix}/${install_prefix}/include )
+  SET(OpenBLAS_INCLUDE_DIRS ${staging_prefix}/${install_prefix}/include/openblas )
   SET(OpenBLAS_LIBRARIES    ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libopenblas.so  )
   SET(OpenBLAS_LIBRARY      ${OpenBLAS_LIBRARIES})
   SET(OpenBLAS_DIR          ${staging_prefix}/${install_prefix}/share/cmake/OpenBLAS )
