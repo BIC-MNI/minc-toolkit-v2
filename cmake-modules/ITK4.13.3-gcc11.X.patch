@@ -1,0 +1,37 @@
+From c80e973ac67f5f8fb5e99622df8a862c226f00ae Mon Sep 17 00:00:00 2001
+From: "Vladimir S. FONOV" <vladimir.fonov@gmail.com>
+Date: Thu, 19 Aug 2021 15:30:05 -0400
+Subject: [PATCH] COMP: Minimal support for gcc 11.X
+
+Added minimal support for gcc 11.X
+
+Change-Id: I1ccfbbdb78948040209eb0729c351349249accef
+---
+ Modules/ThirdParty/VNL/src/vxl/vcl/vcl_compiler.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_compiler.h b/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_compiler.h
+index 9b93c9022d..e2bdf82a39 100644
+--- a/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_compiler.h
++++ b/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_compiler.h
+@@ -119,6 +119,17 @@
+ #  else
+ #   define VCL_GCC_100
+ #  endif
++# elif (__GNUC__==11)
++#  define VCL_GCC_11
++#  if (__GNUC_MINOR__ > 2 )
++#   define VCL_GCC_113
++#  elif (__GNUC_MINOR__ > 1 )
++#   define VCL_GCC_112
++#  elif (__GNUC_MINOR__ > 0 )
++#   define VCL_GCC_111
++#  else
++#   define VCL_GCC_110
++#  endif
+ # else
+ #  error "Dunno about this gcc"
+ # endif
+-- 
+2.25.1
+

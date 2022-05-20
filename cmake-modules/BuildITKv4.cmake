@@ -18,6 +18,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
   LIST(APPEND EXT_CMAKE_CXX_FLAGS -D_XOPEN_SOURCE=600)
   ENDIF(NOT APPLE)
 
+
   set(CMAKE_EXTERNAL_PROJECT_ARGS
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
@@ -138,6 +139,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
+    PATCH_COMMAND patch -p1 < ${CMAKE_CURRENT_LIST_DIR}/cmake-modules/ITK4.13.3-gcc11.X.patch
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
