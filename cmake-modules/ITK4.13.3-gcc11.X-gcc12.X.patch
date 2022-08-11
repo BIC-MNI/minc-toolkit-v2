@@ -1,0 +1,33 @@
+diff --git a/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_compiler.h b/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_compiler.h
+index 9b93c9022d..f35a5062d8 100644
+--- a/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_compiler.h
++++ b/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_compiler.h
+@@ -119,6 +119,28 @@
+ #  else
+ #   define VCL_GCC_100
+ #  endif
++# elif (__GNUC__==11)
++#  define VCL_GCC_11
++#  if (__GNUC_MINOR__ > 2 )
++#   define VCL_GCC_113
++#  elif (__GNUC_MINOR__ > 1 )
++#   define VCL_GCC_112
++#  elif (__GNUC_MINOR__ > 0 )
++#   define VCL_GCC_111
++#  else
++#   define VCL_GCC_110
++#  endif
++# elif (__GNUC__==12)
++#  define VCL_GCC_12
++#  if (__GNUC_MINOR__ > 2 )
++#   define VCL_GCC_123
++#  elif (__GNUC_MINOR__ > 1 )
++#   define VCL_GCC_122
++#  elif (__GNUC_MINOR__ > 0 )
++#   define VCL_GCC_121
++#  else
++#   define VCL_GCC_120
++#  endif
+ # else
+ #  error "Dunno about this gcc"
+ # endif
