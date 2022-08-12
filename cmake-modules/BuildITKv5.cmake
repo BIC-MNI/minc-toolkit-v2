@@ -86,25 +86,8 @@ macro(build_itkv5 install_prefix staging_prefix minc_dir)
       SET(ITK_SHARED_LIBRARY "OFF")
   ENDIF(MT_BUILD_SHARED_LIBS)
 
-  IF(FALSE) # OUTDATED
-  IF(${CMAKE_BUILD_TYPE} STREQUAL Release OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo) OR (CMAKE_BUILD_TYPE STREQUAL MinSizeRel))
-    #message("Using release version of HDF5")
-    SET(HDF5_LIBRARY ${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX})
-    SET(HDF5_CPP_LIBRARY ${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX})
-    SET(HDF5_HL_LIBRARY ${hdf_library_dir}/libhdf5_hl${HDF5_LIB_SUFFIX})
-    SET(HDF5_HL_CPP_LIBRARY ${hdf_library_dir}/libhdf5_hl_cpp${HDF5_LIB_SUFFIX})
-  ELSE(${CMAKE_BUILD_TYPE} STREQUAL Release OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo) OR (CMAKE_BUILD_TYPE STREQUAL MinSizeRel))
-    #message("Using debug version of HDF5")
-    SET(HDF5_LIBRARY ${hdf_library_dir}/libhdf5_debug${HDF5_LIB_SUFFIX})
-    SET(HDF5_CPP_LIBRARY ${hdf_library_dir}/libhdf5_cpp_debug${HDF5_LIB_SUFFIX})
-    SET(HDF5_HL_LIBRARY ${hdf_library_dir}/libhdf5_hl_debug${HDF5_LIB_SUFFIX})
-    SET(HDF5_HL_CPP_LIBRARY ${hdf_library_dir}/libhdf5_hl_cpp_debug${HDF5_LIB_SUFFIX})
-  ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo) OR (CMAKE_BUILD_TYPE STREQUAL MinSizeRel))
-
-  ENDIF()
 
   # HACKS to generate directories for HDF5
-
   IF(HDF5_CXX_LIBRARY)
    SET(HDF5_CPP_LIBRARY "${HDF5_CXX_LIBRARY}")
   ELSE()
@@ -123,11 +106,22 @@ macro(build_itkv5 install_prefix staging_prefix minc_dir)
     STRING(REPLACE "include" "bin" HDF5_BIN_DIR  "${HDF5_INCLUDE_DIR}")
   ENDIF()
 
-  message("HDF5_LIBRARY=${HDF5_LIBRARY}")
-  message("HDF5_CPP_LIBRARY=${HDF5_CPP_LIBRARY}")
-  message("HDF5_HL_LIBRARY=${HDF5_HL_LIBRARY}")
-  message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
-  message("HDF5_BIN_DIR=${HDF5_BIN_DIR}")
+
+  SET(CMAKE_ITK_HDF5_SETTINGS 
+  -DHDF5_DIFF_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5diff
+  -DHDF5_CXX_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
+  -DHDF5_C_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
+  -DHDF5_hdf5_LIBRARY:FILEPATH=${HDF5_LIBRARY}
+  -DHDF5_hdf5_cpp_LIBRARY:FILEPATH=${HDF5_CPP_LIBRARY}
+  -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${HDF5_LIBRARY}
+  -DHDF5_hdf5_cpp_LIBRARY_RELEASE:FILEPATH=${HDF5_CPP_LIBRARY}
+  -DHDF5_hdf5_LIBRARY_DEBUG:FILEPATH=${HDF5_LIBRARY}
+  -DHDF5_hdf5_cpp_LIBRARY_DEBUG:FILEPATH=${HDF5_CPP_LIBRARY}
+  -DHDF5_DIR:PATH=HDF5_DIR-NOTFOUND
+  -DHDF5_Fortran_COMPILER_EXECUTABLE:FILEPATH=''
+  -DHDF5_CXX_COMPILER_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5c++
+  -DHDF5_C_COMPILER_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5cc
+  )
 
   GET_PACKAGE("https://github.com/InsightSoftwareConsortium/ITK/releases/download/v5.2.1/InsightToolkit-5.2.1.tar.gz" "48c1fe49f75fdaa91b31bbf9dda01a42" "InsightToolkit-5.2.1.tar.gz" ITKv5_PATH ) 
 
@@ -175,22 +169,10 @@ macro(build_itkv5 install_prefix staging_prefix minc_dir)
         -DFFTWF_THREADS_LIB:FILEPATH=${FFTW3F_THREADS_LIBRARY}
         -DFFTW_INCLUDE_PATH:PATH=${FFTW3_INCLUDE_DIR}
         -DLIBMINC_DIR:PATH=${minc_dir}
-        -DHDF5_DIFF_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5diff
-        -DHDF5_CXX_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
-        -DHDF5_C_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
-        -DHDF5_hdf5_LIBRARY:FILEPATH=${HDF5_LIBRARY}
-        -DHDF5_hdf5_cpp_LIBRARY:FILEPATH=${HDF5_CPP_LIBRARY}
-        -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${HDF5_LIBRARY}
-        -DHDF5_hdf5_cpp_LIBRARY_RELEASE:FILEPATH=${HDF5_CPP_LIBRARY}
-        -DHDF5_hdf5_LIBRARY_DEBUG:FILEPATH=${HDF5_LIBRARY}
-        -DHDF5_hdf5_cpp_LIBRARY_DEBUG:FILEPATH=${HDF5_CPP_LIBRARY}
-        -DHDF5_DIR:PATH=HDF5_DIR-NOTFOUND
-        -DHDF5_Fortran_COMPILER_EXECUTABLE:FILEPATH=''
-        -DHDF5_CXX_COMPILER_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5c++
-        -DHDF5_C_COMPILER_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5cc
         -DZLIB_LIBRARY:PATH=${ZLIB_LIBRARY}
         -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
         -DITK_LEGACY_REMOVE:BOOL=OFF
+        ${CMAKE_ITK_HDF5_SETTINGS}
     INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
     STEP_TARGETS PatchInstall
@@ -206,6 +188,8 @@ macro(build_itkv5 install_prefix staging_prefix minc_dir)
 
 
   SET(ITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/ITKv5-build)
+
+  IF(FALSE) # DEPRICATED
 
   SET(ITK_INCLUDE_DIRS
         ${CMAKE_CURRENT_BINARY_DIR}/ITKv5-build
@@ -262,4 +246,5 @@ macro(build_itkv5 install_prefix staging_prefix minc_dir)
     SET(ITK_LIBRARIES  ${ITK_LIBRARIES} dl)
   ENDIF(UNIX)
 
+  ENDIF() # DEPRICATED
 endmacro(build_itkv5)

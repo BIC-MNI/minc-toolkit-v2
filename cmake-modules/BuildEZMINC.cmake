@@ -4,7 +4,7 @@ macro(build_EZMINC install_prefix staging_prefix libminc_dir bicpl_dir itk_dir)
   else()
     set(CMAKE_GEN "${CMAKE_GENERATOR}")
   endif()
-  
+
   set(CMAKE_EXTERNAL_PROJECT_ARGS
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
@@ -40,6 +40,7 @@ macro(build_EZMINC install_prefix staging_prefix libminc_dir bicpl_dir itk_dir)
         -DCMAKE_STATIC_LINKER_FLAGS_RELEASE:STRING=${CMAKE_STATIC_LINKER_FLAGS_RELEASE}
         -DCMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+        ${CMAKE_ITK_HDF5_SETTINGS}
   )
   
   if(APPLE)
