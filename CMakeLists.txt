@@ -470,11 +470,11 @@ IF(MT_BUILD_ITK_TOOLS)
   OPTION(MT_BUILD_ANTS     "Build ANTS " ON)
   OPTION(MT_BUILD_C3D      "Build convert3D " ON)
 
-  #OPTION(MT_BUILD_ELASTIX  "Build Elastix " ON)
+  OPTION(MT_BUILD_ELASTIX  "Build Elastix " ON)
   #OPTION(MT_BUILD_ABC      "Build ABC " OFF)
   # FOR Now old fork of Elastix doesn't work with ITKv5 
   # TODO: upgrade to the recent version of Elastix
-  SET(MT_BUILD_ELASTIX      OFF) 
+  #SET(MT_BUILD_ELASTIX      OFF) 
   SET(MT_BUILD_ABC          OFF)
 
 
