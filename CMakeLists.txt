@@ -131,7 +131,13 @@ OPTION(MT_BUILD_OPENBLAS     "Build OpenBLAS: will require fortran" OFF)
 #OPTION(MT_USE_OPENMP_BLAS    "Use Build OpenBLAS with OpenMP support" OFF) # TODO: finish this to compile on some platforms
 ENDIF()
 
+OPTION(MNI_AUTOREG_OLD_AMOEBA_INIT "Use legacy version of the code to initialize AMOEBA in minctracc" OFF)
+
 SET(MT_PACKAGES_PATH "${CMAKE_BINARY_DIR}/cache" CACHE PATH  "Directory containing 3rd party packages")
+
+IF(APPLE)
+  SET(MT_APPLE_ARCH "${CMAKE_SYSTEM_PROCESSOR}"  CACHE STRING "Build for this Apple arch" FORCE  )
+ENDIF(APPLE)
 
 IF(MT_BUILD_LITE)
   SET(MT_BUILD_ITK_TOOLS    OFF)
@@ -268,6 +274,7 @@ ELSE()
   INCLUDE(BuildPCRE)
   build_pcre(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
 ENDIF()
+
 
 # required for mni_autoreg
 INCLUDE(BuildLIBLBFGS)
@@ -502,6 +509,13 @@ IF(MT_BUILD_ITK_TOOLS)
     IF(NOT USE_SYSTEM_FFTW3F)
      ADD_DEPENDENCIES(ITKv5 FFTW3F)
     ENDIF()
+    # TODO: allow using system lib?
+
+    #
+    INCLUDE(BuildPNG)
+    build_png(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
+    ADD_DEPENDENCIES(ITKv4 PNG)
+    
   ENDIF(USE_SYSTEM_ITK)
 
   IF(MT_BUILD_ANTS)
