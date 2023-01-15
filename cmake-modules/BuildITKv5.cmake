@@ -153,6 +153,7 @@ macro(build_itkv5 install_prefix staging_prefix minc_dir)
         -DKWSYS_USE_MD5:BOOL=ON # Required by SlicerExecutionModel
         -DModule_MGHIO:BOOL=ON
         -DModule_GenericLabelInterpolator:BOOL=ON
+        -DModule_MorphologicalContourInterpolation:BOOL=ON
         -DITK_USE_SYSTEM_MINC:BOOL=ON
         -DITK_USE_SYSTEM_HDF5:BOOL=ON
         -DITK_USE_SYSTEM_ZLIB:BOOL=ON
