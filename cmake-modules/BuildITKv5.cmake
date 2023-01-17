@@ -135,7 +135,7 @@ macro(build_itkv5 install_prefix staging_prefix minc_dir)
         -DBUILD_SHARED_LIBS:BOOL=${ITK_SHARED_LIBRARY}
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
         -DCMAKE_SKIP_RPATH:BOOL=OFF
-        -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
+        -DCMAKE_SKIP_INSTALL_RPATH:BOOL=ON
         -DMACOSX_RPATH:BOOL=ON
         -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
         ${CMAKE_EXTERNAL_PROJECT_ARGS}
