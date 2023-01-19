@@ -21,7 +21,7 @@ macro(build_fftw3d install_prefix staging_prefix)
       #SET(EXT_CONFIG_ARGS ${EXT_CONFIG_ARGS} --enable-neon)
     endif()
   else()
-    SET(EXT_CONFIG_ARGS ${EXT_CONFIG_ARGS} --enable-sse --enable-sse2)
+    SET(EXT_CONFIG_ARGS ${EXT_CONFIG_ARGS} --enable-sse2)
   endif()
 
   IF(MT_USE_OPENMP)
