@@ -10,10 +10,11 @@ enable_language(C)
 enable_language(CXX)
 #enable_language(Fortran)
 
+cmake_minimum_required(VERSION 3.14) # for ITKv5
+
 #Turn on PIC (and PIE if supported)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-cmake_minimum_required(VERSION 3.10.2) # for ITKv5
 
 IF(COMMAND CMAKE_POLICY)
   IF(POLICY CMP0026)
