@@ -89,6 +89,7 @@ macro(build_Elastix install_prefix staging_prefix)
         -DUSE_NearestNeighborResampleInterpolator:BOOL=ON
         -DUSE_Simplex:BOOL=ON
         -DUSE_ViolaWellsMutualInformationMetric:BOOL=ON
+        -DUSE_AffineDTITransformElastix:BOOL=ON
         -DFFTW_LIB:FILEPATH=${FFTW3F_LIBRARY}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DITK_DIR:PATH=${ITK_DIR}
