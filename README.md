@@ -40,7 +40,7 @@ Here is a list of bundled packages:
  * ANTS     - ANTS nonlinear registration tool from UPENN  https://github.com/stnava/ANTs
  * Elastix  - Elastix a toolbox for rigid and nonrigid registration of images. http://elastix.isi.uu.nl/ 
 
-## Installation
+## Installation (Linux)
 
 ### Installing from github, need CMake >= 3.1 
 <pre><code>
@@ -80,8 +80,13 @@ make && make install
 
 If you have installed minc-toolkit-v2 outside of the default installation ( i.e. changing DCMAKE_INSTALL_PREFIX:PATH within the build above).
 source minc-toolkit-config.sh
-
+      
 </pre></code>
+
+## Installation (Mac)
+
+Unfortunately, it is not possible to compile this toolkit for ARM64 Apple chips. This is because ITK v4 is a required dependency, but fixes have not been backported into legacy versions of the library (see [this issue](https://github.com/InsightSoftwareConsortium/ITK/issues/2250#issue-785602825) for more details]. Although preliminary support for the M1 architecture was introduced in ITK v5.2, it is non-trivial to address the breaking changes at this time. 
+
 ## Dependencies
 
 ### Following packages are needed to compile all tools:
