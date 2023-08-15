@@ -52,7 +52,7 @@ macro(build_liblbfgs install_prefix staging_prefix)
   endif()
 
   GET_PACKAGE("https://github.com/vfonov/liblbfgs/archive/v1.10-cmake.tar.gz" "1261b1c21eed98617e3b92019cf9b1c5" "liblbfgs-v1.10-cmake.tar.gz" LIBLBFGS_PATH ) 
-  
+
   ExternalProject_Add(LIBLBFGS
     SOURCE_DIR LIBLBFGS
     BINARY_DIR LIBLBFGS-build
@@ -63,18 +63,18 @@ macro(build_liblbfgs install_prefix staging_prefix)
         -DBUILD_TESTING:BOOL=OFF #${BUILD_TESTING}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DBUILD_SHARED_LIBS:BOOL=OFF
-        -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
+        -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}/
         ${CMAKE_EXTERNAL_PROJECT_ARGS}
-    INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
-    INSTALL_DIR ${staging_prefix}/${install_prefix}
+    INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}/
+    INSTALL_DIR     ${staging_prefix}/${install_prefix}/
   )
-  
+
 SET(LIBLBFGS_LIB_SUFFIX ".a")
 
 SET(LIBLBFGS_INCLUDE_DIR  ${staging_prefix}/${install_prefix}/include )
 SET(LIBLBFGS_LIBRARY_DIR  ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/ )
 SET(LIBLBFGS_LIBRARY      ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/liblbfgs${LIBLBFGS_LIB_SUFFIX} )
 SET(LIBLBFGS_FOUND        TRUE)
- 
+
 
 endmacro(build_liblbfgs)

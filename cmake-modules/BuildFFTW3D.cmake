@@ -95,7 +95,7 @@ macro(build_fftw3d install_prefix staging_prefix)
           -DINSTALL_LIB_DIR:PATH=${install_prefix}/lib${LIB_SUFFIX}
           -DINSTALL_INC_DIR:PATH=${install_prefix}/include
           ${CMAKE_EXTERNAL_PROJECT_ARGS}
-      INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
+      INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}/
       INSTALL_DIR ${staging_prefix}/${install_prefix}
     )
 
