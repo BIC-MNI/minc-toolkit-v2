@@ -53,7 +53,7 @@ SET (ZLIB_VERSION_MINOR  13)
     )
   endif()
 
-  GET_PACKAGE("http://zlib.net/zlib-1.2.13.tar.gz" "9b8aa094c4e5765dabf4da391f00d15c" "zlib-1.2.13.tar.gz" ZLIB_PATH )
+  GET_PACKAGE("http://zlib.net/fossils/zlib-1.2.13.tar.gz" "9b8aa094c4e5765dabf4da391f00d15c" "zlib-1.2.13.tar.gz" ZLIB_PATH )
   
 ExternalProject_Add(ZLIB
   URL  "${ZLIB_PATH}"
