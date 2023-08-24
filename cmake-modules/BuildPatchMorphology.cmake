@@ -5,6 +5,7 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
     set(CMAKE_GEN "${CMAKE_GENERATOR}")
   endif()
 
+  message("CMAKE_EXTERNAL_PROJECT_ARGS_FOR_ITK5=${CMAKE_EXTERNAL_PROJECT_ARGS_FOR_ITK5}")
 
   set(CMAKE_EXTERNAL_PROJECT_ARGS ${CMAKE_EXTERNAL_PROJECT_ARGS_FOR_ITK5})
   
@@ -33,6 +34,7 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
     LIST_SEPARATOR :::  
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
+        -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
         -DITK_DIR:PATH=${itk_dir}
         -DPATCH_MORPHOLOGY_BUILD_LEGACY:BOOL=ON
         -DLIBMINC_DIR:PATH=${CMAKE_BINARY_DIR}/libminc
