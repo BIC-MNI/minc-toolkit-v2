@@ -250,12 +250,10 @@ macro(build_itkv5 install_prefix staging_prefix minc_dir)
   endif()
   
   IF(NOT MT_USE_OPENMP)
-    list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
+    list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS_FOR_ITK5
       -DOpenMP_CXX_FLAGS:STRING=
       -DOpenMP_C_FLAGS:STRING=
     )
   ENDIF(NOT MT_USE_OPENMP)
-
-
 
 endmacro(build_itkv5)
