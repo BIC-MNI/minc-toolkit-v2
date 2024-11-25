@@ -120,11 +120,11 @@ macro(build_itkv5 install_prefix staging_prefix minc_dir)
   -DHDF5_C_COMPILER_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5cc
   )
 
-  GET_PACKAGE("https://github.com/InsightSoftwareConsortium/ITK/releases/download/v5.2.1/InsightToolkit-5.2.1.tar.gz" "48c1fe49f75fdaa91b31bbf9dda01a42" "InsightToolkit-5.2.1.tar.gz" ITKv5_PATH ) 
+  GET_PACKAGE("https://github.com/InsightSoftwareConsortium/ITK/archive/refs/tags/v5.3.0.tar.gz" "0eea824a392f7676c23bb24f4d8e3ceb" "InsightToolkit-5.3.0.tar.gz" ITKv5_PATH ) 
 
   ExternalProject_Add(ITKv5
     URL "${ITKv5_PATH}"
-    URL_MD5 "48c1fe49f75fdaa91b31bbf9dda01a42"
+    URL_MD5 "0eea824a392f7676c23bb24f4d8e3ceb"
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv5
     BINARY_DIR ITKv5-build
