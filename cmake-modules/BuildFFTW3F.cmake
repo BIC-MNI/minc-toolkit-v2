@@ -22,6 +22,10 @@ macro(build_fftw3f install_prefix staging_prefix)
     endif()
   else()
     SET(EXT_CONFIG_ARGS ${EXT_CONFIG_ARGS} --enable-sse --enable-sse2)
+    ### HACK
+    # SET(EXT_C_FLAGS     "${EXT_C_FLAGS} -fPIC")
+    # SET(EXT_CXX_FLAGS   "${EXT_CXX_FLAGS} -fPIC")
+    ### HACK
   endif()
 
   IF(MT_USE_OPENMP)
