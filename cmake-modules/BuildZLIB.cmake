@@ -53,11 +53,11 @@ SET (ZLIB_VERSION_MINOR  13)
     )
   endif()
 
-  GET_PACKAGE("http://zlib.net/zlib-1.2.13.tar.gz" "9b8aa094c4e5765dabf4da391f00d15c" "zlib-1.2.13.tar.gz" ZLIB_PATH )
+  GET_PACKAGE("http://zlib.net/zlib-1.3.1.tar.gz" "9855b6d802d7fe5b7bd5b196a2271655" "zlib-1.3.1.tar.gz" ZLIB_PATH )
   
 ExternalProject_Add(ZLIB
   URL  "${ZLIB_PATH}"
-  URL_MD5 "9b8aa094c4e5765dabf4da391f00d15c"
+  URL_MD5 "9855b6d802d7fe5b7bd5b196a2271655"
   UPDATE_COMMAND ""
   SOURCE_DIR ZLIB
   BINARY_DIR ZLIB-build
