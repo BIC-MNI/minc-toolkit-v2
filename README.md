@@ -74,7 +74,11 @@ Following command will configure build system to build all the tools and install
 -DUSE_SYSTEM_NETCDF:BOOL=OFF   \
 -DUSE_SYSTEM_NIFTI:BOOL=OFF   \
 -DUSE_SYSTEM_PCRE:BOOL=OFF   \
--DUSE_SYSTEM_ZLIB:BOOL=OFF 
+-DUSE_SYSTEM_ZLIB:BOOL=OFF \
+-DCMAKE_C_FLAGS:STRING="-std=gnu17" \
+-DCMAKE_CXX_FLAGS:STRING="-std=gnu++17" \
+-DMT_USE_BLAS:BOOL=ON \
+-DMT_BUILD_OPENBLAS:BOOL=ON
 
 make && make install
 

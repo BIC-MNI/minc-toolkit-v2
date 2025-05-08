@@ -51,7 +51,7 @@ macro(build_freeglut install_prefix staging_prefix)
     )
   endif()
 
-GET_PACKAGE("http://downloads.sourceforge.net/project/freeglut/freeglut/3.2.1/freeglut-3.2.1.tar.gz" "cd5c670c1086358598a6d4a9d166949d" "freeglut-3.2.1.tar.gz" FREEGLUT_PATH ) 
+GET_PACKAGE("https://github.com/freeglut/freeglut/releases/download/v3.6.0/freeglut-3.6.0.tar.gz" "1a1c4712b3100f49f5dea22a1ad57c34" "freeglut-3.6.0.tar.gz" FREEGLUT_PATH ) 
 
 # have to find  GL X11 Xrandr Xi
 FIND_PACKAGE(OpenGL REQUIRED)
@@ -59,7 +59,7 @@ FIND_PACKAGE(X11    REQUIRED)
 
 ExternalProject_Add(FREEGLUT
     URL "${FREEGLUT_PATH}"
-    URL_MD5 "cd5c670c1086358598a6d4a9d166949d"
+    URL_MD5 "1a1c4712b3100f49f5dea22a1ad57c34"
   SOURCE_DIR FREEGLUT
   BINARY_DIR FREEGLUT-build
   LIST_SEPARATOR :::
