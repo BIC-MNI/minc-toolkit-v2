@@ -62,11 +62,11 @@ macro(build_hdf5 install_prefix staging_prefix)
   SET(HDF_CMAKE_CXX_FLAGS "-fPIC ${CMAKE_CXX_FLAGS}")
   SET(HDF_CMAKE_C_FLAGS   "-fPIC ${CMAKE_C_FLAGS}")
 
-  GET_PACKAGE("https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.11/src/hdf5-1.10.11.tar.bz2" "b60f44a9210770794fb9a2949bfb9587" "hdf5-1.10.11.tar.bz2" HDF5_PATH )
+  GET_PACKAGE("https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.1/src/hdf5-1.12.1.tar.bz2" "442469fbf43626006346e679c22cf10a" "hdf5-1.12.1.tar.bz2" HDF5_PATH )
 
 ExternalProject_Add(HDF5
   URL "${HDF5_PATH}"
-  URL_MD5 "b60f44a9210770794fb9a2949bfb9587"
+  URL_MD5 "442469fbf43626006346e679c22cf10a"
   SOURCE_DIR HDF5
   BINARY_DIR HDF5-build
   CMAKE_GENERATOR ${CMAKE_GEN}
