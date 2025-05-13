@@ -125,7 +125,7 @@ sudo apt-get install \
  libxi6 libxi-dev \
  libxmu6 libxmu-dev libxmu-headers \
  libgl1-mesa-dev libglu1-mesa-dev \
- libjpeg-dev
+ libjpeg-dev libxxf86vm-dev
 </code></pre>
 
 ### Installing Build Dependencies on CentOS 7:
