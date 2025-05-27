@@ -65,7 +65,7 @@ def stack_plot(fr, outfile, normalize=False, dont_stack=False, max_n=20):
     pyplot.legend(loc=2)
     pyplot.ylabel('Lines of code')
     pyplot.tight_layout()
-    pyplot.savefig(outfile, bbox_inches='tight',dpi=200)
+    pyplot.savefig(outfile, bbox_inches='tight',dpi=150)
 
 if __name__ == '__main__':
     all_datasets = pd.HDFStore('statistics.h5')
