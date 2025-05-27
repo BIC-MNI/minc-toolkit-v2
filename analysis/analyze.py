@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
+#from __future__ import print_function
 import argparse, git, datetime, numpy, pygments.lexers, traceback, time, os, fnmatch, json
 import pandas as pd
 from tqdm import tqdm
@@ -28,7 +28,11 @@ from datetime import UTC
 IGNORE_PYGMENTS_FILETYPES = ['*.json', '*.md', '*.ps', '*.eps', '*.txt', '*.xml', '*.xsl', '*.rss', '*.xslt', '*.xsd', '*.wsdl', '*.wsf', '*.yaml', '*.yml']
 
 
-def analyze(repos, interval=7*24*60*60, ignore=[], only=[],branch=None,rename={},cohortfm='%Y',all_filetypes=False,prefix='.',earliest=None):
+def analyze(repos, interval=7*24*60*60, 
+      ignore=[], only=[],branch=None,
+      rename={},cohortfm='%Y',
+      all_filetypes=False,prefix='.',earliest=None):
+
     default_filetypes = set()
     for _, _, filetypes, _ in pygments.lexers.get_all_lexers():
         default_filetypes.update(filetypes)
@@ -184,11 +188,34 @@ if __name__ == '__main__':
     outdir='.'
     
     repos=[
-        'bic-pipelines','patch_morphology','xdisp','arguments','BEaST','bicgl',
-        'Display','bicpl','classify','conglomerate', 
-        'EBTKS','EZminc','glim_image','ILT','inormalize','libminc','minctools',
-        'minc-widgets','mni_autoreg','mni-perllib','mrisim','N3','oobicpl',
-        'postf', 'ray_trace','Register','.'
+        'bic-pipelines',
+        'patch_morphology',
+        'xdisp',
+        'arguments',
+        'BEaST',
+        'bicgl',
+        'Display',
+        'bicpl',
+        'classify',
+        'conglomerate',
+        'EBTKS',
+        'EZminc',
+        'glim_image',
+        'ILT',
+        'inormalize',
+        'libminc',
+        'minctools',
+        'minc-widgets',
+        'mni_autoreg',
+        'mni-perllib',
+        'mrisim',
+        'N3',
+        'oobicpl',
+        'postf',
+        'ray_trace',
+        'Register',
+        'minc_gco',
+        '.'
         ]
     #repos=['.','patch_morphology']
     repo_prefix='..'
@@ -207,16 +234,15 @@ if __name__ == '__main__':
     if not os.path.exists(outdir):
         os.makedirs(outdir)
     
-    
     authors={}
     cohorts={}
     exts={}
     
-    for r in repos :
+    for r in list(set(repos)):
         earliest=None
         if r=='minctools': earliest='cc7477c7e7bf46a45a1959a7030fd65863e79062' # don't analyze beyond that (libminc & minctools split)
         
-        curves,commit_history,curves_set,ts=analyze(r,prefix=repo_prefix,rename=rename,interval=interval,earliest=earliest)
+        curves, commit_history, curves_set, ts = analyze(r, prefix=repo_prefix, rename=rename, interval=interval, earliest=earliest)
         
         def to_pandas(key_type, label_fmt=lambda x: x):
             key_items = sorted(k for t, k in curves_set if t == key_type)
@@ -270,12 +296,12 @@ if __name__ == '__main__':
     
     # save to HDF file
     store = pd.HDFStore('statistics.h5')
-    store['all_authors']=all_authors
-    store['all_cohorts']=all_cohorts
-    store['all_exts']   =all_exts
+    store['all_authors'] = all_authors
+    store['all_cohorts'] = all_cohorts
+    store['all_exts']    = all_exts
     
     # save libminc authors
-    store['libminc'] = authors['libminc']
+    store['libminc']     = authors['libminc']
     
     store.close()
     
