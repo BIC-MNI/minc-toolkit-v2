@@ -304,6 +304,7 @@ if __name__ == '__main__':
     store['libminc']     = authors['libminc']
     store['minctools']   = authors['minctools']
     #
+    store['libminc_years']     = cohorts['libminc']
     store['minctools_years']   = cohorts['minctools']
 
     store.close()

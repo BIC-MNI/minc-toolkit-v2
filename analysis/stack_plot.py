@@ -78,4 +78,5 @@ if __name__ == '__main__':
     stack_plot(all_datasets['libminc'],'libminc_top10_authors.png',max_n=10)
     stack_plot(all_datasets['minctools'],'minctools_top10_authors.png',max_n=10)
     stack_plot(all_datasets['minctools_years'],'minctools_by_year.png',max_n=100)
+    stack_plot(all_datasets['libminc_years'],'libminc_by_year.png',max_n=100)
     all_datasets.close()
