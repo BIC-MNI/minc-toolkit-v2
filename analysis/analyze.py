@@ -25,8 +25,7 @@ from datetime import UTC
 #from matplotlib import pyplot
 
 # Some filetypes in Pygments are not necessarily computer code, but configuration/documentation. Let's not include those.
-IGNORE_PYGMENTS_FILETYPES = ['*.json', '*.md', '*.ps', '*.eps', '*.txt', '*.xml', '*.xsl', '*.rss', '*.xslt', '*.xsd', '*.wsdl', '*.wsf', '*.yaml', '*.yml']
-
+IGNORE_PYGMENTS_FILETYPES = ['*.json', '*.ps', '*.eps', '*.xml', '*.xsl', '*.rss', '*.xslt', '*.xsd', '*.wsdl', '*.wsf']
 
 def analyze(repos, interval=7*24*60*60, 
       ignore=[], only=[],branch=None,
@@ -221,7 +220,7 @@ if __name__ == '__main__':
     repo_prefix='..'
     rename = {}
     interval= 7*24*60*60 # 1 week
-    
+
     with open(authors,'r') as f:
         for ln in f:
             ll=ln.rstrip("\n").split('|')
@@ -230,14 +229,14 @@ if __name__ == '__main__':
                     rename[ll[j]]=ll[0]
             else:
                 rename[ll[0]]=ll[0]
-    
+
     if not os.path.exists(outdir):
         os.makedirs(outdir)
-    
+
     authors={}
     cohorts={}
     exts={}
-    
+
     for r in list(set(repos)):
         earliest=None
         if r=='minctools': earliest='cc7477c7e7bf46a45a1959a7030fd65863e79062' # don't analyze beyond that (libminc & minctools split)
