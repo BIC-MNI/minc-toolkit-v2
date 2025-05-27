@@ -114,7 +114,7 @@ def analyze(repos, interval=7*24*60*60,
     def get_entries(commit):
         return [entry for entry in commit.tree.traverse()
                 if entry.type == 'blob' and entry_path_ok(entry.path)]
-    
+
     for i, commit in enumerate(reversed(master_commits)):
         bar.update(1)
         n = 0
@@ -131,7 +131,7 @@ def analyze(repos, interval=7*24*60*60,
             for old_commit, lines in repo.blame(commit, path):
                 cohort = commit2cohort.get(old_commit.hexsha, "MISSING")
                 _, ext = os.path.splitext(path)
-                
+
                 keys = [('cohort', cohort), ('ext', ext), ('author', rename_author(old_commit.author))]
 
                 if old_commit.hexsha in commit2timestamp:
@@ -241,14 +241,14 @@ if __name__ == '__main__':
     for r in list(set(repos)):
         earliest=None
         if r=='minctools': earliest='cc7477c7e7bf46a45a1959a7030fd65863e79062' # don't analyze beyond that (libminc & minctools split)
-        
+
         curves, commit_history, curves_set, ts = analyze(r, prefix=repo_prefix, rename=rename, interval=interval, earliest=earliest)
-        
+
         def to_pandas(key_type, label_fmt=lambda x: x):
             key_items = sorted(k for t, k in curves_set if t == key_type)
-            
+
             return {key_item:pd.Series(curves[(key_type, key_item)],index=ts,name=label_fmt(key_item)) for key_item in key_items}
-            
+
         authors[r]=pd.DataFrame(to_pandas('author'))
         cohorts[r]=pd.DataFrame(to_pandas('cohort',lambda c: 'Year %s' % c))
         exts[r]=   pd.DataFrame(to_pandas('ext'))
@@ -271,13 +271,13 @@ if __name__ == '__main__':
     # resample by week
     rng = pd.date_range(start=range_start, end=range_end, freq='W')
         
-    def pool_results(samples,rng):
+    def pool_results(samples, rng):
         all_samples=set()
         # gather all keys
         for k, c in samples.items():
             all_samples.update(c.columns.tolist())
 
-        all_samples = pd.DataFrame(columns=list(all_samples),index=rng).fillna(0.0)
+        all_samples = pd.DataFrame(columns=list(all_samples), index=rng).fillna(0.0)
         
         # resample all data 
         for k, c in samples.items():
@@ -292,16 +292,19 @@ if __name__ == '__main__':
     # and join different authors into a single DataFrame
     all_authors = pool_results(authors,rng)
     all_cohorts = pool_results(cohorts,rng)
-    all_exts    = pool_results(exts,rng)
-    
+    all_exts    = pool_results(exts,   rng)
+
     # save to HDF file
     store = pd.HDFStore('statistics.h5')
+
     store['all_authors'] = all_authors
     store['all_cohorts'] = all_cohorts
     store['all_exts']    = all_exts
-    
+
     # save libminc authors
     store['libminc']     = authors['libminc']
-    
+    store['minctools']   = authors['minctools']
+    #
+    store['minctools_years']   = cohorts['minctools']
+
     store.close()
-    
