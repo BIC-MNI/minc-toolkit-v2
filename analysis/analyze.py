@@ -15,9 +15,10 @@
 # limitations under the License.
 
 from __future__ import print_function
-import argparse, git, datetime, numpy, pygments.lexers, traceback, time, os, fnmatch, json, progressbar
+import argparse, git, datetime, numpy, pygments.lexers, traceback, time, os, fnmatch, json
 import pandas as pd
-
+from tqdm import tqdm
+from datetime import UTC
 
 #import matplotlib
 #matplotlib.use('Agg')
@@ -55,10 +56,11 @@ def analyze(repos, interval=7*24*60*60, ignore=[], only=[],branch=None,rename={}
     print("Analyzing {}".format(repos))
     
     print('Listing all commits')
-    bar = progressbar.ProgressBar(max_value=progressbar.UnknownLength)
+    #bar = progressbar.ProgressBar()
+    bar = tqdm()
     for i, commit in enumerate(repo.iter_commits(branch)):
-        bar.update(i)
-        cohort = datetime.datetime.utcfromtimestamp(commit.committed_date).strftime(cohortfm)
+        bar.update(1)
+        cohort = datetime.datetime.fromtimestamp(commit.committed_date,UTC).strftime(cohortfm)
         curves_set.add(('cohort', cohort))
         curves_set.add(('author', rename_author(commit.author)))
         commit2cohort[commit.hexsha] = cohort
@@ -68,14 +70,15 @@ def analyze(repos, interval=7*24*60*60, ignore=[], only=[],branch=None,rename={}
             last_date = commit.committed_date
             commit2timestamp[commit.hexsha] = commit.committed_date
             
-    bar.finish()
+    bar.close()
     
     print('Backtracking current branch')
-    bar = progressbar.ProgressBar(max_value=progressbar.UnknownLength)
+    #bar = progressbar.ProgressBar(max_value=progressbar.UnknownLength)
+    bar = tqdm()
     i, commit = 0, repo.head.commit
     last_date = None
     while True:
-        bar.update(i)
+        bar.update(1)
         if not commit.parents:
             break
         
@@ -88,11 +91,11 @@ def analyze(repos, interval=7*24*60*60, ignore=[], only=[],branch=None,rename={}
         
         i, commit = i+1, commit.parents[0]
 
-    bar.finish()
+    bar.close()
     
     print('Counting total entries to analyze + caching filenames')
     entries_total = 0
-    bar = progressbar.ProgressBar(max_value=len(master_commits))
+    bar = tqdm() #progressbar.ProgressBar(max_value=len(master_commits))
     
     ok_entry_paths = {} 
     def entry_path_ok(path):
@@ -109,14 +112,14 @@ def analyze(repos, interval=7*24*60*60, ignore=[], only=[],branch=None,rename={}
                 if entry.type == 'blob' and entry_path_ok(entry.path)]
     
     for i, commit in enumerate(reversed(master_commits)):
-        bar.update(i)
+        bar.update(1)
         n = 0
         for entry in get_entries(commit):
             n += 1
             _, ext = os.path.splitext(entry.path)
             curves_set.add(('ext', ext))
         entries_total += n
-    bar.finish()
+    bar.close()
     
     def get_file_histogram(commit, path):
         h = {}
@@ -141,10 +144,11 @@ def analyze(repos, interval=7*24*60*60, ignore=[], only=[],branch=None,rename={}
     file_histograms = {}
     last_commit = None
     print('Analyzing commit history')
-    bar = progressbar.ProgressBar(max_value=entries_total, widget_kwargs=dict(samples=10000))
+    #bar = progressbar.ProgressBar(max_value=entries_total, widget_kwargs=dict(samples=10000))
+    bar = tqdm()
     entries_processed = 0
     for commit in reversed(master_commits):
-        t = datetime.datetime.utcfromtimestamp(commit.committed_date)
+        t = datetime.datetime.fromtimestamp(commit.committed_date,UTC)
         ts.append(t)
         changed_files = set()
         for diff in commit.diff(last_commit):
@@ -157,7 +161,7 @@ def analyze(repos, interval=7*24*60*60, ignore=[], only=[],branch=None,rename={}
         histogram = {}
         entries = get_entries(commit)
         for entry in entries:
-            bar.update(entries_processed)
+            bar.update(1)  #entries_processed)
             entries_processed += 1
             if entry.path in changed_files or entry.path not in file_histograms:
                 file_histograms[entry.path] = get_file_histogram(commit, entry.path)
@@ -171,7 +175,7 @@ def analyze(repos, interval=7*24*60*60, ignore=[], only=[],branch=None,rename={}
 
         for key in curves_set:
             curves.setdefault(key, []).append(histogram.get(key, 0))
-    bar.finish()
+    bar.close()
     return curves, commit_history, curves_set, ts
 
 
@@ -234,7 +238,7 @@ if __name__ == '__main__':
     print("Overall range:{} - {}".format(range_start,range_end))
     
     # FIX for broken time in some packages
-    force_start=pd.Timestamp(1991,1,1)
+    force_start=pd.Timestamp(1991,1,1,tz=UTC)
     
     if range_start<force_start:
         range_start=force_start
@@ -246,7 +250,8 @@ if __name__ == '__main__':
         # gather all keys
         for k, c in samples.items():
             all_samples.update(c.columns.tolist())
-        all_samples = pd.DataFrame(columns=all_samples,index=rng).fillna(0.0)
+
+        all_samples = pd.DataFrame(columns=list(all_samples),index=rng).fillna(0.0)
         
         # resample all data 
         for k, c in samples.items():
