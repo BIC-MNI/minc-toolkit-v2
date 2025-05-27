@@ -17,7 +17,8 @@
 import pandas as pd
 
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
+matplotlib.use('Cairo')
 
 import argparse, dateutil.parser, itertools, json, numpy, seaborn, sys
 from matplotlib import pyplot

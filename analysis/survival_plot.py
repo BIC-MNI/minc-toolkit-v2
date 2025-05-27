@@ -15,7 +15,8 @@
 # limitations under the License.
 
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
+matplotlib.use('Cairo')
 
 import sys, seaborn, dateutil.parser, numpy, json, collections, math, scipy.optimize, argparse, os
 
