@@ -3,9 +3,9 @@ macro(build_zlib install_prefix staging_prefix)
 
 # make a custom ZLIB configuration file
 
-SET (ZLIB_VERSION_STRING 1.2)
-SET (ZLIB_VERSION_MAJOR  1.2)
-SET (ZLIB_VERSION_MINOR  13)
+SET (ZLIB_VERSION_STRING 1.3)
+SET (ZLIB_VERSION_MAJOR  1.3)
+SET (ZLIB_VERSION_MINOR  2)
 
   if(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
@@ -53,11 +53,11 @@ SET (ZLIB_VERSION_MINOR  13)
     )
   endif()
 
-  GET_PACKAGE("http://zlib.net/zlib-1.3.1.tar.gz" "9855b6d802d7fe5b7bd5b196a2271655" "zlib-1.3.1.tar.gz" ZLIB_PATH )
+  GET_PACKAGE("https://zlib.net/zlib-1.3.2.tar.gz" "a1e6c958597af3c67d162995a342138a" "zlib-1.3.2.tar.gz" ZLIB_PATH )
   
 ExternalProject_Add(ZLIB
   URL  "${ZLIB_PATH}"
-  URL_MD5 "9855b6d802d7fe5b7bd5b196a2271655"
+  URL_MD5 "a1e6c958597af3c67d162995a342138a"
   UPDATE_COMMAND ""
   SOURCE_DIR ZLIB
   BINARY_DIR ZLIB-build
@@ -95,6 +95,20 @@ IF(MT_BUILD_SHARED_LIBS)
 ELSE(MT_BUILD_SHARED_LIBS)
   SET(ZLIB_LIBRARY ${ZLIB_STATIC_LIBRARY} )
 ENDIF(MT_BUILD_SHARED_LIBS)
+
+# Create the ZLIB::ZLIB imported target so that downstream projects
+# (e.g. libminc) can use target_link_libraries(... ZLIB::ZLIB)
+IF(NOT TARGET ZLIB::ZLIB)
+  # Ensure the include directory exists at configure time so that
+  # CMake's INTERFACE_INCLUDE_DIRECTORIES validation passes.
+  # The actual headers are populated when the ExternalProject builds.
+  FILE(MAKE_DIRECTORY "${ZLIB_INCLUDE_DIR}")
+  ADD_LIBRARY(ZLIB::ZLIB STATIC IMPORTED GLOBAL)
+  SET_TARGET_PROPERTIES(ZLIB::ZLIB PROPERTIES
+    IMPORTED_LOCATION             "${ZLIB_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${ZLIB_INCLUDE_DIR}"
+  )
+ENDIF()
 
 configure_file(${CMAKE_SOURCE_DIR}/cmake-modules/ZLIB-config.cmake.install.in ${staging_prefix}/${install_prefix}/share/cmake/ZLIB/ZLIBConfig.cmake @ONLY )
 
