@@ -64,10 +64,10 @@ macro(build_Elastix install_prefix staging_prefix)
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/Elastix/src
     BINARY_DIR Elastix-build
     LIST_SEPARATOR :::
-    PATCH_COMMAND
-      ${CMAKE_COMMAND}
-        -DSOURCE_DIR=${CMAKE_SOURCE_DIR}/Elastix/src
-        -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/PatchElastix.cmake
+#    PATCH_COMMAND
+#      ${CMAKE_COMMAND}
+#        -DSOURCE_DIR=${CMAKE_SOURCE_DIR}/Elastix/src
+#        -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/PatchElastix.cmake
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
         -DFFTW3F_FOUND:BOOL=${FFTW3F_FOUND}
