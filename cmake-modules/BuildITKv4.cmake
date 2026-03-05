@@ -54,6 +54,11 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
         -DCMAKE_STATIC_LINKER_FLAGS_RELEASE:STRING=${CMAKE_STATIC_LINKER_FLAGS_RELEASE}
         -DCMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+        -DNETCDF_INCLUDE_DIR:PATH=${NETCDF_INCLUDE_DIR}
+        -DHDF5_C_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
+        -DHDF5_CPP_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
+        -DHDF5_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
+        -DNETCDF_LIBRARY:STRING=${NETCDF_LIBRARY}
   )
   if(APPLE)
     list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
@@ -86,23 +91,6 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
       SET(HDF5_LIB_SUFFIX    ".a")
       SET(ITK_SHARED_LIBRARY "OFF")
   ENDIF(MT_BUILD_SHARED_LIBS)
-
-  IF(FALSE) # OUTDATED
-  IF(${CMAKE_BUILD_TYPE} STREQUAL Release OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo) OR (CMAKE_BUILD_TYPE STREQUAL MinSizeRel))
-    #message("Using release version of HDF5")
-    SET(HDF5_LIBRARY ${hdf_library_dir}/libhdf5${HDF5_LIB_SUFFIX})
-    SET(HDF5_CPP_LIBRARY ${hdf_library_dir}/libhdf5_cpp${HDF5_LIB_SUFFIX})
-    SET(HDF5_HL_LIBRARY ${hdf_library_dir}/libhdf5_hl${HDF5_LIB_SUFFIX})
-    SET(HDF5_HL_CPP_LIBRARY ${hdf_library_dir}/libhdf5_hl_cpp${HDF5_LIB_SUFFIX})
-  ELSE(${CMAKE_BUILD_TYPE} STREQUAL Release OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo) OR (CMAKE_BUILD_TYPE STREQUAL MinSizeRel))
-    #message("Using debug version of HDF5")
-    SET(HDF5_LIBRARY ${hdf_library_dir}/libhdf5_debug${HDF5_LIB_SUFFIX})
-    SET(HDF5_CPP_LIBRARY ${hdf_library_dir}/libhdf5_cpp_debug${HDF5_LIB_SUFFIX})
-    SET(HDF5_HL_LIBRARY ${hdf_library_dir}/libhdf5_hl_debug${HDF5_LIB_SUFFIX})
-    SET(HDF5_HL_CPP_LIBRARY ${hdf_library_dir}/libhdf5_hl_cpp_debug${HDF5_LIB_SUFFIX})
-  ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Release OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo) OR (CMAKE_BUILD_TYPE STREQUAL MinSizeRel))
-
-  ENDIF()
 
   # HACKS to generate directories for HDF5
 
@@ -175,6 +163,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
         -DHDF5_C_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
         -DHDF5_hdf5_LIBRARY:FILEPATH=${HDF5_LIBRARY}
         -DHDF5_hdf5_cpp_LIBRARY:FILEPATH=${HDF5_CPP_LIBRARY}
+        -DHDF5_hdf5_c_LIBRARY:FILEPATH=${HDF5_C_LIBRARY}
         -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${HDF5_LIBRARY}
         -DHDF5_hdf5_cpp_LIBRARY_RELEASE:FILEPATH=${HDF5_CPP_LIBRARY}
         -DHDF5_hdf5_LIBRARY_DEBUG:FILEPATH=${HDF5_LIBRARY}

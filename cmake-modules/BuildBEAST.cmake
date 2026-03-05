@@ -48,11 +48,27 @@ macro(build_BEAST install_prefix staging_prefix )
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
         -DZLIB_LIBRARY:PATH=${ZLIB_LIBRARY}
         -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
+        -DNETCDF_INCLUDE_DIR:PATH=${NETCDF_INCLUDE_DIR}            
         -DHDF5_C_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
+        -DHDF5_CPP_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}           
+        -DHDF5_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
+        -DNETCDF_LIBRARY:STRING=${NETCDF_LIBRARY}
         -DHDF5_hdf5_LIBRARY:FILEPATH=${HDF5_LIBRARY}
-        -DNETCDF_LIBRARY:PATH=${NETCDF_LIBRARY}
-        -DNETCDF_INCLUDE_DIR:PATH=${NETCDF_INCLUDE_DIR}
-        
+        -DHDF5_hdf5_cpp_LIBRARY:FILEPATH=${HDF5_CPP_LIBRARY}                                                                                                                            
+        -DHDF5_hdf5_c_LIBRARY:FILEPATH=${HDF5_LIBRARY}                                                                                                                                  
+        -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${HDF5_LIBRARY}                                                                                                                            
+        -DHDF5_hdf5_cpp_LIBRARY_RELEASE:FILEPATH=${HDF5_CPP_LIBRARY}                                                                                                                    
+        -DHDF5_hdf5_LIBRARY_DEBUG:FILEPATH=${HDF5_LIBRARY}                                                                                                                              
+        -DHDF5_hdf5_cpp_LIBRARY_DEBUG:FILEPATH=${HDF5_CPP_LIBRARY}                                                                                                                      
+        -DHDF5_LIBRARY:FILEPATH=${HDF5_LIBRARY}                                                                                                                                         
+        -DHDF5_CPP_LIBRARY:FILEPATH=${HDF5_CPP_LIBRARY}                                                                                                                                 
+        -DHDF5_C_LIBRARY:FILEPATH=${HDF5_LIBRARY}                                                                                                                                       
+        -DHDF5_LIBRARY_RELEASE:FILEPATH=${HDF5_LIBRARY}                                                                                                                                 
+        -DHDF5_CPP_LIBRARY_RELEASE:FILEPATH=${HDF5_CPP_LIBRARY}                                                                                                                         
+        -DHDF5_LIBRARY_DEBUG:FILEPATH=${HDF5_LIBRARY}                                                                                                                                   
+        -DHDF5_CPP_LIBRARY_DEBUG:FILEPATH=${HDF5_CPP_LIBRARY}                                                                                                                           
+        -DHDF5_LIBRARIES:STRING=${HDF5_LIBRARIES}                                                                                                                                       
+        -DHDF5_INCLUDE_DIRS:STRING=${HDF5_INCLUDE_DIRS}                         
   )
   if(APPLE)
     list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS

@@ -40,6 +40,27 @@ macro(build_EZMINC install_prefix staging_prefix libminc_dir bicpl_dir itk_dir)
         -DCMAKE_STATIC_LINKER_FLAGS_RELEASE:STRING=${CMAKE_STATIC_LINKER_FLAGS_RELEASE}
         -DCMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+        -DNETCDF_INCLUDE_DIR:PATH=${NETCDF_INCLUDE_DIR}            
+        -DHDF5_C_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
+        -DHDF5_CPP_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}           
+        -DHDF5_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
+        -DNETCDF_LIBRARY:STRING=${NETCDF_LIBRARY}
+        -DHDF5_hdf5_LIBRARY:FILEPATH=${HDF5_LIBRARY}
+        -DHDF5_hdf5_cpp_LIBRARY:FILEPATH=${HDF5_CPP_LIBRARY}                                                                                                                            
+        -DHDF5_hdf5_c_LIBRARY:FILEPATH=${HDF5_LIBRARY}                                                                                                                                  
+        -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${HDF5_LIBRARY}                                                                                                                            
+        -DHDF5_hdf5_cpp_LIBRARY_RELEASE:FILEPATH=${HDF5_CPP_LIBRARY}                                                                                                                    
+        -DHDF5_hdf5_LIBRARY_DEBUG:FILEPATH=${HDF5_LIBRARY}                                                                                                                              
+        -DHDF5_hdf5_cpp_LIBRARY_DEBUG:FILEPATH=${HDF5_CPP_LIBRARY}                                                                                                                      
+        -DHDF5_LIBRARY:FILEPATH=${HDF5_LIBRARY}                                                                                                                                         
+        -DHDF5_CPP_LIBRARY:FILEPATH=${HDF5_CPP_LIBRARY}                                                                                                                                 
+        -DHDF5_C_LIBRARY:FILEPATH=${HDF5_LIBRARY}                                                                                                                                       
+        -DHDF5_LIBRARY_RELEASE:FILEPATH=${HDF5_LIBRARY}                                                                                                                                 
+        -DHDF5_CPP_LIBRARY_RELEASE:FILEPATH=${HDF5_CPP_LIBRARY}                                                                                                                         
+        -DHDF5_LIBRARY_DEBUG:FILEPATH=${HDF5_LIBRARY}                                                                                                                                   
+        -DHDF5_CPP_LIBRARY_DEBUG:FILEPATH=${HDF5_CPP_LIBRARY}                                                                                                                           
+        -DHDF5_LIBRARIES:STRING=${HDF5_LIBRARIES}                                                                                                                                       
+        -DHDF5_INCLUDE_DIRS:STRING=${HDF5_INCLUDE_DIRS}                 
   )
 
   if(APPLE)
