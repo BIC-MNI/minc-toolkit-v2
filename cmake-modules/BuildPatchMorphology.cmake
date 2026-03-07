@@ -73,6 +73,8 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
         -DHDF5_CPP_LIBRARY_DEBUG:FILEPATH=${HDF5_CPP_LIBRARY}                                                                                                                           
         -DHDF5_LIBRARIES:STRING=${HDF5_LIBRARIES}                                                                                                                                       
         -DHDF5_INCLUDE_DIRS:STRING=${HDF5_INCLUDE_DIRS}                 
+        -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
+        -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
   )
   if(APPLE)
     list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
