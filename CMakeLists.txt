@@ -377,6 +377,17 @@ SET(LIBMINC_USE_FILE ${CMAKE_BINARY_DIR}/libminc/UseLIBMINC.cmake CACHE INTERNAL
 INCLUDE(${CMAKE_BINARY_DIR}/libminc/LIBMINCConfig.cmake)
 INCLUDE(${LIBMINC_USE_FILE})
 
+# The generated LIBMINCConfig.cmake sets LIBMINC_LIBRARIES / VOLUME_IO_LIBRARIES
+# to absolute file paths (to avoid link-order issues in standalone builds).
+# In the superbuild context, we need the actual CMake target name so that
+# downstream targets (minctools, bicpl, etc.) inherit the correct include
+# directories and build-order dependencies via target_link_libraries / LINK_LIBRARIES.
+SET(LIBMINC_LIBRARIES        minc2)
+SET(VOLUME_IO_LIBRARIES      minc2)
+SET(LIBMINC_STATIC_LIBRARIES minc2)
+SET(VOLUME_IO_STATIC_LIBRARIES minc2)
+SET(EZMINC_LIBRARIES         minc_io minc2)
+
 ADD_SUBDIRECTORY(minctools)
 
 IF(NOT USE_SYSTEM_OPENJPEG)
