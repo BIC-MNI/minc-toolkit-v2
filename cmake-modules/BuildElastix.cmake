@@ -5,9 +5,20 @@ macro(build_Elastix install_prefix staging_prefix)
     set(CMAKE_GEN "${CMAKE_GENERATOR}")
   endif()
   
+  SET(ELASTIX_URL "https://github.com/vfonov/elastix-1/archive/ebb429a33bdf3248c2137fc4adb4259a2ec7db24.tar.gz")
+  SET(ELASTIX_URL_MD5 "367bdb0197d8e158c41af888873eb0aa")
+
+  IF(NOT MT_PACKAGES_PATH STREQUAL "")
+    GET_PACKAGE("${ELASTIX_URL}" "${ELASTIX_URL_MD5}" "elastix-1-ebb429a3.tar.gz" ELASTIX_PATH)
+  ELSE()
+    SET(ELASTIX_PATH "${ELASTIX_URL}")
+  ENDIF()
 
   ExternalProject_Add(Elastix
-    SOURCE_DIR ${CMAKE_SOURCE_DIR}/Elastix
+    URL "${ELASTIX_PATH}"
+    URL_MD5 "${ELASTIX_URL_MD5}"
+    UPDATE_COMMAND ""
+    SOURCE_DIR Elastix
     BINARY_DIR Elastix-build
     LIST_SEPARATOR :::  
     CMAKE_GENERATOR ${CMAKE_GEN}
