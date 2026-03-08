@@ -70,9 +70,6 @@
 [submodule "xdisp"]
 	path = xdisp
 	url = https://github.com/BIC-MNI/xdisp.git
-[submodule "Elastix"]
-	path = Elastix
-	url = https://github.com/vfonov/elastix.git
 [submodule "ANTs"]
 	path = ANTs
 	url = https://github.com/vfonov/ANTs.git

@@ -83,14 +83,27 @@ macro(build_Elastix install_prefix staging_prefix)
   ENDIF(NOT MT_USE_OPENMP)
   
 
+  SET(ELASTIX_URL "https://github.com/vfonov/elastix/archive/4a561ff4861b494b4d64f642601950001c8c90d5.tar.gz")
+  SET(ELASTIX_URL_MD5 "25870bd35b7add74019762e65fc2e1cc")
+
+  IF(NOT MT_PACKAGES_PATH STREQUAL "")
+    GET_PACKAGE("${ELASTIX_URL}" "${ELASTIX_URL_MD5}" "elastix-4a561ff4.tar.gz" ELASTIX_PATH)
+  ELSE()
+    SET(ELASTIX_PATH "${ELASTIX_URL}")
+  ENDIF()
+
   ExternalProject_Add(Elastix
-    SOURCE_DIR ${CMAKE_SOURCE_DIR}/Elastix/src
+    URL "${ELASTIX_PATH}"
+    URL_MD5 "${ELASTIX_URL_MD5}"
+    UPDATE_COMMAND ""
+    SOURCE_DIR Elastix
+    SOURCE_SUBDIR src
     BINARY_DIR Elastix-build
     LIST_SEPARATOR :::
-#    PATCH_COMMAND
-#      ${CMAKE_COMMAND}
-#        -DSOURCE_DIR=${CMAKE_SOURCE_DIR}/Elastix/src
-#        -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/PatchElastix.cmake
+    PATCH_COMMAND
+      ${CMAKE_COMMAND}
+        -DSOURCE_DIR=<SOURCE_DIR>/src
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/PatchElastix.cmake
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
         -DFFTW3F_FOUND:BOOL=${FFTW3F_FOUND}
