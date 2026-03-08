@@ -4,6 +4,8 @@
 #
 # HDF5_INCLUDE_DIR  = where hdf5.h can be found
 # HDF5_LIBRARY      = the library to link against (hdf5 etc)
+# HDF5_CXX_LIBRARY  = HDF5 C++ bindings library
+# HDF5_HL_LIBRARY   = HDF5 High-Level library
 # HDF5_FOUND        = set to true after finding the library
 #
 
@@ -42,8 +44,15 @@ ELSE(Hdf5_INCLUDE_DIRS)
     SET(TRIAL_INCLUDE_PATHS $ENV{HDF5_DIR}/include ${TRIAL_INCLUDE_PATHS} )
   ENDIF($ENV{HDF5_DIR} MATCHES "hdf")
   
-  FIND_LIBRARY(HDF5_LIBRARY hdf5 ${TRIAL_LIBRARY_PATHS})
-  FIND_PATH(HDF5_INCLUDE_DIR hdf5.h ${TRIAL_INCLUDE_PATHS} )
+  FIND_LIBRARY(HDF5_LIBRARY NAMES hdf5 hdf5_serial PATHS ${TRIAL_LIBRARY_PATHS})
+  FIND_PATH(HDF5_INCLUDE_DIR hdf5.h PATHS ${TRIAL_INCLUDE_PATHS}
+    PATH_SUFFIXES hdf5/serial hdf5)
+
+  # Find optional component libraries (C++, HL)
+  # On Ubuntu/Debian with serial variant, libraries are named hdf5_serial_cpp, etc.
+  FIND_LIBRARY(HDF5_CXX_LIBRARY NAMES hdf5_cpp hdf5_serial_cpp PATHS ${TRIAL_LIBRARY_PATHS})
+  FIND_LIBRARY(HDF5_HL_LIBRARY  NAMES hdf5_hl  hdf5_serial_hl  PATHS ${TRIAL_LIBRARY_PATHS})
+  FIND_LIBRARY(HDF5_HL_CXX_LIBRARY NAMES hdf5_hl_cpp hdf5_serial_hl_cpp PATHS ${TRIAL_LIBRARY_PATHS})
 
 ENDIF(Hdf5_INCLUDE_DIRS)
 
@@ -52,6 +61,9 @@ ENDIF(Hdf5_INCLUDE_DIRS)
 
 IF(HDF5_INCLUDE_DIR AND HDF5_LIBRARY)
   SET(HDF5_FOUND 1 CACHE BOOL "Found hdf5 library")
+  # Set plural forms expected by consumers (e.g. libminc uses HDF5_INCLUDE_DIRS)
+  SET(HDF5_INCLUDE_DIRS ${HDF5_INCLUDE_DIR})
+  SET(HDF5_LIBRARIES    ${HDF5_LIBRARY})
 ELSE(HDF5_INCLUDE_DIR AND HDF5_LIBRARY)
   SET(HDF5_FOUND 0 CACHE BOOL "Not fount hdf5 library")
 ENDIF(HDF5_INCLUDE_DIR AND HDF5_LIBRARY)
@@ -62,8 +74,14 @@ ENDIF(HDF5_INCLUDE_DIR AND HDF5_LIBRARY)
 IF (HDF5_FOUND)
   IF (NOT HDF5_FIND_QUIETLY)
     MESSAGE (STATUS "Found components for HDF5")
-    MESSAGE (STATUS "HDF5 library : ${HDF5_LIBRARY}")
-    MESSAGE (STATUS "HDF5 headers : ${HDF5_INCLUDE_DIR}")
+    MESSAGE (STATUS "HDF5 library     : ${HDF5_LIBRARY}")
+    MESSAGE (STATUS "HDF5 headers     : ${HDF5_INCLUDE_DIR}")
+    IF(HDF5_CXX_LIBRARY)
+      MESSAGE (STATUS "HDF5 C++ library : ${HDF5_CXX_LIBRARY}")
+    ENDIF()
+    IF(HDF5_HL_LIBRARY)
+      MESSAGE (STATUS "HDF5 HL library  : ${HDF5_HL_LIBRARY}")
+    ENDIF()
   ENDIF (NOT HDF5_FIND_QUIETLY)
 ELSE (HDF5_FOUND)
   IF (HDF5_FIND_REQUIRED)

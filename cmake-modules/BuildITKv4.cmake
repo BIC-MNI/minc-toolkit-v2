@@ -92,7 +92,9 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
       SET(ITK_SHARED_LIBRARY "OFF")
   ENDIF(MT_BUILD_SHARED_LIBS)
 
-  # HACKS to generate directories for HDF5
+  # Derive HDF5 component library paths.
+  # FindHDF5.cmake now sets HDF5_CXX_LIBRARY, HDF5_HL_LIBRARY, HDF5_HL_CXX_LIBRARY
+  # when the libraries are found.  Fall back to string replacement only as last resort.
 
   IF(HDF5_CXX_LIBRARY)
    SET(HDF5_CPP_LIBRARY "${HDF5_CXX_LIBRARY}")
@@ -104,12 +106,20 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
    STRING(REPLACE "libhdf5" "libhdf5_hl"  HDF5_HL_LIBRARY "${HDF5_LIBRARY}")
   ENDIF()
 
-  IF(NOT HDF5_HL_CPP_LIBRARY)
+  IF(HDF5_HL_CXX_LIBRARY)
+   SET(HDF5_HL_CPP_LIBRARY "${HDF5_HL_CXX_LIBRARY}")
+  ELSEIF(NOT HDF5_HL_CPP_LIBRARY)
    STRING(REPLACE "libhdf5" "libhdf5_hl_cpp" HDF5_HL_CPP_LIBRARY "${HDF5_LIBRARY}")
   ENDIF()
 
   IF(NOT HDF5_BIN_DIR)
-    STRING(REPLACE "include" "bin" HDF5_BIN_DIR  "${HDF5_INCLUDE_DIR}")
+    # Try to find h5diff to determine the HDF5 binary directory
+    FIND_PROGRAM(_hdf5_h5diff_exe NAMES h5diff)
+    IF(_hdf5_h5diff_exe)
+      GET_FILENAME_COMPONENT(HDF5_BIN_DIR "${_hdf5_h5diff_exe}" DIRECTORY)
+    ELSE()
+      STRING(REPLACE "include" "bin" HDF5_BIN_DIR  "${HDF5_INCLUDE_DIR}")
+    ENDIF()
   ENDIF()
 
   message("HDF5_LIBRARY=${HDF5_LIBRARY}")
