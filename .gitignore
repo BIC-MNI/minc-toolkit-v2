@@ -1,3 +1,7 @@
 # backup files #
 ################
 *~
+
+# build directory #
+###################
+build/
