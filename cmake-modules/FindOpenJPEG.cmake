@@ -25,6 +25,10 @@ FIND_PATH(OPENJPEG_INCLUDE_DIR openjpeg.h
     /usr/include/openjpeg
     /usr/include
   PATH_SUFFIXES
+    openjpeg-2.5
+    openjpeg-2.4
+    openjpeg-2.3
+    openjpeg-2.2
     openjpeg-2.1
   DOC "Location of OpenJPEG Headers"
 )
@@ -33,7 +37,7 @@ SET(OPENJPEG_NAMES ${OPENJPEG_NAMES} openjpeg)
 SET(OPENJPEG_NAMES ${OPENJPEG_NAMES} openjp2)
 FIND_LIBRARY(OPENJPEG_LIBRARY
   NAMES ${OPENJPEG_NAMES}
-  PATHS /usr/lib /usr/local/lib
+  PATHS /usr/lib /usr/local/lib /usr/lib/x86_64-linux-gnu /usr/lib64
   )
 
 IF (OPENJPEG_LIBRARY AND OPENJPEG_INCLUDE_DIR)
