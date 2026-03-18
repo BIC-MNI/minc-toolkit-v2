@@ -300,6 +300,10 @@ SET(HAVE_MINC1 ON)
 # and MINC2 API
 SET(HAVE_MINC2 ON)
 
+# SET PERL Modules install path
+SET(INSTALL_PERL_MODULES_PATH "${CMAKE_INSTALL_PREFIX}/perl" CACHE PATH "Path to install minc-tookit related perl modules")
+
+
 IF(MT_BUILD_SHARED_LIBS)
   SET(LIBMINC_BUILD_SHARED_LIBS    ON)
   #EBTKS
