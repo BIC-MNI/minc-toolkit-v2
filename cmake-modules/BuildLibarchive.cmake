@@ -79,6 +79,7 @@ macro(build_libarchive install_prefix staging_prefix)
         -DENABLE_GRZIP:BOOL=OFF
         -DENABLE_LZMA:BOOL=OFF
         -DENABLE_COMPRESSION:BOOL=OFF
+        -DENABLE_TEST:BOOL=OFF
         -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
         -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
         ${CMAKE_EXTERNAL_PROJECT_ARGS}
