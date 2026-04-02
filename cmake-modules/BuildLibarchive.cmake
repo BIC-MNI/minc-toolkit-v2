@@ -77,6 +77,8 @@ macro(build_libarchive install_prefix staging_prefix)
         -DENABLE_LZ4:BOOL=OFF
         -DENABLE_BZip2:BOOL=OFF
         -DENABLE_GRZIP:BOOL=OFF
+        -DENABLE_ACL:BOOL=OFF
+        -DENABLE_LIBB2:BOOL=OFF
         -DENABLE_LZMA:BOOL=OFF
         -DENABLE_COMPRESSION:BOOL=OFF
         -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
