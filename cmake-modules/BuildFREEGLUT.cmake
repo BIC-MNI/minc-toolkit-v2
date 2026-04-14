@@ -94,8 +94,12 @@ ExternalProject_Add(FREEGLUT
 
 SET(GLUT_LIBRARY     ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libfreeglut.a )
 # ${GLUT_Xmu_LIBRARY}  ${GLUT_Xi_LIBRARY} ${GLUT_X11_LIBRARY}
-SET(GLUT_LIBRARIES   ${GLUT_LIBRARY} ${X11_X11_LIB} ${GLUT_GL_LIBRARY} ${X11_Xrandr_LIB}  ${X11_Xi_LIB} ${X11_Xxf86vm_LIB} )
-SET(GLUT_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
+SET(GLUT_LIBRARIES   ${GLUT_LIBRARY} ${X11_X11_LIB} ${GLUT_GL_LIBRARY} ${X11_Xrandr_LIB}  ${X11_Xi_LIB} )
+IF(X11_Xxf86vm_LIB)
+  LIST(APPEND GLUT_LIBRARIES ${X11_Xxf86vm_LIB})
+ENDIF()
+SET(GLUT_INCLUDE_DIR  ${staging_prefix}/${install_prefix}/include )
+SET(GLUT_INCLUDE_DIRS ${staging_prefix}/${install_prefix}/include )
 
 #include(FREEGLUT-build/FreeGLUT/FreeGLUTTargets.cmake)
 #SET(GLUT_LIBRARIES   FreeGLUT::freeglut_static )

@@ -8,6 +8,10 @@ project(minc-toolkit-v2 )
 
 enable_language(C)
 enable_language(CXX)
+
+# Ensure CMAKE_INSTALL_LIBDIR (and siblings) are set before any Build*.cmake macros
+# that use them to construct staged library paths.
+include(GNUInstallDirs)
 #enable_language(Fortran)
 
 #Turn on PIC (and PIE if supported)
@@ -586,10 +590,11 @@ IF(MT_BUILD_VISUAL_TOOLS)
 
   IF(MT_USE_GLFW) # no need to use GLUT
     SET(BICGL_USE_GLFW ON)
-    FIND_PACKAGE( glfw3 REQUIRED )  
+    FIND_PACKAGE( glfw3 REQUIRED )
 
     # TODO: enable building GLFW from source if not found, and add it as a dependency to bicgl
   ELSE()
+    SET(BICGL_USE_GLUT ON)
     IF(USE_SYSTEM_GLUT)
       FIND_PACKAGE( GLUT   REQUIRED )
     ELSE(USE_SYSTEM_GLUT)
