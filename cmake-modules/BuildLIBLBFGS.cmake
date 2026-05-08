@@ -1,11 +1,11 @@
 macro(build_liblbfgs install_prefix staging_prefix)
-  
+
   if(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
   else()
     set(CMAKE_GEN "${CMAKE_GENERATOR}")
   endif()
-  
+
   set(CMAKE_EXTERNAL_PROJECT_ARGS
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
@@ -42,7 +42,7 @@ macro(build_liblbfgs install_prefix staging_prefix)
         -DCMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
   )
-  
+
   if(APPLE)
     list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
       -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
@@ -51,15 +51,16 @@ macro(build_liblbfgs install_prefix staging_prefix)
     )
   endif()
 
-  GET_PACKAGE("https://github.com/vfonov/liblbfgs/archive/v1.10-cmake.tar.gz" "1261b1c21eed98617e3b92019cf9b1c5" "liblbfgs-v1.10-cmake.tar.gz" LIBLBFGS_PATH ) 
-  
+  GET_PACKAGE("https://github.com/chokkan/liblbfgs/archive/5ad02fbefefdeff339ab03635e673571055a0644.tar.gz" "ed3c9e5afe162ac3bcbb203522af48d5" "liblbfgs-5ad02fb.tar.gz" LIBLBFGS_PATH )
+
   ExternalProject_Add(LIBLBFGS
     SOURCE_DIR LIBLBFGS
     BINARY_DIR LIBLBFGS-build
     URL "${LIBLBFGS_PATH}"
-    URL_MD5 "1261b1c21eed98617e3b92019cf9b1c5"
+    URL_MD5 "ed3c9e5afe162ac3bcbb203522af48d5"
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
         -DBUILD_TESTING:BOOL=OFF #${BUILD_TESTING}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DBUILD_SHARED_LIBS:BOOL=OFF
