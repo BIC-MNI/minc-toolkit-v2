@@ -1,11 +1,11 @@
 macro(build_pcre install_prefix staging_prefix)
-  
+
   if(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
   else()
     set(CMAKE_GEN "${CMAKE_GENERATOR}")
   endif()
-  
+
   set(CMAKE_OSX_EXTERNAL_PROJECT_ARGS)
   if(APPLE)
     list(APPEND CMAKE_OSX_EXTERNAL_PROJECT_ARGS
@@ -14,24 +14,26 @@ macro(build_pcre install_prefix staging_prefix)
       -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
     )
   endif()
-  
+
   SET(EXT_CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
   SET(EXT_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
   IF(NOT APPLE)
   LIST(APPEND EXT_CMAKE_C_FLAGS -D_XOPEN_SOURCE=600)
   LIST(APPEND EXT_CMAKE_CXX_FLAGS -D_XOPEN_SOURCE=600)
   ENDIF(NOT APPLE)
-  
-  
-  GET_PACKAGE("https://sourceforge.net/projects/pcre/files/pcre/8.40/pcre-8.40.tar.bz2" "41a842bf7dcecd6634219336e2167d1d" "pcre-8.40.tar.bz2" PCRE_PATH ) 
+
+
+  GET_PACKAGE("https://sourceforge.net/projects/pcre/files/pcre/8.45/pcre-8.45.tar.bz2" "4452288e6a0eefb2ab11d36010a1eebb" "pcre-8.45.tar.bz2" PCRE_PATH )
 
   ExternalProject_Add(PCRE
     SOURCE_DIR PCRE
     BINARY_DIR PCRE-build
     URL "${PCRE_PATH}"
-    URL_MD5 "41a842bf7dcecd6634219336e2167d1d"
+    URL_MD5 "4452288e6a0eefb2ab11d36010a1eebb"
+    PATCH_COMMAND sed -i "s/CMAKE_POLICY(SET CMP0026 OLD)/CMAKE_POLICY(SET CMP0026 NEW)/" <SOURCE_DIR>/CMakeLists.txt
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
         -DBUILD_TESTING:BOOL=OFF #${BUILD_TESTING}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DBUILD_SHARED_LIBS:BOOL=OFF
@@ -64,6 +66,6 @@ SET(PCRE_LIBRARY      ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libpc
 SET(PCRECPP_LIBRARY   ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libpcrecpp${PCRE_LIB_SUFFIX} )
 
 SET(PCRE_FOUND ON)
- 
+
 
 endmacro(build_pcre)
