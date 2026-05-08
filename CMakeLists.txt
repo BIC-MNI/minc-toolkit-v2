@@ -467,6 +467,9 @@ IF(MT_BUILD_OPENBLAS)
   enable_language(Fortran)
   INCLUDE(BuildOpenBLAS)
   build_open_blas(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX} ${MT_USE_OPENMP})
+  # Signal to downstream consumers (BEAST, patch_morphology) that BLAS is available.
+  # BuildOpenBLAS populates OpenBLAS_LIBRARIES/_INCLUDE_DIRS but not BLAS_FOUND.
+  SET(BLAS_FOUND TRUE)
 ENDIF(MT_BUILD_OPENBLAS)
 
 #required for EZminc
@@ -579,7 +582,16 @@ ADD_DEPENDENCIES(BEAST minc_io)
 IF(MT_BUILD_OPENBLAS)
     ADD_DEPENDENCIES(BEAST OpenBLAS)
 ELSE()
-    FIND_PACKAGE(OpenBLAS )
+    # Generic BLAS provider lookup (supports OpenBLAS, reference Netlib BLAS,
+    # MKL, ATLAS, Accelerate, etc). Falls back to OpenBLAS-specific lookup
+    # for backward compatibility with installations that ship only an
+    # OpenBLASConfig.cmake.
+    FIND_PACKAGE(BLAS)
+    IF(BLAS_FOUND)
+      SET(OpenBLAS_LIBRARIES ${BLAS_LIBRARIES})
+    ELSE()
+      FIND_PACKAGE(OpenBLAS)
+    ENDIF()
 ENDIF()
 
 
