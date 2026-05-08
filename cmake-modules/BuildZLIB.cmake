@@ -2,10 +2,12 @@ macro(build_zlib install_prefix staging_prefix)
 
 
 # make a custom ZLIB configuration file
+# Using zlib-ng (https://github.com/zlib-ng/zlib-ng) in ZLIB_COMPAT mode as a
+# drop-in replacement for upstream zlib.
 
-SET (ZLIB_VERSION_STRING 1.3)
-SET (ZLIB_VERSION_MAJOR  1.3)
-SET (ZLIB_VERSION_MINOR  2)
+SET (ZLIB_VERSION_STRING 2.3.3)
+SET (ZLIB_VERSION_MAJOR  2)
+SET (ZLIB_VERSION_MINOR  3)
 
   if(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
@@ -53,11 +55,11 @@ SET (ZLIB_VERSION_MINOR  2)
     )
   endif()
 
-  GET_PACKAGE("https://zlib.net/zlib-1.3.2.tar.gz" "a1e6c958597af3c67d162995a342138a" "zlib-1.3.2.tar.gz" ZLIB_PATH )
-  
+  GET_PACKAGE("https://github.com/zlib-ng/zlib-ng/archive/refs/tags/2.3.3.tar.gz" "72337e6a7d2662af50a4ed0274c61b7e" "zlib-ng-2.3.3.tar.gz" ZLIB_PATH )
+
 ExternalProject_Add(ZLIB
   URL  "${ZLIB_PATH}"
-  URL_MD5 "a1e6c958597af3c67d162995a342138a"
+  URL_MD5 "72337e6a7d2662af50a4ed0274c61b7e"
   UPDATE_COMMAND ""
   SOURCE_DIR ZLIB
   BINARY_DIR ZLIB-build
@@ -65,6 +67,13 @@ ExternalProject_Add(ZLIB
   CMAKE_GENERATOR ${CMAKE_GEN}
   CMAKE_ARGS
       -DBUILD_SHARED_LIBS:BOOL=OFF
+      -DZLIB_COMPAT:BOOL=ON
+      -DWITH_GZFILEOP:BOOL=ON
+      -DBUILD_TESTING:BOOL=OFF
+      -DZLIB_ENABLE_TESTS:BOOL=OFF
+      -DWITH_GTEST:BOOL=OFF
+      -DWITH_BENCHMARKS:BOOL=OFF
+      -DWITH_FUZZERS:BOOL=OFF
       -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
       -DCMAKE_SKIP_RPATH:BOOL=OFF
       -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
@@ -73,7 +82,7 @@ ExternalProject_Add(ZLIB
       -DINSTALL_LIB_DIR:PATH=${install_prefix}/lib${LIB_SUFFIX}
       -DINSTALL_INC_DIR:PATH=${install_prefix}/include
       ${CMAKE_EXTERNAL_PROJECT_ARGS}
-  INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix} 
+  INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
   INSTALL_DIR ${staging_prefix}/${install_prefix}
 )
 
