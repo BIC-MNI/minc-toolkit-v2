@@ -1,5 +1,5 @@
 message("Running PatchITKv4")
-SET(ITK_VERSION "ITK-4.13")
+SET(ITK_VERSION "ITK-4.14")
 
 message("staging_prefix=${staging_prefix}")
 
