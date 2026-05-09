@@ -128,20 +128,20 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
   message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
   message("HDF5_BIN_DIR=${HDF5_BIN_DIR}")
 
-  # Pinned to release-4.14 branch tip (2026-05-05). No v4.14.X release tag has
+  # Pinned to release-4.14 branch tip (2026-05-09). No v4.14.X release tag has
   # been cut yet; bump this SHA when upstream pushes a meaningful fix. The 4.14
   # branch carries fixes for modern GCC and CMake 4 that the prior 4.13.3
   # release tarball needs heavy patching to support.
   GET_PACKAGE(
-    "https://github.com/InsightSoftwareConsortium/ITK/archive/b31208a22862a7e2fe713c3a90cb6b9b307b4795.tar.gz"
-    "f5285b0c2129c00c2b67e1589cd0eb56"
-    "InsightToolkit-4.14-b31208a2.tar.gz"
+    "https://github.com/InsightSoftwareConsortium/ITK/archive/d72b44595a13ed45e8cdb1d9f5db236f2be3ce66.tar.gz"
+    "25eee1af4553c030c1a48868c1504aed"
+    "InsightToolkit-4.14-d72b4459.tar.gz"
     ITKv4_PATH)
 
 
   ExternalProject_Add(ITKv4
     URL "${ITKv4_PATH}"
-    URL_MD5 "f5285b0c2129c00c2b67e1589cd0eb56"
+    URL_MD5 "25eee1af4553c030c1a48868c1504aed"
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
