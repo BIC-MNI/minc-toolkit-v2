@@ -11,17 +11,14 @@ Pass these at top-level configure time:
 
 | Cache var | Default | Meaning |
 | --- | --- | --- |
-| `MT_USE_BLAS`      | `ON`   | If `OFF`, BLAS is not used at all. Detection is skipped even if a system BLAS is present, and `BLAS::BLAS` / `LAPACKE::LAPACKE` become empty stub targets. Subprojects with optional BLAS code paths (BEaST SPAMS, patch_morphology NNLS) compile that code out. |
-| `BLAS_FROM_SOURCE` | `OFF`  | If `ON`, build OpenBLAS from source via `ExternalProject_Add`; system BLAS is ignored entirely. Opt-in. Requires `MT_USE_BLAS=ON`. |
-| `BLAS_PREFERENCE`  | `Auto` | Preferred system BLAS. One of `Auto`, `OpenBLAS`, `MKL`, `Apple`, `Netlib`. Ignored when `BLAS_FROM_SOURCE=ON` or `MT_USE_BLAS=OFF`. |
+| `MT_USE_BLAS`       | `ON`   | If `OFF`, BLAS is not used at all. Detection is skipped even if a system BLAS is present, and `BLAS::BLAS` / `LAPACKE::LAPACKE` become empty stub targets. Subprojects with optional BLAS code paths (BEaST SPAMS, patch_morphology NNLS) compile that code out. |
+| `MT_BUILD_OPENBLAS` | `OFF`  | If `ON`, build OpenBLAS from source via `ExternalProject_Add`; system BLAS is ignored entirely. Opt-in. Requires `MT_USE_BLAS=ON`. |
+| `BLAS_PREFERENCE`   | `Auto` | Preferred system BLAS. One of `Auto`, `OpenBLAS`, `MKL`, `Apple`, `Netlib`. Ignored when `MT_BUILD_OPENBLAS=ON` or `MT_USE_BLAS=OFF`. |
 
-`MT_USE_BLAS=OFF` and `BLAS_FROM_SOURCE=ON` are mutually exclusive — configure
+`MT_USE_BLAS=OFF` and `MT_BUILD_OPENBLAS=ON` are mutually exclusive — configure
 fails with a clear error if both are set. When `MT_USE_BLAS=ON`,
-`BLAS_FROM_SOURCE=ON` short-circuits detection and `BLAS_PREFERENCE` has no
+`MT_BUILD_OPENBLAS=ON` short-circuits detection and `BLAS_PREFERENCE` has no
 effect.
-
-`MT_BUILD_OPENBLAS` is kept as a deprecated alias: `-DMT_BUILD_OPENBLAS=ON`
-is silently mapped to `-DBLAS_FROM_SOURCE=ON` with a warning.
 
 ### Disabling BLAS entirely
 
@@ -177,7 +174,7 @@ so subprojects can guard their `<lapacke.h>` includes with
 
 | BLAS preference | LAPACKE source | `HAVE_LAPACKE` defined? |
 | --- | --- | --- |
-| `OpenBLAS` (system or from-source) | bundled in libopenblas; `LAPACKE::LAPACKE` aliases `BLAS::BLAS` | Yes when `lapacke.h` is findable on system, or always when `BLAS_FROM_SOURCE=ON` (the EP is built with `-DLAPACKE=ON`) |
+| `OpenBLAS` (system or from-source) | bundled in libopenblas; `LAPACKE::LAPACKE` aliases `BLAS::BLAS` | Yes when `lapacke.h` is findable on system, or always when `MT_BUILD_OPENBLAS=ON` (the EP is built with `-DLAPACKE=ON`) |
 | `MKL` | bundled in libmkl; `LAPACKE::LAPACKE` aliases `BLAS::BLAS` | Yes when `lapacke.h` is findable |
 | `Auto` | same as whichever was resolved (typically OpenBLAS) | Yes when `lapacke.h` is findable |
 | `Netlib` / `ATLAS` | separate `liblapacke` + standalone `lapacke.h`; both must be present on `CMAKE_LIBRARY_PATH` / `CMAKE_INCLUDE_PATH` (or default search paths) | Yes when both are found, otherwise the target is a stub and a warning is emitted |
@@ -209,14 +206,14 @@ simply not defined and the lapacke-using code is compiled out.
 ### Apple caveat
 
 If you are on macOS and need LAPACKE, do not use `BLAS_PREFERENCE=Apple`.
-Use `BLAS_PREFERENCE=OpenBLAS` (homebrew or `BLAS_FROM_SOURCE=ON`) instead.
+Use `BLAS_PREFERENCE=OpenBLAS` (homebrew or `MT_BUILD_OPENBLAS=ON`) instead.
 
 ## Files
 
 - `cmake-modules/BLASSetup.cmake` — top-level orchestrator, included by root `CMakeLists.txt`
 - `cmake-modules/BLASVendorMap.cmake` — `blas_vendor_from_preference()`
 - `cmake-modules/BLASMKLSetup.cmake` — MKL config-package + FindBLAS fallback
-- `cmake-modules/BLASSourceBuild.cmake` — OpenBLAS-from-source path (`BLAS_FROM_SOURCE=ON`)
+- `cmake-modules/BLASSourceBuild.cmake` — OpenBLAS-from-source path (`MT_BUILD_OPENBLAS=ON`)
 - `cmake-modules/BLASTargetShim.cmake` — `blas_create_target_shim()` for CMake < 3.18 and config-package wrapping
 - `cmake-modules/BLASExternalProjectArgs.cmake` — `blas_external_project_args()`
 - `cmake-modules/LAPACKESetup.cmake` — `lapacke_setup()` (per-implementation LAPACKE handling)

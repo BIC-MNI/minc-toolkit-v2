@@ -1,6 +1,6 @@
 # BLASSourceBuild.cmake — opt-in source-build of OpenBLAS.
 #
-# When BLAS_FROM_SOURCE=ON, the superbuild ignores any system BLAS entirely
+# When MT_BUILD_OPENBLAS=ON, the superbuild ignores any system BLAS entirely
 # and arranges to build OpenBLAS from source. setup_blas_from_source() emits
 # the BLAS_SOURCE_BUILD=ON marker (visible in configure logs) and sets
 # BLA_VENDOR=OpenBLAS so blas_external_project_args() forwards a coherent
