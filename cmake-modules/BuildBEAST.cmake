@@ -4,7 +4,7 @@ macro(build_BEAST install_prefix staging_prefix )
   else()
     set(CMAKE_GEN "${CMAKE_GENERATOR}")
   endif()
-  
+  blas_external_project_args(BLAS_EP_ARGS)
   set(CMAKE_EXTERNAL_PROJECT_ARGS
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
@@ -86,9 +86,10 @@ macro(build_BEAST install_prefix staging_prefix )
     LIST_SEPARATOR :::  
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
+        -DSUPERBUILD_CMAKE_DIR:PATH=${PROJECT_SOURCE_DIR}/cmake-modules
+        ${BLAS_EP_ARGS}
         -DLIBMINC_DIR:PATH=${CMAKE_BINARY_DIR}/libminc
 #        -DLIBLBFGS_DIR:PATH=${LIBLBFGS_LIBRARY_DIR}
-        -DOpenBLAS_DIR:PATH=${OpenBLAS_DIR}
         -DBUILD_TESTING:BOOL=${BUILD_TESTING}
         -DUSE_NIFTI:BOOL=OFF
         -DMT_USE_OPENMP:BOOL=${MT_USE_OPENMP}
