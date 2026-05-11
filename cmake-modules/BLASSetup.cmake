@@ -1,9 +1,14 @@
 # BLASSetup.cmake — superbuild-level BLAS detection and BLAS::BLAS export.
 #
-# Two top-level modes:
+# Three top-level modes:
+#   - MT_USE_BLAS=OFF: do not detect or build any BLAS, even if a system
+#     library is present. BLAS::BLAS and LAPACKE::LAPACKE are created as
+#     empty stub targets and BLAS_LIBRARIES / BLAS_MKL_MODE / ... are
+#     emitted as empty values to ExternalProject children, so consumers
+#     that gate on those variables compile-out their BLAS-using code paths.
 #   - BLAS_FROM_SOURCE=ON: ignore any system BLAS, build OpenBLAS from source
-#     (delegated to BLASSourceBuild.cmake).
-#   - BLAS_FROM_SOURCE=OFF (default): resolve BLAS_PREFERENCE
+#     (delegated to BLASSourceBuild.cmake). Requires MT_USE_BLAS=ON.
+#   - MT_USE_BLAS=ON, BLAS_FROM_SOURCE=OFF (default): resolve BLAS_PREFERENCE
 #     (Auto/OpenBLAS/MKL/Apple/Netlib) into a BLAS::BLAS IMPORTED GLOBAL
 #     target so consumers (whether pulled in via add_subdirectory or built
 #     as ExternalProjects) all link the same way.
@@ -21,8 +26,40 @@ include("${CMAKE_CURRENT_LIST_DIR}/BLASSourceBuild.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/BLASExternalProjectArgs.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/LAPACKESetup.cmake")
 
+option(MT_USE_BLAS
+  "Use BLAS. If OFF, BLAS detection is skipped even if a system BLAS is present." ON)
 option(BLAS_FROM_SOURCE
   "Build OpenBLAS from source instead of detecting any system BLAS." OFF)
+
+if(NOT MT_USE_BLAS)
+  if(BLAS_FROM_SOURCE)
+    message(FATAL_ERROR
+      "MT_USE_BLAS=OFF and BLAS_FROM_SOURCE=ON are mutually exclusive. "
+      "Either enable MT_USE_BLAS (to build/use BLAS) or disable BLAS_FROM_SOURCE.")
+  endif()
+  message(STATUS "BLAS disabled (MT_USE_BLAS=OFF): skipping detection; stub targets only.")
+  # Clear any forwarded state so blas_external_project_args() emits empty values
+  # and downstream gating in EP children (e.g. patch_morphology's
+  # `if(BLAS_LIBRARIES OR BLAS_MKL_MODE STREQUAL "Config")`) takes the "no BLAS"
+  # branch. BLASSetup is include()'d at root scope, so these plain sets shadow
+  # any value the user might have passed for -DBLAS_LIBRARIES=... on the command
+  # line (which would otherwise leak through unchanged).
+  set(BLA_VENDOR        "")
+  set(BLAS_LIBRARIES    "")
+  set(BLAS_LINKER_FLAGS "")
+  set(BLAS_INCLUDE_DIRS "")
+  set(BLAS_MKL_MODE     "")
+  # Stub targets so `if(TARGET BLAS::BLAS)` checks elsewhere don't crash.
+  # They carry no link libraries and no HAVE_LAPACKE — consumers that
+  # additionally check USE_BLAS / HAVE_LAPACKE will compile-out cleanly.
+  if(NOT TARGET BLAS::BLAS)
+    add_library(BLAS::BLAS INTERFACE IMPORTED GLOBAL)
+  endif()
+  if(NOT TARGET LAPACKE::LAPACKE)
+    add_library(LAPACKE::LAPACKE INTERFACE IMPORTED GLOBAL)
+  endif()
+  return()
+endif()
 
 if(BLAS_FROM_SOURCE)
   setup_blas_from_source()

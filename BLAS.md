@@ -11,14 +11,48 @@ Pass these at top-level configure time:
 
 | Cache var | Default | Meaning |
 | --- | --- | --- |
-| `BLAS_FROM_SOURCE` | `OFF` | If `ON`, build OpenBLAS from source via `ExternalProject_Add`; system BLAS is ignored entirely. Opt-in. |
-| `BLAS_PREFERENCE`  | `Auto` | Preferred system BLAS. One of `Auto`, `OpenBLAS`, `MKL`, `Apple`, `Netlib`. Ignored when `BLAS_FROM_SOURCE=ON`. |
+| `MT_USE_BLAS`      | `ON`   | If `OFF`, BLAS is not used at all. Detection is skipped even if a system BLAS is present, and `BLAS::BLAS` / `LAPACKE::LAPACKE` become empty stub targets. Subprojects with optional BLAS code paths (BEaST SPAMS, patch_morphology NNLS) compile that code out. |
+| `BLAS_FROM_SOURCE` | `OFF`  | If `ON`, build OpenBLAS from source via `ExternalProject_Add`; system BLAS is ignored entirely. Opt-in. Requires `MT_USE_BLAS=ON`. |
+| `BLAS_PREFERENCE`  | `Auto` | Preferred system BLAS. One of `Auto`, `OpenBLAS`, `MKL`, `Apple`, `Netlib`. Ignored when `BLAS_FROM_SOURCE=ON` or `MT_USE_BLAS=OFF`. |
 
-The two are mutually exclusive: `BLAS_FROM_SOURCE=ON` short-circuits all
-detection and `BLAS_PREFERENCE` has no effect.
+`MT_USE_BLAS=OFF` and `BLAS_FROM_SOURCE=ON` are mutually exclusive — configure
+fails with a clear error if both are set. When `MT_USE_BLAS=ON`,
+`BLAS_FROM_SOURCE=ON` short-circuits detection and `BLAS_PREFERENCE` has no
+effect.
 
 `MT_BUILD_OPENBLAS` is kept as a deprecated alias: `-DMT_BUILD_OPENBLAS=ON`
 is silently mapped to `-DBLAS_FROM_SOURCE=ON` with a warning.
+
+### Disabling BLAS entirely
+
+```sh
+# Force a BLAS-free build, even if libopenblas / libmkl / Accelerate is installed.
+cmake -B build -DMT_USE_BLAS=OFF
+```
+
+This is the right choice on:
+
+- Minimal containers / embedded systems where you don't want to pull in a
+  multi-megabyte BLAS dependency for the few optional code paths that use it.
+- Build hosts where the system BLAS is broken, or unsupported (e.g. an older
+  Accelerate-only macOS where the LAPACKE C interface is unavailable and you
+  don't want OpenBLAS from source either).
+- CI matrix entries that explicitly cover the "no BLAS" configuration.
+
+Effect of `MT_USE_BLAS=OFF`:
+
+- No `find_package(BLAS)` is invoked anywhere in the superbuild.
+- `BLAS::BLAS` / `LAPACKE::LAPACKE` are empty interface targets (so
+  `if(TARGET ...)` checks still resolve), but they carry no link libraries and
+  no `HAVE_LAPACKE` compile definition.
+- `blas_external_project_args()` emits empty `-DBLAS_LIBRARIES=`, empty
+  `-DBLAS_MKL_MODE=`, etc. The EP children (BEaST, patch_morphology) gate
+  their BLAS-using code on these variables being non-empty, so the code
+  compiles out cleanly.
+- BEaST's SPAMS sparse-segmentation path stays off (it is off by default
+  anyway — `MT_SPARSE_BEAST=OFF`).
+- patch_morphology's NNLS path stays off (`HAVE_OPENBLAS=OFF`, gated in
+  `patch_morphology/src/CMakeLists.txt`).
 
 ## How `BLAS_PREFERENCE` maps to detection
 

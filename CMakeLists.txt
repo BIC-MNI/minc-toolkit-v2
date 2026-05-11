@@ -475,26 +475,26 @@ ADD_SUBDIRECTORY(minc_gco)
 # and emits forwarding -D flags via blas_external_project_args() for ExternalProject
 # children (BEAST, patch_morphology). When BLAS_FROM_SOURCE=ON, BLASSourceBuild
 # emits a marker; the actual OpenBLAS ExternalProject is wired below.
-IF(MT_USE_BLAS)
-  IF(BLAS_FROM_SOURCE)
-    enable_language(Fortran)
-  ENDIF()
-  include(${CMAKE_SOURCE_DIR}/cmake-modules/BLASSetup.cmake)
-  IF(BLAS_FROM_SOURCE)
-    include(BuildOpenBLAS)
-    build_open_blas(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX} ${MT_USE_OPENMP})
-    set(BLAS_LIBRARIES    "${OpenBLAS_LIBRARIES}")
-    set(BLAS_INCLUDE_DIRS "${OpenBLAS_INCLUDE_DIRS}")
-    set(BLAS_LINKER_FLAGS "")
-    blas_create_target_shim("${OpenBLAS_LIBRARIES}" "" "${OpenBLAS_INCLUDE_DIRS}")
-    # Source build was configured with -DLAPACKE=ON; the staged include dir
-    # owns lapacke.h (materialised at make time, not configure time, so we
-    # don't probe for it — we trust the build flag).
-    set_property(TARGET LAPACKE::LAPACKE APPEND PROPERTY
-      INTERFACE_INCLUDE_DIRECTORIES "${OpenBLAS_INCLUDE_DIRS}")
-    set_property(TARGET LAPACKE::LAPACKE APPEND PROPERTY
-      INTERFACE_COMPILE_DEFINITIONS "HAVE_LAPACKE")
-  ENDIF()
+# When MT_USE_BLAS=OFF, BLASSetup short-circuits and creates empty stub targets;
+# the BLAS_FROM_SOURCE block below is also skipped (BLASSetup rejects that combo).
+IF(MT_USE_BLAS AND BLAS_FROM_SOURCE)
+  enable_language(Fortran)
+ENDIF()
+include(${CMAKE_SOURCE_DIR}/cmake-modules/BLASSetup.cmake)
+IF(MT_USE_BLAS AND BLAS_FROM_SOURCE)
+  include(BuildOpenBLAS)
+  build_open_blas(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX} ${MT_USE_OPENMP})
+  set(BLAS_LIBRARIES    "${OpenBLAS_LIBRARIES}")
+  set(BLAS_INCLUDE_DIRS "${OpenBLAS_INCLUDE_DIRS}")
+  set(BLAS_LINKER_FLAGS "")
+  blas_create_target_shim("${OpenBLAS_LIBRARIES}" "" "${OpenBLAS_INCLUDE_DIRS}")
+  # Source build was configured with -DLAPACKE=ON; the staged include dir
+  # owns lapacke.h (materialised at make time, not configure time, so we
+  # don't probe for it — we trust the build flag).
+  set_property(TARGET LAPACKE::LAPACKE APPEND PROPERTY
+    INTERFACE_INCLUDE_DIRECTORIES "${OpenBLAS_INCLUDE_DIRS}")
+  set_property(TARGET LAPACKE::LAPACKE APPEND PROPERTY
+    INTERFACE_COMPILE_DEFINITIONS "HAVE_LAPACKE")
 ENDIF()
 
 #required for EZminc
