@@ -78,6 +78,9 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
         -DBUILD_SHARED_LIBS:BOOL=ON
         -DBUILD_STATIC_LIBS:BOOL=ON
         -DBUILD_WITHOUT_CBLAS:BOOL=OFF
+        -DBUILD_WITHOUT_LAPACK:BOOL=OFF
+        -DC_LAPACK:BOOL=ON
+        -DLAPACKE:BOOL=ON
         -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
         -DMACOSX_RPATH:BOOL=ON
         -DDYNAMIC_ARCH:BOOL=ON

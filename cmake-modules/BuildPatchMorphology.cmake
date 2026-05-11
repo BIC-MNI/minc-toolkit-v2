@@ -6,34 +6,20 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
   endif()
 
   message("CMAKE_EXTERNAL_PROJECT_ARGS_FOR_ITK5=${CMAKE_EXTERNAL_PROJECT_ARGS_FOR_ITK5}")
-
   set(CMAKE_EXTERNAL_PROJECT_ARGS ${CMAKE_EXTERNAL_PROJECT_ARGS_FOR_ITK5})
-  
-  IF(MT_USE_BLAS)
-    IF(MT_BUILD_OPENBLAS)
-      list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
-        -DOpenBLAS_INCLUDE_DIR:PATH=${OpenBLAS_INCLUDE_DIRS}
-        -DOpenBLAS_LIBRARY:PATH=${OpenBLAS_LIBRARY}
-        -DCMAKE_DISABLE_FIND_PACKAGE_OpenBLAS:BOOL=ON
-        -DOpenBLAS_DIR:PATH=${OpenBLAS_DIR}
-        -DUSE_BLAS:BOOL=ON
-      )
-    ELSE()
-      list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
-        -DUSE_BLAS:BOOL=ON
-      )
-    ENDIF()
-  ELSE()
-  list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS 
-    -DUSE_BLAS:BOOL=OFF)
-  ENDIF()
+
+  blas_external_project_args(BLAS_EP_ARGS)
 
   ExternalProject_Add(patch_morphology
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/patch_morphology
     BINARY_DIR patch_morphology-build
-    LIST_SEPARATOR :::  
+    LIST_SEPARATOR :::
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
+#        -DLIBLBFGS_DIR:PATH=${LIBLBFGS_LIBRARY_DIR}
+        -DMINC_TOOLKIT_BUILD:BOOL=ON
+        -DSUPERBUILD_CMAKE_DIR:PATH=${PROJECT_SOURCE_DIR}/cmake-modules
+        ${BLAS_EP_ARGS}
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
         -DITK_DIR:PATH=${itk_dir}
         -DPATCH_MORPHOLOGY_BUILD_LEGACY:BOOL=ON
@@ -45,10 +31,10 @@ macro(build_PatchMorphology install_prefix staging_prefix itk_dir)
     INSTALL_DIR ${staging_prefix}/${install_prefix}
     TEST_BEFORE_INSTALL 0 #TODO: figure out how to run test on external project
   )
-  
+
   IF(BUILD_TESTING)
     ADD_TEST(NAME TEST_PATCH_MORPHOLOGY COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/patch_morphology-build 
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/patch_morphology-build
     )
 
     IF(MINC_TEST_ENVIRONMENT)
