@@ -132,15 +132,7 @@ OPTION(USE_SYSTEM_ITK        "Use System ITK" OFF)
 OPTION(MT_USE_OPENMP         "Use OpenMP multi-threading" OFF)
 OPTION(MT_BUILD_IM           "Build ImageMagick and dependent libraries" OFF)
 OPTION(MT_USE_BLAS           "Use BLAS for linear algebra")
-
-IF(MT_USE_BLAS)
-  OPTION(MT_BUILD_OPENBLAS     "Deprecated alias for -DBLAS_FROM_SOURCE=ON" OFF)
-  IF(MT_BUILD_OPENBLAS AND NOT DEFINED CACHE{BLAS_FROM_SOURCE})
-    message(WARNING "MT_BUILD_OPENBLAS is deprecated; use -DBLAS_FROM_SOURCE=ON. Aliasing for now.")
-    set(BLAS_FROM_SOURCE ON CACHE BOOL "Build OpenBLAS from source" FORCE)
-  ENDIF()
 #OPTION(MT_USE_OPENMP_BLAS    "Use Build OpenBLAS with OpenMP support" OFF) # TODO: finish this to compile on some platforms
-ENDIF()
 
 OPTION(MNI_AUTOREG_OLD_AMOEBA_INIT "Use legacy version of the code to initialize AMOEBA in minctracc" OFF)
 
@@ -473,15 +465,15 @@ ADD_SUBDIRECTORY(minc_gco)
 
 # BLAS detection: single point that exports BLAS::BLAS for in-tree consumers
 # and emits forwarding -D flags via blas_external_project_args() for ExternalProject
-# children (BEAST, patch_morphology). When BLAS_FROM_SOURCE=ON, BLASSourceBuild
+# children (BEAST, patch_morphology). When MT_BUILD_OPENBLAS=ON, BLASSourceBuild
 # emits a marker; the actual OpenBLAS ExternalProject is wired below.
 # When MT_USE_BLAS=OFF, BLASSetup short-circuits and creates empty stub targets;
-# the BLAS_FROM_SOURCE block below is also skipped (BLASSetup rejects that combo).
-IF(MT_USE_BLAS AND BLAS_FROM_SOURCE)
+# the MT_BUILD_OPENBLAS block below is also skipped (BLASSetup rejects that combo).
+IF(MT_USE_BLAS AND MT_BUILD_OPENBLAS)
   enable_language(Fortran)
 ENDIF()
 include(${CMAKE_SOURCE_DIR}/cmake-modules/BLASSetup.cmake)
-IF(MT_USE_BLAS AND BLAS_FROM_SOURCE)
+IF(MT_USE_BLAS AND MT_BUILD_OPENBLAS)
   include(BuildOpenBLAS)
   build_open_blas(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX} ${MT_USE_OPENMP})
   set(BLAS_LIBRARIES    "${OpenBLAS_LIBRARIES}")
@@ -601,7 +593,7 @@ IF(MT_BUILD_ITK_TOOLS)
   build_PatchMorphology(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX} ${ITK_DIR})
   ADD_DEPENDENCIES(patch_morphology ITKv5 minc_io)
 
-  IF(MT_USE_BLAS AND BLAS_FROM_SOURCE)
+  IF(MT_BUILD_OPENBLAS)
     ADD_DEPENDENCIES(patch_morphology OpenBLAS)
   ENDIF()
 
@@ -619,7 +611,7 @@ INCLUDE(BuildBEAST)
 build_BEAST(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
 ADD_DEPENDENCIES(BEAST minc_io)
 
-IF(MT_USE_BLAS AND BLAS_FROM_SOURCE)
+IF(MT_BUILD_OPENBLAS)
     ADD_DEPENDENCIES(BEAST OpenBLAS)
 ENDIF()
 

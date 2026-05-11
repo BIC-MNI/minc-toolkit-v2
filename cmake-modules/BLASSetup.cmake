@@ -6,9 +6,9 @@
 #     empty stub targets and BLAS_LIBRARIES / BLAS_MKL_MODE / ... are
 #     emitted as empty values to ExternalProject children, so consumers
 #     that gate on those variables compile-out their BLAS-using code paths.
-#   - BLAS_FROM_SOURCE=ON: ignore any system BLAS, build OpenBLAS from source
+#   - MT_BUILD_OPENBLAS=ON: ignore any system BLAS, build OpenBLAS from source
 #     (delegated to BLASSourceBuild.cmake). Requires MT_USE_BLAS=ON.
-#   - MT_USE_BLAS=ON, BLAS_FROM_SOURCE=OFF (default): resolve BLAS_PREFERENCE
+#   - MT_USE_BLAS=ON, MT_BUILD_OPENBLAS=OFF (default): resolve BLAS_PREFERENCE
 #     (Auto/OpenBLAS/MKL/Apple/Netlib) into a BLAS::BLAS IMPORTED GLOBAL
 #     target so consumers (whether pulled in via add_subdirectory or built
 #     as ExternalProjects) all link the same way.
@@ -28,14 +28,14 @@ include("${CMAKE_CURRENT_LIST_DIR}/LAPACKESetup.cmake")
 
 option(MT_USE_BLAS
   "Use BLAS. If OFF, BLAS detection is skipped even if a system BLAS is present." ON)
-option(BLAS_FROM_SOURCE
+option(MT_BUILD_OPENBLAS
   "Build OpenBLAS from source instead of detecting any system BLAS." OFF)
 
 if(NOT MT_USE_BLAS)
-  if(BLAS_FROM_SOURCE)
+  if(MT_BUILD_OPENBLAS)
     message(FATAL_ERROR
-      "MT_USE_BLAS=OFF and BLAS_FROM_SOURCE=ON are mutually exclusive. "
-      "Either enable MT_USE_BLAS (to build/use BLAS) or disable BLAS_FROM_SOURCE.")
+      "MT_USE_BLAS=OFF and MT_BUILD_OPENBLAS=ON are mutually exclusive. "
+      "Either enable MT_USE_BLAS (to build/use BLAS) or disable MT_BUILD_OPENBLAS.")
   endif()
   message(STATUS "BLAS disabled (MT_USE_BLAS=OFF): skipping detection; stub targets only.")
   # Clear any forwarded state so blas_external_project_args() emits empty values
@@ -61,11 +61,11 @@ if(NOT MT_USE_BLAS)
   return()
 endif()
 
-if(BLAS_FROM_SOURCE)
+if(MT_BUILD_OPENBLAS)
   setup_blas_from_source()
   # LAPACKE::LAPACKE is set up here (target exists immediately for downstream
   # checks). Root enriches it with the staged include dir and HAVE_LAPACKE
-  # after build_open_blas runs — see CMakeLists.txt's BLAS_FROM_SOURCE block.
+  # after build_open_blas runs — see CMakeLists.txt's MT_BUILD_OPENBLAS block.
   lapacke_setup("OpenBLAS")
 else()
   set(BLAS_PREFERENCE "Auto" CACHE STRING
