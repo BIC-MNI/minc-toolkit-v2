@@ -187,4 +187,4 @@ Use `BLAS_PREFERENCE=OpenBLAS` (homebrew or `BLAS_FROM_SOURCE=ON`) instead.
 - `cmake-modules/BLASExternalProjectArgs.cmake` — `blas_external_project_args()`
 - `cmake-modules/LAPACKESetup.cmake` — `lapacke_setup()` (per-implementation LAPACKE handling)
 - `cmake-modules/LAPACKETargetShim.cmake` — `lapacke_create_target_shim()` for ExternalProject children
-- `tests/blas_selection/` — full TDD test suite (17 tests across 11 cycles)
+- `tests/blas_integration/` — end-to-end smoke test (3 sub-tests: Auto / OpenBLAS / Netlib)
