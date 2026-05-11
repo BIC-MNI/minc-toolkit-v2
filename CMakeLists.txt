@@ -471,11 +471,13 @@ ADD_SUBDIRECTORY(minc_gco)
 # and emits forwarding -D flags via blas_external_project_args() for ExternalProject
 # children (BEAST, patch_morphology). When BLAS_FROM_SOURCE=ON, BLASSourceBuild
 # emits a marker; the actual OpenBLAS ExternalProject is wired below.
-IF(BLAS_FROM_SOURCE)
+# When MT_USE_BLAS=OFF, BLASSetup short-circuits and creates empty stub targets;
+# the BLAS_FROM_SOURCE block below is also skipped (BLASSetup rejects that combo).
+IF(MT_USE_BLAS AND BLAS_FROM_SOURCE)
   enable_language(Fortran)
 ENDIF()
 include(${CMAKE_SOURCE_DIR}/cmake-modules/BLASSetup.cmake)
-IF(BLAS_FROM_SOURCE)
+IF(MT_USE_BLAS AND BLAS_FROM_SOURCE)
   include(BuildOpenBLAS)
   build_open_blas(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX} ${MT_USE_OPENMP})
   set(BLAS_LIBRARIES    "${OpenBLAS_LIBRARIES}")
