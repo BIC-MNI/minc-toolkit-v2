@@ -1,27 +1,3 @@
-# Shared assertion helpers for blas_selection tests.
-# Helpers FATAL_ERROR on failure so the enclosing `cmake -P` script exits non-zero
-# and ctest records the test as failed.
-
-function(assert_substring needle haystack ctx)
-  string(FIND "${haystack}" "${needle}" idx)
-  if(idx EQUAL -1)
-    message(FATAL_ERROR
-      "[${ctx}] expected substring not found.\n"
-      "  needle:\n    ${needle}\n"
-      "  haystack:\n${haystack}")
-  endif()
-endfunction()
-
-function(assert_no_substring needle haystack ctx)
-  string(FIND "${haystack}" "${needle}" idx)
-  if(NOT idx EQUAL -1)
-    message(FATAL_ERROR
-      "[${ctx}] forbidden substring found.\n"
-      "  needle:\n    ${needle}\n"
-      "  haystack:\n${haystack}")
-  endif()
-endfunction()
-
 # Run a child `cmake` configure on a fixture and capture rc/stdout/stderr.
 # Usage:
 #   run_child_configure(

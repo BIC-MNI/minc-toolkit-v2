@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
-project(full_integration LANGUAGES C)
+project(blas_integration LANGUAGES C)
 
-# Cycle 11 fixture — superbuild-shaped integration:
+# BLAS integration fixture — superbuild-shaped:
 #   - root includes BLASSetup → BLAS::BLAS available
 #   - one add_subdirectory consumer (mimics in-tree subprojects)
 #   - one ExternalProject_Add child that reconstructs BLAS::BLAS from the
