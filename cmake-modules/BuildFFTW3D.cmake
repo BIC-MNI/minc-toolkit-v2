@@ -73,17 +73,18 @@ macro(build_fftw3d install_prefix staging_prefix)
   ENDIF(MT_USE_OPENMP)
 
 
-  GET_PACKAGE("http://www.fftw.org/fftw-3.3.8.tar.gz" "8aac833c943d8e90d51b697b27d4384d" "fftw-3.3.8.tar.gz" FFTW_PATH )
+  GET_PACKAGE("https://fftw.org/fftw-3.3.11.tar.gz" "40ec8d0447d03b8f01f8c90aa77bd16f" "fftw-3.3.11.tar.gz" FFTW_PATH )
 
     ExternalProject_Add(FFTW3D
       URL  "${FFTW_PATH}"
-      URL_MD5 "8aac833c943d8e90d51b697b27d4384d"
+      URL_MD5 "40ec8d0447d03b8f01f8c90aa77bd16f"
       UPDATE_COMMAND ""
       SOURCE_DIR FFTW3D
       BINARY_DIR FFTW3D-build
       LIST_SEPARATOR :::
       CMAKE_GENERATOR ${CMAKE_GEN}
       CMAKE_ARGS
+          -DCMAKE_POLICY_VERSION_MINIMUM=3.5
           -DENABLE_FLOAT:BOOL=OFF
           -DDISABLE_FORTRAN:BOOL=ON
           -DBUILD_SHARED_LIBS:BOOL=OFF

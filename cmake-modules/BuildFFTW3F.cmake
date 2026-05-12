@@ -1,5 +1,5 @@
 macro(build_fftw3f install_prefix staging_prefix)
-  
+
   if(CMAKE_EXTRA_GENERATOR)
     set(CMAKE_GEN "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
   else()
@@ -71,17 +71,18 @@ macro(build_fftw3f install_prefix staging_prefix)
   ENDIF(MT_USE_OPENMP)
 
 
-  GET_PACKAGE("http://www.fftw.org/fftw-3.3.8.tar.gz" "8aac833c943d8e90d51b697b27d4384d" "fftw-3.3.8.tar.gz" FFTW_PATH )
+  GET_PACKAGE("https://fftw.org/fftw-3.3.11.tar.gz" "40ec8d0447d03b8f01f8c90aa77bd16f" "fftw-3.3.11.tar.gz" FFTW_PATH )
 
     ExternalProject_Add(FFTW3F
       URL  "${FFTW_PATH}"
-      URL_MD5 "8aac833c943d8e90d51b697b27d4384d"
+      URL_MD5 "40ec8d0447d03b8f01f8c90aa77bd16f"
       UPDATE_COMMAND ""
       SOURCE_DIR FFTW3F
       BINARY_DIR FFTW3F-build
       LIST_SEPARATOR :::
       CMAKE_GENERATOR ${CMAKE_GEN}
       CMAKE_ARGS
+          -DCMAKE_POLICY_VERSION_MINIMUM=3.5
           -DENABLE_FLOAT:BOOL=ON
           -DDISABLE_FORTRAN:BOOL=ON
           -DBUILD_SHARED_LIBS:BOOL=OFF
@@ -98,14 +99,14 @@ macro(build_fftw3f install_prefix staging_prefix)
     )
 
 
-      
+
 SET(FFTW3F_INCLUDE_DIR      ${install_prefix}/include )
 SET(FFTW3F_LIBRARY          ${install_prefix}/lib${LIB_SUFFIX}/libfftw3f.a )
 SET(FFTW3F_THREADS_LIBRARY  ${install_prefix}/lib${LIB_SUFFIX}/libfftw3f_threads.a )
 SET(FFTW3F_OMP_LIBRARY      ${install_prefix}/lib${LIB_SUFFIX}/libfftw3f_omp.a )
 #configure_file(${CMAKE_SOURCE_DIR}/cmake-modules/FFTW3FConfig.cmake.in ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/FFTW3FConfig.cmake @ONLY)
 
-      
+
 SET(FFTW3F_INCLUDE_DIR      ${staging_prefix}/${install_prefix}/include )
 SET(FFTW3F_LIBRARY          ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libfftw3f.a )
 SET(FFTW3F_THREADS_LIBRARY  ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libfftw3f_threads.a )
