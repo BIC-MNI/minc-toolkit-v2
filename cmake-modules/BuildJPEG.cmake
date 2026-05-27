@@ -51,18 +51,16 @@ macro(build_jpeg install_prefix staging_prefix)
     )
   endif()
     
-  GET_PACKAGE("https://github.com/libjpeg-turbo/libjpeg-turbo/archive/1.5.90.tar.gz" "85f7f9c377b70cbf48e61726097d4efa" "libjpeg-turbo-1.5.90.tar.gz" LIBJPEG_PATH ) 
+  GET_PACKAGE("https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.4.1/libjpeg-turbo-3.1.4.1.tar.gz" "997f868afac9f358a098617d16f36167" "libjpeg-turbo-3.1.4.1.tar.gz" LIBJPEG_PATH )
 
   ExternalProject_Add(JPEG
     URL "${LIBJPEG_PATH}"
-    URL_MD5 "85f7f9c377b70cbf48e61726097d4efa"
+    URL_MD5 "997f868afac9f358a098617d16f36167"
     SOURCE_DIR JPEG
     BINARY_DIR JPEG-build
     LIST_SEPARATOR :::
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
-      -DBUILD_SHARED_LIBS:BOOL=OFF
-      -DBUILD_STATIC_LIBS:BOOL=ON
       -DENABLE_SHARED:BOOL=OFF
       -DENABLE_STATIC:BOOL=ON
       -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
