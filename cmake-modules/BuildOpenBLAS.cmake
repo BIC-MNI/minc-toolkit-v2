@@ -64,12 +64,11 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
     )
   endif()
 
- 
-  GET_PACKAGE("https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.29/OpenBLAS-0.3.29.tar.gz" "853a0c5c0747c5943e7ef4bbb793162d" "openblas_v0.3.29.tar.gz" OPENBLAS_PATH )
+  GET_PACKAGE("https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.33/OpenBLAS-0.3.33.tar.gz" "96c5cd9013013faefc294bc57830c77d" "openblas_v0.3.33.tar.gz" OPENBLAS_PATH )
 
   ExternalProject_Add(OpenBLAS
         URL "${OPENBLAS_PATH}"
-        URL_MD5 "853a0c5c0747c5943e7ef4bbb793162d"
+        URL_MD5 "96c5cd9013013faefc294bc57830c77d"
         SOURCE_DIR OpenBLAS
         BINARY_DIR OpenBLAS-build
         LIST_SEPARATOR :::
