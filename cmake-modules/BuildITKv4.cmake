@@ -18,6 +18,15 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
   LIST(APPEND EXT_CMAKE_CXX_FLAGS -D_XOPEN_SOURCE=600)
   ENDIF(NOT APPLE)
 
+  # GCC 15+ defaults to C23, where an empty () prototype means (void) rather
+  # than K&R unspecified-args. VXL's bundled netlib (v3p/netlib/sparse/spFactor.c)
+  # is vintage K&R C that declares functions with () and calls them with args,
+  # which now errors ("too many arguments to function ... expected 0").
+  # Pin ITK's C compilation to gnu17 so () keeps unspecified-args semantics.
+  # Use string concatenation (not LIST(APPEND)) so the flag stays part of the
+  # CMAKE_C_FLAGS value rather than becoming a separate ;-separated cmake arg.
+  SET(EXT_CMAKE_C_FLAGS "${EXT_CMAKE_C_FLAGS} -std=gnu17")
+
 
   set(CMAKE_EXTERNAL_PROJECT_ARGS
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
