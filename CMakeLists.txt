@@ -120,7 +120,6 @@ OPTION(USE_SYSTEM_ZLIB       "Use System ZLIB "       OFF)
 #OPTION(USE_SYSTEM_GIFTI      "Use System GIfTI"       OFF)
 OPTION(USE_SYSTEM_NETCDF     "Use System NETCDF > 3.6.3" OFF)
 OPTION(USE_SYSTEM_HDF5       "Use System HDF5 > 1.8"     OFF)
-OPTION(USE_SYSTEM_PCRE       "Use System PCRE "        OFF)
 OPTION(USE_SYSTEM_GSL        "Use System GSL "         OFF)
 OPTION(USE_SYSTEM_FFTW3F     "Use System FFTW3F "      OFF)
 OPTION(USE_SYSTEM_FFTW3D     "Use System FFTW3D "      OFF)
@@ -274,14 +273,6 @@ IF( USE_SYSTEM_NETPBM ) # else we will use bundled libppm
   FIND_PACKAGE( NETPBM QUIET )
 ENDIF( USE_SYSTEM_NETPBM )
 
-#required for oobicpl
-IF(USE_SYSTEM_PCRE)
-  FIND_PACKAGE( PCRE QUIET )
-ELSE()
-  INCLUDE(BuildPCRE)
-  build_pcre(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
-ENDIF()
-
 # required for mni_autoreg
 INCLUDE(BuildLIBLBFGS)
 build_liblbfgs(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
@@ -431,10 +422,6 @@ INCLUDE(${ARGUMENTS_USE_FILE})
 
 ADD_SUBDIRECTORY(oobicpl)
 ADD_DEPENDENCIES(oobicpl minc2 bicpl arguments)
-
-IF( NOT USE_SYSTEM_PCRE)
-    ADD_DEPENDENCIES(oobicpl PCRE)
-ENDIF( NOT USE_SYSTEM_PCRE)
 
 
 #setup oobicpl variables
