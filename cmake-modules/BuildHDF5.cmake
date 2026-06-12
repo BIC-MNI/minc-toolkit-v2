@@ -96,6 +96,11 @@ ExternalProject_Add(HDF5
       -DZLIB_SHARED_LIBRARY:STRING=${ZLIB_STATIC_LIBRARY}  # for fixing error with restricted binaries on MacOSX
       -DSKIP_HDF5_FORTRAN_SHARED:BOOL=ON
       ${CMAKE_EXTERNAL_PROJECT_ARGS}
+      # hdf5-1.10.6 has K&R-era implicit function declarations (e.g.
+      # H5O__fsinfo_set_version in H5Fsuper.c). Modern clang/GCC make those a
+      # hard error by default; downgrade to a warning so the vendored build
+      # survives. Placed after CMAKE_EXTERNAL_PROJECT_ARGS so it wins.
+      "-DCMAKE_C_FLAGS:STRING=-Wno-error=implicit-function-declaration ${CMAKE_C_FLAGS}"
   INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
   INSTALL_DIR ${staging_prefix}/${install_prefix}
 #  TEST_COMMAND make test
