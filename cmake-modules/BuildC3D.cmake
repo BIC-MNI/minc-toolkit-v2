@@ -83,7 +83,10 @@ macro(build_C3D install_prefix staging_prefix)
     UPDATE_COMMAND ""
     SOURCE_DIR C3D
     BINARY_DIR C3D-build
-    LIST_SEPARATOR :::  
+    LIST_SEPARATOR :::
+    PATCH_COMMAND ${CMAKE_COMMAND}
+        -DSOURCE_DIR=<SOURCE_DIR>
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/PatchC3D.cmake
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
         -DCMAKE_POLICY_VERSION_MINIMUM=3.5
