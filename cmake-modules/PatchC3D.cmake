@@ -24,8 +24,11 @@ ADD_EXECUTABLE(c3d Convert3DMain.cxx)
 ADD_EXECUTABLE(c2d Convert2DMain.cxx)"
 "ADD_EXECUTABLE(c3d Convert3DMain.cxx)
 ADD_EXECUTABLE(c2d Convert2DMain.cxx)
-TARGET_LINK_LIBRARIES(c3d cnd_adapters cnd_driver \${ITK_LIBRARIES} ITKVoxBoIO ITKPovRayIO \${FFTW3F_LIBRARY})
-TARGET_LINK_LIBRARIES(c2d cnd_adapters cnd_driver \${ITK_LIBRARIES} ITKVoxBoIO ITKPovRayIO \${FFTW3F_LIBRARY})"
+# cnd_driver (ConvertImageND) references symbols defined in cnd_adapters, so the
+# provider must follow the referencer for single-pass linkers (modern GNU ld on
+# e.g. Ubuntu 26.04 no longer rescans archives).
+TARGET_LINK_LIBRARIES(c3d cnd_driver cnd_adapters \${ITK_LIBRARIES} ITKVoxBoIO ITKPovRayIO \${FFTW3F_LIBRARY})
+TARGET_LINK_LIBRARIES(c2d cnd_driver cnd_adapters \${ITK_LIBRARIES} ITKVoxBoIO ITKPovRayIO \${FFTW3F_LIBRARY})"
 CONTENT "${CONTENT}")
 
 file(WRITE "${CMAKELISTS}" "${CONTENT}")
