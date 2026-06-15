@@ -128,20 +128,20 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
   message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
   message("HDF5_BIN_DIR=${HDF5_BIN_DIR}")
 
-  # Pinned to release-4.14 branch tip (2026-05-09). No v4.14.X release tag has
-  # been cut yet; bump this SHA when upstream pushes a meaningful fix. The 4.14
-  # branch carries fixes for modern GCC and CMake 4 that the prior 4.13.3
-  # release tarball needs heavy patching to support.
+  # Pinned to release-4.14 branch tip (2026-06-14). No v4.14.X release tag has
+  # been cut yet; bump this SHA when upstream pushes a meaningful fix. This tip
+  # adds modern-toolchain fixes: spFactor.c C23 prototypes, dropping Carbon-era
+  # fp.h from the bundled libpng on macOS, and CMake 4.x support.
   GET_PACKAGE(
-    "https://github.com/InsightSoftwareConsortium/ITK/archive/d72b44595a13ed45e8cdb1d9f5db236f2be3ce66.tar.gz"
-    "25eee1af4553c030c1a48868c1504aed"
-    "InsightToolkit-4.14-d72b4459.tar.gz"
+    "https://github.com/InsightSoftwareConsortium/ITK/archive/cae3eb95758e70ff879f3ab5d3cbd5a764d70cf9.tar.gz"
+    "9a3fd160f88a27e664098b94a5de3062"
+    "InsightToolkit-4.14-cae3eb9.tar.gz"
     ITKv4_PATH)
 
 
   ExternalProject_Add(ITKv4
     URL "${ITKv4_PATH}"
-    URL_MD5 "25eee1af4553c030c1a48868c1504aed"
+    URL_MD5 "9a3fd160f88a27e664098b94a5de3062"
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
