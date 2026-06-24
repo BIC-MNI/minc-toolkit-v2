@@ -70,7 +70,11 @@ macro(build_liblbfgs install_prefix staging_prefix)
     INSTALL_DIR     ${staging_prefix}/${install_prefix}/
   )
 
-SET(LIBLBFGS_LIB_SUFFIX ".a")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  SET(LIBLBFGS_LIB_SUFFIX "d.a")
+else()
+  SET(LIBLBFGS_LIB_SUFFIX ".a")
+endif()
 
 SET(LIBLBFGS_INCLUDE_DIR  ${staging_prefix}/${install_prefix}/include )
 SET(LIBLBFGS_LIBRARY_DIR  ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/ )
