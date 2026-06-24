@@ -137,6 +137,7 @@ OPTION(MT_USE_OPENMP         "Use OpenMP multi-threading" OFF)
 OPTION(MT_BUILD_IM           "Build ImageMagick and dependent libraries" OFF)
 #OPTION(MT_USE_OPENMP_BLAS    "Use Build OpenBLAS with OpenMP support" OFF) # TODO: finish this to compile on some platforms
 OPTION(MNI_AUTOREG_OLD_AMOEBA_INIT "Use legacy version of the code to initialize AMOEBA in minctracc" OFF)
+OPTION(MT_BUILD_DCM2MNC_TESTS "Download dcm2niix DICOM test data and enable dcm2mnc integration tests (requires internet at build time)" OFF)
 
 SET(MT_PACKAGES_PATH "${CMAKE_BINARY_DIR}/cache" CACHE PATH  "Directory containing 3rd party packages")
 
