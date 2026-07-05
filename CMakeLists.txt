@@ -134,7 +134,6 @@ OPTION(MT_USE_GLFW           "Use GLFW for visual tools" OFF)
 
 OPTION(USE_SYSTEM_ITK        "Use System ITK" OFF)
 OPTION(MT_USE_OPENMP         "Use OpenMP multi-threading" OFF)
-OPTION(MT_BUILD_IM           "Build ImageMagick and dependent libraries" OFF)
 #OPTION(MT_USE_OPENMP_BLAS    "Use Build OpenBLAS with OpenMP support" OFF) # TODO: finish this to compile on some platforms
 OPTION(MNI_AUTOREG_OLD_AMOEBA_INIT "Use legacy version of the code to initialize AMOEBA in minctracc" OFF)
 OPTION(MT_BUILD_DCM2MNC_TESTS "Download dcm2niix DICOM test data and enable dcm2mnc integration tests (requires internet at build time)" OFF)
@@ -640,21 +639,6 @@ IF(MT_BUILD_VISUAL_TOOLS)
     ADD_DEPENDENCIES(xdisp minc2)
   ENDIF(X11_FOUND)
 ENDIF(MT_BUILD_VISUAL_TOOLS)
-
-IF(MT_BUILD_IM)
-    message("Building minimal imagemagick, use with caution!")
-    INCLUDE(BuildJPEG)
-    INCLUDE(BuildPNG)
-    INCLUDE(BuildFREETYPE)
-    INCLUDE(BuildIM)
-
-    build_jpeg(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
-    build_png(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX} ${ZLIB_INCLUDE_DIR} ${ZLIB_LIBRARY} ${ZLIB_DIR} )
-    build_freetype(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX} ${ZLIB_INCLUDE_DIR} ${ZLIB_LIBRARY} ${ZLIB_DIR})
-    build_im(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX} ${ZLIB_INCLUDE_DIR} ${ZLIB_LIBRARY} ${ZLIB_DIR})
-    ADD_DEPENDENCIES(FREETYPE PNG)
-    ADD_DEPENDENCIES(IM FREETYPE PNG JPEG)
-ENDIF(MT_BUILD_IM)
 
   #install external dependencies to final destination
 INSTALL(DIRECTORY ${SUPERBUILD_STAGING_PREFIX}/${CMAKE_INSTALL_PREFIX}/bin
