@@ -130,7 +130,9 @@ OPTION(USE_SYSTEM_LIBARCHIVE  "Use System LIBARCHIVE " OFF)
 
 OPTION(MT_BUILD_ITK_TOOLS    "Build ITK-based tools"  ON)
 OPTION(MT_BUILD_VISUAL_TOOLS "Build visual tools (Display, Register, postf, ray_trace) requires OpenGL & Glut"  OFF)
-OPTION(MT_USE_GLFW           "Use GLFW for visual tools" OFF)
+# GLUT is deprecated on macOS (and freeglut is fragile to build there); use
+# bicgl's GLFW/native-Cocoa windowing backend instead when building on Apple.
+OPTION(MT_USE_GLFW           "Use GLFW for visual tools instead of GLUT" ${APPLE})
 
 OPTION(USE_SYSTEM_ITK        "Use System ITK" OFF)
 OPTION(MT_USE_OPENMP         "Use OpenMP multi-threading" OFF)
@@ -593,10 +595,10 @@ IF(MT_BUILD_VISUAL_TOOLS)
   FIND_PACKAGE( X11    QUIET )
 
   IF(MT_USE_GLFW) # no need to use GLUT
-    SET(BICGL_USE_GLFW ON)
-    FIND_PACKAGE( glfw3 REQUIRED )
-
-    # TODO: enable building GLFW from source if not found, and add it as a dependency to bicgl
+    SET(BICGL_USE_GLFW ON CACHE BOOL "Build GLFW windowing backend (no GLX required)" FORCE)
+    # bicgl/CMakeLists.txt finds the system glfw3 package, or fetches and
+    # builds GLFW 3.4 from source via FetchContent if none is found.
+    ADD_DEFINITIONS(-DBICGL_USE_GLFW=1)
   ELSE()
     SET(BICGL_USE_GLUT ON)
     IF(USE_SYSTEM_GLUT)
