@@ -128,7 +128,7 @@ OPTION(MT_BUILD_ITK_TOOLS    "Build ITK-based tools"  ON)
 OPTION(MT_BUILD_VISUAL_TOOLS "Build visual tools (Display, Register, postf, ray_trace) requires OpenGL & Glut"  OFF)
 # GLUT is deprecated on macOS (and freeglut is fragile to build there); use
 # bicgl's GLFW/native-Cocoa windowing backend instead when building on Apple.
-OPTION(MT_VISUAL_TOOLS_USE_GLFW "Build Display/Register/ray_trace using bicgl's GLFW backend instead of GLUT" ${APPLE})
+OPTION(MT_USE_GLFW           "Use GLFW for visual tools instead of GLUT" ${APPLE})
 
 OPTION(USE_SYSTEM_ITK        "Use System ITK" OFF)
 OPTION(MT_USE_OPENMP         "Use OpenMP multi-threading" OFF)
@@ -604,23 +604,23 @@ IF(MT_BUILD_OPENBLAS)
 ENDIF()
 
 
-# build tools that require OpenGL, and either GLUT or (via MT_VISUAL_TOOLS_USE_GLFW) GLFW
+# build tools that require OpenGL, and either GLUT or (via MT_USE_GLFW) GLFW
 IF(MT_BUILD_VISUAL_TOOLS)
   FIND_PACKAGE( OpenGL REQUIRED )
   FIND_PACKAGE( X11    QUIET )
 
-  IF(MT_VISUAL_TOOLS_USE_GLFW)
+  IF(MT_USE_GLFW) # no need to use GLUT
     # bicgl's GLFW backend (native Cocoa on macOS) — no GLUT/freeglut needed.
     SET(BICGL_USE_GLFW ON CACHE BOOL "Build GLFW windowing backend (no GLX required)" FORCE)
     ADD_DEFINITIONS(-DBICGL_USE_GLFW=1)
-  ELSE(MT_VISUAL_TOOLS_USE_GLFW)
+  ELSE()
     IF(USE_SYSTEM_GLUT)
       FIND_PACKAGE( GLUT   REQUIRED )
     ELSE(USE_SYSTEM_GLUT)
       INCLUDE(BuildFREEGLUT) # newer version of build_freeglut seem to be causing problems
       build_freeglut( ${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
     ENDIF(USE_SYSTEM_GLUT)
-  ENDIF(MT_VISUAL_TOOLS_USE_GLFW)
+  ENDIF()
 
   ADD_SUBDIRECTORY(bicgl)
   INCLUDE(${CMAKE_BINARY_DIR}/bicgl/BICGLConfig.cmake)
@@ -630,7 +630,7 @@ IF(MT_BUILD_VISUAL_TOOLS)
   ADD_SUBDIRECTORY(Register)
   ADD_SUBDIRECTORY(ILT)
 
-  IF(NOT MT_VISUAL_TOOLS_USE_GLFW AND NOT USE_SYSTEM_GLUT)
+  IF(NOT MT_USE_GLFW AND NOT USE_SYSTEM_GLUT)
     ADD_DEPENDENCIES(bicgl    FREEGLUT)
     ADD_DEPENDENCIES(register FREEGLUT)
     ADD_DEPENDENCIES(Display  FREEGLUT)
