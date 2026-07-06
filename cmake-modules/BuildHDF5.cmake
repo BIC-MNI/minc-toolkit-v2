@@ -79,14 +79,30 @@ ExternalProject_Add(HDF5
       -DMACOSX_RPATH:BOOL=ON
       -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
       -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
-      -DHDF5_INSTALL_CMAKE_DIR:PATH=${install_prefix}
+      # Must be RELATIVE to the install prefix. Passing the absolute ${install_prefix}
+      # made HDF5 emit a broken package config: `include(${PACKAGE_PREFIX_DIR}//app/install/-targets.cmake)`,
+      # so config-mode find_package(HDF5 NO_MODULE) (ITK's preferred path) could not load it.
+      # NOTE: HDF5 1.12.x APPENDS "/hdf5" (the package name) to this dir, so "share/cmake"
+      # installs the package to share/cmake/hdf5 — matching HDF5_DIR below. (HDF5 1.10.x does
+      # NOT append, so develop-1.9.18 uses share/cmake/hdf5 there.)
+      -DHDF5_INSTALL_CMAKE_DIR:PATH=share/cmake
       -DHDF5_NO_PACKAGES:BOOL=ON
       -DHDF5_BUILD_CPP_LIB:BOOL=ON
       -DHDF5_BUILD_TOOLS:BOOL=ON
       -DHDF5_BUILD_EXAMPLES:BOOL=OFF
       -DZLIB_USE_EXTERNAL:BOOL=ON
-      -DHDF5_EXTERNALLY_CONFIGURED:BOOL=ON
+      # OFF: we build HDF5 as a standalone ExternalProject, not embedded via add_subdirectory.
+      # ON suppressed installation of HDF5's own CMake package (hdf5-config.cmake + targets),
+      # so config-mode find_package(HDF5 NO_MODULE) — ITK's preferred, system-HDF5-proof path —
+      # had nothing to load.
+      -DHDF5_EXTERNALLY_CONFIGURED:BOOL=OFF
       -DHDF5_ENABLE_Z_LIB_SUPPORT:BOOL=ON
+      # KEEP for HDF5 1.12.x: H5_ZLIB_HEADER makes CMakeFilters.cmake take the
+      # "zlib already configured by parent" branch and set H5_HAVE_ZLIB_H/LIBZ; the
+      # subsequent `set(LINK_COMP_LIBS ... ${ZLIB_STATIC_LIBRARY})` runs unconditionally,
+      # so our zlib-ng libz.a is still linked into libhdf5. (This differs from HDF5
+      # 1.10.x, where that link line sits inside `if(NOT H5_ZLIB_HEADER)` and setting
+      # the var left libhdf5 with undefined zlib symbols — hence develop-1.9.18 drops it.)
       -DH5_ZLIB_HEADER:STRING=zlib.h
       -DH5_HAVE_ZLIB_H:BOOL=ON
       -DZLIB_INCLUDE_DIRS:STRING=${ZLIB_INCLUDE_DIR}
@@ -129,6 +145,15 @@ SET(HDF5_BIN_DIR     ${staging_prefix}/${install_prefix}/bin )
 SET(HDF5_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include )
 SET(HDF5_LIBRARY_DIR ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX} )
 SET(HDF5_LIBRARY     ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libhdf5${HDF5_LIB_SUFFIX} )
+# The HDF5 C library IS libhdf5; export HDF5_C_LIBRARY explicitly, plus the C++/HL component
+# libraries pointing at OUR staged HDF5. Otherwise the custom FindHDF5.cmake (invoked by e.g.
+# libminc's find_package(HDF5)) caches the SYSTEM libhdf5_serial_cpp/_hl, which then leak into
+# consumers and mix a Debian HDF5 C++ lib with our libhdf5.so. build_hdf5() is a macro, so
+# these SET() shadow the stale cache in the caller scope (as HDF5_LIBRARY already does).
+SET(HDF5_C_LIBRARY   ${HDF5_LIBRARY})
+SET(HDF5_CXX_LIBRARY    ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libhdf5_cpp${HDF5_LIB_SUFFIX} )
+SET(HDF5_HL_LIBRARY     ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libhdf5_hl${HDF5_LIB_SUFFIX} )
+SET(HDF5_HL_CXX_LIBRARY ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libhdf5_hl_cpp${HDF5_LIB_SUFFIX} )
 
 
 SET(HDF5_LIBRARIES    ${HDF5_LIBRARY})
