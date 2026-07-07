@@ -55,11 +55,8 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
         -DCMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DNETCDF_INCLUDE_DIR:PATH=${NETCDF_INCLUDE_DIR}
-        -DHDF5_C_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
-        -DHDF5_CPP_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
-        -DHDF5_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
         -DNETCDF_LIBRARY:STRING=${NETCDF_LIBRARY}
-  )
+       )
   if(APPLE)
     list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
       -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
@@ -150,6 +147,24 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
   message("HDF5_HL_CPP_LIBRARY=${HDF5_HL_CPP_LIBRARY}")
   message("HDF5_BIN_DIR=${HDF5_BIN_DIR}")
 
+  # Point ITK at our staged HDF5 via CONFIG mode only. ITK's itk-module-init.cmake tries
+  # `find_package(HDF5 NO_MODULE COMPONENTS CXX C shared)` first and only falls back to the
+  # (fragile) module-mode FindHDF5 if that fails. Feeding a real HDF5_DIR makes the config
+  # find succeed, so module mode never runs. This is deliberately robust against the system
+  # HDF5 present on this box (/usr/bin/h5cc, /usr/lib/.../hdf5/serial): module-mode FindHDF5
+  # otherwise either grabs that Debian HDF5 or chokes on our h5cc/h5c++ wrappers (which bake
+  # in the not-yet-existing final /install prefix). HDF5_DIR resolves to
+  # ${staging}/${install}/share/cmake/hdf5 (installed there because BuildHDF5 now sets
+  # HDF5_EXTERNALLY_CONFIGURED=OFF and HDF5_INSTALL_CMAKE_DIR=share/cmake/hdf5).
+  SET(CMAKE_ITK_HDF5_SETTINGS
+    -DHDF5_DIR:PATH=${HDF5_DIR}
+    -DHDF5_DIFF_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5diff
+  )
+
+
+
+
+
   # Pinned to release-4.14 branch tip (2026-06-14). No v4.14.X release tag has
   # been cut yet; bump this SHA when upstream pushes a meaningful fix. This tip
   # adds modern-toolchain fixes: spFactor.c C23 prototypes, dropping Carbon-era
@@ -177,6 +192,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
         -DMACOSX_RPATH:BOOL=ON
         -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
         ${CMAKE_EXTERNAL_PROJECT_ARGS}
+        ${CMAKE_ITK_HDF5_SETTINGS}
         -DBUILD_EXAMPLES:BOOL=OFF
         -DBUILD_TESTING:BOOL=OFF
         -DModule_ITKReview:BOOL=ON
@@ -197,20 +213,20 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
         -DFFTWF_THREADS_LIB:FILEPATH=${FFTW3F_THREADS_LIBRARY}
         -DFFTW_INCLUDE_PATH:PATH=${FFTW3_INCLUDE_DIR}
         -DLIBMINC_DIR:PATH=${minc_dir}
-        -DHDF5_DIFF_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5diff
-        -DHDF5_CXX_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
-        -DHDF5_C_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
-        -DHDF5_hdf5_LIBRARY:FILEPATH=${HDF5_LIBRARY}
-        -DHDF5_hdf5_cpp_LIBRARY:FILEPATH=${HDF5_CPP_LIBRARY}
-        -DHDF5_hdf5_c_LIBRARY:FILEPATH=${HDF5_C_LIBRARY}
-        -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${HDF5_LIBRARY}
-        -DHDF5_hdf5_cpp_LIBRARY_RELEASE:FILEPATH=${HDF5_CPP_LIBRARY}
-        -DHDF5_hdf5_LIBRARY_DEBUG:FILEPATH=${HDF5_LIBRARY}
-        -DHDF5_hdf5_cpp_LIBRARY_DEBUG:FILEPATH=${HDF5_CPP_LIBRARY}
-        -DHDF5_DIR:PATH=HDF5_DIR-NOTFOUND
-        -DHDF5_Fortran_COMPILER_EXECUTABLE:FILEPATH=''
-        -DHDF5_CXX_COMPILER_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5c++
-        -DHDF5_C_COMPILER_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5cc
+#        -DHDF5_DIFF_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5diff
+#        -DHDF5_CXX_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
+#        -DHDF5_C_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
+#        -DHDF5_hdf5_LIBRARY:FILEPATH=${HDF5_LIBRARY}
+#        -DHDF5_hdf5_cpp_LIBRARY:FILEPATH=${HDF5_CPP_LIBRARY}
+#        -DHDF5_hdf5_c_LIBRARY:FILEPATH=${HDF5_C_LIBRARY}
+#        -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${HDF5_LIBRARY}
+#        -DHDF5_hdf5_cpp_LIBRARY_RELEASE:FILEPATH=${HDF5_CPP_LIBRARY}
+#        -DHDF5_hdf5_LIBRARY_DEBUG:FILEPATH=${HDF5_LIBRARY}
+#        -DHDF5_hdf5_cpp_LIBRARY_DEBUG:FILEPATH=${HDF5_CPP_LIBRARY}
+#        -DHDF5_DIR:PATH=HDF5_DIR-NOTFOUND
+#        -DHDF5_Fortran_COMPILER_EXECUTABLE:FILEPATH=''
+#        -DHDF5_CXX_COMPILER_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5c++
+#        -DHDF5_C_COMPILER_EXECUTABLE:FILEPATH=${HDF5_BIN_DIR}/h5cc
         -DZLIB_LIBRARY:PATH=${ZLIB_LIBRARY}
         -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
         -DITK_LEGACY_REMOVE:BOOL=OFF
