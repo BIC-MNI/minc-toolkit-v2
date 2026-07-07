@@ -21,5 +21,18 @@ string(REPLACE
   "# export_library_dependencies removed (CMP0033, CMake >= 3.28)"
   CONTENT "${CONTENT}")
 
+# 3. CMake >= 4.0 removed OLD behaviour for CMP0033 and CMP0007; force NEW.
+#    (The export_library_dependencies() call CMP0033 OLD protected is already
+#     removed above, and the project's cmake_minimum_required already implies
+#     NEW for these old policies.)
+string(REPLACE
+  "cmake_policy( SET CMP0033 OLD )"
+  "cmake_policy( SET CMP0033 NEW )"
+  CONTENT "${CONTENT}")
+string(REPLACE
+  "cmake_policy( SET CMP0007 OLD )"
+  "cmake_policy( SET CMP0007 NEW )"
+  CONTENT "${CONTENT}")
+
 file(WRITE "${CMAKELISTS}" "${CONTENT}")
-message(STATUS "Patched Elastix CMakeLists.txt for CMake 3.28+ compatibility")
+message(STATUS "Patched Elastix CMakeLists.txt for CMake 3.28+/4.x compatibility")

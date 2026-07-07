@@ -83,9 +83,16 @@ macro(build_C3D install_prefix staging_prefix)
     UPDATE_COMMAND ""
     SOURCE_DIR C3D
     BINARY_DIR C3D-build
-    LIST_SEPARATOR :::  
+    LIST_SEPARATOR :::
+    PATCH_COMMAND
+      ${CMAKE_COMMAND}
+        -DSOURCE_DIR=<SOURCE_DIR>
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/PatchC3D.cmake
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
+        # C3D declares cmake_minimum_required() < 3.5, which CMake >= 4.0 rejects
+        # outright. Allow it to configure by supplying the removed policy floor.
+        -DCMAKE_POLICY_VERSION_MINIMUM:STRING=3.5
         -DFFTW3F_FOUND:BOOL=${FFTW3F_FOUND}
         -DFFTW3F_INCLUDE_DIR:PATH=${FFTW3F_INCLUDE_DIR}
         -DFFTW3F_LIBRARY:PATH=${FFTW3F_LIBRARY}

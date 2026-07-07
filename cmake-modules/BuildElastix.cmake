@@ -106,6 +106,9 @@ macro(build_Elastix install_prefix staging_prefix)
         -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/PatchElastix.cmake
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
+        # Elastix declares cmake_minimum_required() < 3.5, which CMake >= 4.0
+        # rejects outright. Supply the removed policy floor so it can configure.
+        -DCMAKE_POLICY_VERSION_MINIMUM:STRING=3.5
         -DFFTW3F_FOUND:BOOL=${FFTW3F_FOUND}
         -DFFTW3F_INCLUDE_DIR:PATH=${FFTW3F_INCLUDE_DIR}
         -DFFTW3F_LIBRARY:PATH=${FFTW3F_LIBRARY}

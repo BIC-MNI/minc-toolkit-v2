@@ -76,6 +76,28 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
     )
   ENDIF()
 
+  # ITK 4.14's bundled libpng references ARM-NEON symbols it never compiles on
+  # Apple Silicon (undefined _png_init_filter_functions_neon at link time).
+  # Use the system libpng instead when requested.  We locate libpng directly
+  # rather than via FIND_PACKAGE(PNG), because FindPNG pulls in FindZLIB, which
+  # mis-resolves against the superbuild's staged/keg-only zlib at configure time.
+  # ITK's own configure runs FIND_PACKAGE(PNG) with the paths and ZLIB below.
+  IF(USE_SYSTEM_PNG)
+   FIND_LIBRARY(SYSTEM_PNG_LIBRARY NAMES png png16 libpng16 libpng)
+   FIND_PATH(SYSTEM_PNG_INCLUDE_DIR png.h PATH_SUFFIXES libpng libpng16)
+   IF(NOT SYSTEM_PNG_LIBRARY OR NOT SYSTEM_PNG_INCLUDE_DIR)
+     MESSAGE(FATAL_ERROR "USE_SYSTEM_PNG is ON but the system libpng was not found "
+       "(SYSTEM_PNG_LIBRARY=${SYSTEM_PNG_LIBRARY}, SYSTEM_PNG_INCLUDE_DIR=${SYSTEM_PNG_INCLUDE_DIR}). "
+       "Install libpng (e.g. 'brew install libpng') or configure with -DUSE_SYSTEM_PNG=OFF.")
+   ENDIF()
+   MESSAGE(STATUS "ITK: using system libpng ${SYSTEM_PNG_LIBRARY} (include ${SYSTEM_PNG_INCLUDE_DIR})")
+   list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
+    -DITK_USE_SYSTEM_PNG:BOOL=ON
+    -DPNG_LIBRARY:FILEPATH=${SYSTEM_PNG_LIBRARY}
+    -DPNG_PNG_INCLUDE_DIR:PATH=${SYSTEM_PNG_INCLUDE_DIR}
+    )
+  ENDIF()
+
   SET(HDF5_LIB_SUFFIX ".a")
 
   IF(MT_BUILD_SHARED_LIBS)

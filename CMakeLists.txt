@@ -127,12 +127,25 @@ OPTION(USE_SYSTEM_GLUT       "Use System GLUT  "       ON)
 OPTION(USE_SYSTEM_OPENJPEG   "Use System OpenJPEG  "   OFF)
 OPTION(USE_SYSTEM_JPEG       "Use System JPEG  "   OFF)
 OPTION(USE_SYSTEM_LIBARCHIVE  "Use System LIBARCHIVE " OFF)
+# ITK 4.14's bundled libpng references ARM-NEON symbols it never compiles on
+# Apple Silicon; use the system libpng there. Other platforms keep the bundle.
+SET(_default_use_system_png OFF)
+IF(APPLE AND (CMAKE_SYSTEM_PROCESSOR MATCHES "arm64|aarch64"
+              OR CMAKE_OSX_ARCHITECTURES MATCHES "arm64"))
+  SET(_default_use_system_png ON)
+ENDIF()
+OPTION(USE_SYSTEM_PNG        "Use system libPNG for ITK (fixes bundled libpng on Apple Silicon)" ${_default_use_system_png})
 
 OPTION(MT_BUILD_ITK_TOOLS    "Build ITK-based tools"  ON)
 OPTION(MT_BUILD_VISUAL_TOOLS "Build visual tools (Display, Register, postf, ray_trace) requires OpenGL & Glut"  OFF)
 # GLUT is deprecated on macOS (and freeglut is fragile to build there); use
 # bicgl's GLFW/native-Cocoa windowing backend instead when building on Apple.
 OPTION(MT_USE_GLFW           "Use GLFW for visual tools instead of GLUT" ${APPLE})
+# On Apple, GLUT/freeglut is not supported; always use the GLFW backend.
+IF(APPLE AND NOT MT_USE_GLFW)
+  MESSAGE(STATUS "Forcing MT_USE_GLFW=ON on Apple (GLUT/freeglut unsupported)")
+  SET(MT_USE_GLFW ON CACHE BOOL "Use GLFW for visual tools instead of GLUT" FORCE)
+ENDIF()
 
 OPTION(USE_SYSTEM_ITK        "Use System ITK" OFF)
 OPTION(MT_USE_OPENMP         "Use OpenMP multi-threading" OFF)
@@ -637,8 +650,12 @@ IF(MT_BUILD_VISUAL_TOOLS)
   IF(X11_FOUND)
     ADD_SUBDIRECTORY(postf)
     ADD_DEPENDENCIES(postf minc2)
-    ADD_SUBDIRECTORY(xdisp)
-    ADD_DEPENDENCIES(xdisp minc2)
+    # xdisp (EZWGL) pulls in BSD networking headers (net/if.h) that fail to
+    # compile against the macOS SDK when _XOPEN_SOURCE is defined; skip on Apple.
+    IF(NOT APPLE)
+      ADD_SUBDIRECTORY(xdisp)
+      ADD_DEPENDENCIES(xdisp minc2)
+    ENDIF(NOT APPLE)
   ENDIF(X11_FOUND)
 ENDIF(MT_BUILD_VISUAL_TOOLS)
 
