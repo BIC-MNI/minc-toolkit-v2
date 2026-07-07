@@ -650,12 +650,8 @@ IF(MT_BUILD_VISUAL_TOOLS)
   IF(X11_FOUND)
     ADD_SUBDIRECTORY(postf)
     ADD_DEPENDENCIES(postf minc2)
-    # xdisp (EZWGL) pulls in BSD networking headers (net/if.h) that fail to
-    # compile against the macOS SDK when _XOPEN_SOURCE is defined; skip on Apple.
-    IF(NOT APPLE)
-      ADD_SUBDIRECTORY(xdisp)
-      ADD_DEPENDENCIES(xdisp minc2)
-    ENDIF(NOT APPLE)
+    ADD_SUBDIRECTORY(xdisp)
+    ADD_DEPENDENCIES(xdisp minc2)
   ENDIF(X11_FOUND)
 ENDIF(MT_BUILD_VISUAL_TOOLS)
 
