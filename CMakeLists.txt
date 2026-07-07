@@ -129,6 +129,11 @@ OPTION(MT_BUILD_VISUAL_TOOLS "Build visual tools (Display, Register, postf, ray_
 # GLUT is deprecated on macOS (and freeglut is fragile to build there); use
 # bicgl's GLFW/native-Cocoa windowing backend instead when building on Apple.
 OPTION(MT_USE_GLFW           "Use GLFW for visual tools instead of GLUT" ${APPLE})
+# On Apple, GLUT/freeglut is not supported; always use the GLFW backend.
+IF(APPLE AND NOT MT_USE_GLFW)
+  MESSAGE(STATUS "Forcing MT_USE_GLFW=ON on Apple (GLUT/freeglut unsupported)")
+  SET(MT_USE_GLFW ON CACHE BOOL "Use GLFW for visual tools instead of GLUT" FORCE)
+ENDIF()
 
 OPTION(USE_SYSTEM_ITK        "Use System ITK" OFF)
 OPTION(MT_USE_OPENMP         "Use OpenMP multi-threading" OFF)
@@ -170,7 +175,7 @@ SET(SUPERBUILD_STAGING_PREFIX ${CMAKE_BINARY_DIR}/external)
 file(MAKE_DIRECTORY ${SUPERBUILD_STAGING_PREFIX}/${CMAKE_INSTALL_PREFIX}/share)
 
 SET(MINC_TEST_ENVIRONMENT
- "PATH=${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_CURRENT_BINARY_DIR}/N3:${CMAKE_CURRENT_BINARY_DIR}/classify:${CMAKE_CURRENT_BINARY_DIR}/minctools/progs:${CMAKE_CURRENT_BINARY_DIR}/minctools/conversion:${CMAKE_CURRENT_BINARY_DIR}/mni_autoreg/mincblur:${CMAKE_CURRENT_BINARY_DIR}/mni_autoreg/make_phantom:${CMAKE_CURRENT_BINARY_DIR}/mni_autoreg/minctracc:${SUPERBUILD_STAGING_PREFIX}/${CMAKE_INSTALL_PREFIX}/bin:$ENV{PATH}"
+ "PATH=${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_CURRENT_BINARY_DIR}/N3:${CMAKE_CURRENT_BINARY_DIR}/classify:${CMAKE_CURRENT_BINARY_DIR}/minctools/progs:${CMAKE_CURRENT_BINARY_DIR}/minctools/conversion:${CMAKE_CURRENT_BINARY_DIR}/mni_autoreg/mincblur:${CMAKE_CURRENT_BINARY_DIR}/mni_autoreg/make_phantom:${CMAKE_CURRENT_BINARY_DIR}/mni_autoreg/minctracc:${CMAKE_CURRENT_BINARY_DIR}/EZMINC-build/tools:${CMAKE_CURRENT_BINARY_DIR}/EZMINC-build/distortion_correction:${SUPERBUILD_STAGING_PREFIX}/${CMAKE_INSTALL_PREFIX}/bin:$ENV{PATH}"
 )
 
 LIST(APPEND MINC_TEST_ENVIRONMENT "PERL5LIB=${CMAKE_SOURCE_DIR}/mni-perllib:${CMAKE_CURRENT_BINARY_DIR}/mni-perllib/perl:${CMAKE_CURRENT_BINARY_DIR}/perl-modules:$ENV{PERL5LIB}")
@@ -649,8 +654,12 @@ IF(MT_BUILD_VISUAL_TOOLS)
   IF(X11_FOUND)
     ADD_SUBDIRECTORY(postf)
     ADD_DEPENDENCIES(postf minc2)
-    ADD_SUBDIRECTORY(xdisp)
-    ADD_DEPENDENCIES(xdisp minc2)
+    # xdisp (EZWGL) pulls in BSD networking headers (net/if.h) that fail to
+    # compile against the macOS SDK when _XOPEN_SOURCE is defined; skip on Apple.
+    IF(NOT APPLE)
+      ADD_SUBDIRECTORY(xdisp)
+      ADD_DEPENDENCIES(xdisp minc2)
+    ENDIF(NOT APPLE)
   ENDIF(X11_FOUND)
 ENDIF(MT_BUILD_VISUAL_TOOLS)
 
