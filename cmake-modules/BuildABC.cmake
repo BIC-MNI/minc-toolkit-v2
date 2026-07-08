@@ -65,6 +65,9 @@ macro(build_ABC install_prefix staging_prefix)
     LIST_SEPARATOR :::  
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
+        # ABC declares cmake_minimum_required() < 3.5, which CMake >= 4.0 rejects
+        # outright. Allow it to configure by supplying the removed policy floor.
+        -DCMAKE_POLICY_VERSION_MINIMUM:STRING=3.5
         -DITK_DIR:PATH=${ITK_DIR}
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
         -DCOMPILE_COMMANDLINE:BOOL=ON
