@@ -15,8 +15,8 @@ find_path(FFTW3F_INCLUDE_DIR fftw3.h
           NAMES fftw3.h )
 
 find_library(FFTW3F_LIBRARY NAMES fftw3f libfftw3f )
-find_library(FFTW3F_THREADS_LIBRARY NAMES fftw3_threads libfftw3f_threads )
-find_library(FFTW3F_OMP_LIBRARY NAMES fftw3_omp libfftw3f_omp )
+find_library(FFTW3F_THREADS_LIBRARY NAMES fftw3f_threads libfftw3f_threads )
+find_library(FFTW3F_OMP_LIBRARY NAMES fftw3f_omp libfftw3f_omp )
 
 set(FFTW3F_LIBRARIES ${FFTW3F_LIBRARY} )
 set(FFTW3F_INCLUDE_DIRS ${FFTW3F_INCLUDE_DIR} )
