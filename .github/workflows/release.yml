@@ -105,8 +105,9 @@ jobs:
             resolute|trixie) PCRE_PKG="" ;;
             *)               PCRE_PKG="libpcre3-dev" ;;
           esac
+          # bc is used by the mni_autoreg / patch_morphology test scripts.
           apt-get install -y \
-            build-essential cmake git ccache lsb-release file \
+            build-essential cmake git ccache lsb-release file bc \
             bison flex perl gfortran imagemagick \
             zlib1g-dev libnetcdf-dev libhdf5-dev $PCRE_PKG \
             libgsl-dev libfftw3-dev libjpeg-dev libopenjp2-7-dev \
@@ -127,7 +128,7 @@ jobs:
           key: ccache-${{ matrix.image }}-${{ matrix.variant }}-${{ github.sha }}
           restore-keys: |
             ccache-${{ matrix.image }}-${{ matrix.variant }}-
-      - name: Configure + build + package
+      - name: Configure + build
         run: |
           set -euxo pipefail
           if [ "${{ matrix.variant }}" = "full" ]; then FULL=ON; else FULL=OFF; fi
@@ -143,6 +144,7 @@ jobs:
             -DMINC_TOOLKIT_PACKAGE_VERSION_MINOR=${{ needs.meta.outputs.minor }} \
             -DMINC_TOOLKIT_PACKAGE_VERSION_PATCH=${{ needs.meta.outputs.patch }} \
             -DMT_BUILD_SHARED_LIBS=ON \
+            -DBUILD_TESTING=ON \
             -DMT_BUILD_ITK_TOOLS=ON \
             -DMT_BUILD_ANTS=$FULL \
             -DMT_BUILD_C3D=$FULL \
@@ -164,7 +166,16 @@ jobs:
             .
           cmake --build build -j"$(nproc)"
           df -h && du -sh build/ || true
-          cd build && cpack -G DEB
+      - name: Run test suite
+        run: |
+          set -euxo pipefail
+          cd build
+          ctest --output-on-failure -j"$(nproc)"
+      - name: Package
+        run: |
+          set -euxo pipefail
+          cd build
+          cpack -G DEB
       - name: Rename artifact
         run: |
           mv build/*.deb \
@@ -199,8 +210,11 @@ jobs:
     steps:
       - name: Install build deps
         run: |
+          # 'which' is not installed on Fedora 42+ (package dropped); the minctools
+          # Perl tests locate binaries via `which`, and bc is used by the
+          # mni_autoreg / patch_morphology test scripts.
           dnf install -y \
-            gcc gcc-c++ gcc-gfortran cmake make git ccache rpm-build file \
+            gcc gcc-c++ gcc-gfortran cmake make git ccache rpm-build file which bc \
             bison flex perl perl-FindBin perl-File-Path ImageMagick \
             zlib-devel netcdf-devel hdf5-devel pcre-devel gsl-devel \
             fftw-devel libjpeg-turbo-devel openjpeg2-devel \
@@ -221,7 +235,7 @@ jobs:
           key: ccache-${{ matrix.image }}-${{ matrix.variant }}-${{ github.sha }}
           restore-keys: |
             ccache-${{ matrix.image }}-${{ matrix.variant }}-
-      - name: Configure + build + package
+      - name: Configure + build
         run: |
           set -euxo pipefail
           if [ "${{ matrix.variant }}" = "full" ]; then FULL=ON; else FULL=OFF; fi
@@ -233,6 +247,7 @@ jobs:
             -DMINC_TOOLKIT_PACKAGE_VERSION_MINOR=${{ needs.meta.outputs.minor }} \
             -DMINC_TOOLKIT_PACKAGE_VERSION_PATCH=${{ needs.meta.outputs.patch }} \
             -DMT_BUILD_SHARED_LIBS=ON \
+            -DBUILD_TESTING=ON \
             -DMT_BUILD_ITK_TOOLS=ON \
             -DMT_BUILD_ANTS=$FULL \
             -DMT_BUILD_C3D=$FULL \
@@ -254,7 +269,16 @@ jobs:
             .
           cmake --build build -j"$(nproc)"
           df -h && du -sh build/ || true
-          cd build && cpack -G RPM
+      - name: Run test suite
+        run: |
+          set -euxo pipefail
+          cd build
+          ctest --output-on-failure -j"$(nproc)"
+      - name: Package
+        run: |
+          set -euxo pipefail
+          cd build
+          cpack -G RPM
       - name: Rename artifact
         run: |
           mv build/*.rpm \
@@ -279,7 +303,7 @@ jobs:
           fetch-depth: 0
       - name: Install build deps
         run: brew install cmake ccache bison flex pkg-config libpng freeglut
-      - name: Configure + build + package
+      - name: Configure + build
         run: |
           set -euxo pipefail
           if [ "${{ matrix.variant }}" = "full" ]; then FULL=ON; else FULL=OFF; fi
@@ -294,6 +318,7 @@ jobs:
             -DMINC_TOOLKIT_PACKAGE_VERSION_MINOR=${{ needs.meta.outputs.minor }} \
             -DMINC_TOOLKIT_PACKAGE_VERSION_PATCH=${{ needs.meta.outputs.patch }} \
             -DMT_BUILD_SHARED_LIBS=ON \
+            -DBUILD_TESTING=ON \
             -DMT_BUILD_VISUAL_TOOLS=$FULL \
             -DMT_BUILD_ITK_TOOLS=ON \
             -DMT_BUILD_ANTS=$FULL \
@@ -305,7 +330,25 @@ jobs:
             .
           cmake --build build -j"$(sysctl -n hw.ncpu)"
           df -h && du -sh build/ || true
-          cd build && cpack -G productbuild
+      - name: Run test suite
+        run: |
+          set -euxo pipefail
+          cd build
+          # Exclude two arch-fragile tests from the macOS gate only:
+          #  nu_reference_1  - N3 non-uniformity result drifts ~8.5e-4 RMS on
+          #                    Apple Silicon (tolerance 1e-4); FP variance, not a
+          #                    regression (passes on Linux).
+          #  minc2-leak-test - false positive: ru_maxrss is KB on Linux but bytes
+          #                    on macOS, tripping the leak threshold (fails on
+          #                    macos-15/26, passes on macos-14). Real fix is
+          #                    libminc #144, forward-ported to develop-1.9.18 in
+          #                    libminc PR #149; drop from -E once the pin bumps.
+          ctest --output-on-failure -j"$(sysctl -n hw.ncpu)" -E 'nu_reference_1|minc2-leak-test'
+      - name: Package
+        run: |
+          set -euxo pipefail
+          cd build
+          cpack -G productbuild
       - name: Rename artifact
         run: |
           mv build/*.pkg \
