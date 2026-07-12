@@ -1,5 +1,8 @@
 # MINC - TOOLKIT (Medical Imaging NetCDF Toolkit)
 
+[![CI](https://github.com/BIC-MNI/minc-toolkit-v2/actions/workflows/ci.yml/badge.svg)](https://github.com/BIC-MNI/minc-toolkit-v2/actions/workflows/ci.yml)
+[![Release](https://github.com/BIC-MNI/minc-toolkit-v2/actions/workflows/release.yml/badge.svg)](https://github.com/BIC-MNI/minc-toolkit-v2/actions/workflows/release.yml)
+
 ## Introduction
 
 This metaproject bundles multiple MINC-based packages that historically have been developed somewhat independently.
