@@ -334,16 +334,12 @@ jobs:
         run: |
           set -euxo pipefail
           cd build
-          # Exclude two arch-fragile tests from the macOS gate only:
-          #  nu_reference_1  - N3 non-uniformity result drifts ~8.5e-4 RMS on
-          #                    Apple Silicon (tolerance 1e-4); FP variance, not a
-          #                    regression (passes on Linux).
-          #  minc2-leak-test - false positive: ru_maxrss is KB on Linux but bytes
-          #                    on macOS, tripping the leak threshold (fails on
-          #                    macos-15/26, passes on macos-14). Real fix is
-          #                    libminc #144, forward-ported to develop-1.9.18 in
-          #                    libminc PR #149; drop from -E once the pin bumps.
-          ctest --output-on-failure -j"$(sysctl -n hw.ncpu)" -E 'nu_reference_1|minc2-leak-test'
+          # Exclude one test from the macOS gate: nu_reference_1 -- the N3
+          # non-uniformity result drifts ~8.5e-4 RMS on Apple Silicon (over the
+          # 1e-4 tolerance); floating-point variance, not a regression (passes on
+          # Linux). minc2-leak-test's macOS false positive is fixed via the
+          # libminc bump (#144/#145, forward-ported in libminc PR #149).
+          ctest --output-on-failure -j"$(sysctl -n hw.ncpu)" -E 'nu_reference_1'
       - name: Package
         run: |
           set -euxo pipefail
