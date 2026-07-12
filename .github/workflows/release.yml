@@ -50,7 +50,7 @@ jobs:
     needs: meta
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
           fetch-depth: 0
@@ -66,7 +66,7 @@ jobs:
             -DMT_USE_BLAS=OFF \
             .
           cd build && cpack --config CPackSourceConfig.cmake -G TGZ
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: source
           path: build/*-src.tar.gz
@@ -118,11 +118,11 @@ jobs:
           fi
       - name: Allow git to read the workspace owned by the runner user
         run: git config --global --add safe.directory '*'
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
           fetch-depth: 0
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: /root/.ccache
           key: ccache-${{ matrix.image }}-${{ matrix.variant }}-${{ github.sha }}
@@ -180,7 +180,7 @@ jobs:
         run: |
           mv build/*.deb \
             "minc-toolkit-v2_${{ needs.meta.outputs.version }}_${{ matrix.distro }}-${{ matrix.codename }}-${{ matrix.variant }}_amd64.deb"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: deb-${{ matrix.distro }}-${{ matrix.codename }}-${{ matrix.variant }}
           path: '*.deb'
@@ -225,11 +225,11 @@ jobs:
           fi
       - name: Allow git to read the workspace owned by the runner user
         run: git config --global --add safe.directory '*'
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
           fetch-depth: 0
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: /root/.ccache
           key: ccache-${{ matrix.image }}-${{ matrix.variant }}-${{ github.sha }}
@@ -283,7 +283,7 @@ jobs:
         run: |
           mv build/*.rpm \
             "minc-toolkit-v2-${{ needs.meta.outputs.version }}-fc${{ matrix.release }}-${{ matrix.variant }}.x86_64.rpm"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: rpm-fc${{ matrix.release }}-${{ matrix.variant }}
           path: '*.rpm'
@@ -297,7 +297,7 @@ jobs:
         runner: [macos-14, macos-15, macos-26]
         variant: [minimal, full]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
           fetch-depth: 0
@@ -349,7 +349,7 @@ jobs:
         run: |
           mv build/*.pkg \
             "minc-toolkit-v2-${{ needs.meta.outputs.version }}-${{ matrix.runner }}-universal-${{ matrix.variant }}.pkg"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.runner }}-${{ matrix.variant }}
           path: '*.pkg'
@@ -359,11 +359,11 @@ jobs:
     needs: [meta, source-tarball, deb, rpm, macos]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: artifacts
           merge-multiple: true
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: artifacts/*
           tag_name: ${{ github.ref_name }}
