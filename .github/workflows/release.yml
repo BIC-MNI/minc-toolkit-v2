@@ -348,7 +348,7 @@ jobs:
       - name: Rename artifact
         run: |
           mv build/*.pkg \
-            "minc-toolkit-v2-${{ needs.meta.outputs.version }}-${{ matrix.runner }}-universal-${{ matrix.variant }}.pkg"
+            "minc-toolkit-v2-${{ needs.meta.outputs.version }}-${{ matrix.runner }}-arm64-${{ matrix.variant }}.pkg"
       - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.runner }}-${{ matrix.variant }}

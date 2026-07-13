@@ -112,15 +112,21 @@ ENDIF()
 # still provides them. Components forward ${CMAKE_CXX_FLAGS} to their
 # ExternalProjects, so this reaches every consumer; ITK keeps its own internal
 # standard. Matches the existing -std=gnu17 handling for C.
-IF(NOT CMAKE_CXX_FLAGS MATCHES "-std=")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17")
-ENDIF()
+#
+# These are GCC/Clang flag spellings; MSVC and clang-cl use /std: and reject
+# -std= / -Wno-register. Windows/MSVC is not a supported build target (Linux and
+# macOS only), but guard on NOT MSVC so a stray MSVC configure does not error.
+IF(NOT MSVC)
+  IF(NOT CMAKE_CXX_FLAGS MATCHES "-std=")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17")
+  ENDIF()
 
-# The 'register' storage-class keyword was removed in C++17. Vintage vendored
-# code still uses it (e.g. Elastix's ANN/ann_1.1). clang makes this a hard
-# error at C++17 ([-Wregister]); gcc only warns (so Linux built). Downgrade it
-# everywhere so the C++17 cap doesn't break this code on clang/macOS.
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-register")
+  # The 'register' storage-class keyword was removed in C++17. Vintage vendored
+  # code still uses it (e.g. Elastix's ANN/ann_1.1). clang makes this a hard
+  # error at C++17 ([-Wregister]); gcc only warns (so Linux built). Downgrade it
+  # everywhere so the C++17 cap doesn't break this code on clang/macOS.
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-register")
+ENDIF()
 
 # At C++17 std::unary_function/binary_function (and other C++17-removed cruft)
 # are gone. libstdc++ still ships them as deprecated, but macOS libc++ removes
@@ -232,7 +238,7 @@ LIST(APPEND MINC_TEST_ENVIRONMENT "PERL5LIB=${CMAKE_SOURCE_DIR}/mni-perllib:${CM
 
 IF(APPLE)
   LIST(APPEND MINC_TEST_ENVIRONMENT "DYLD_LIBRARY_PATH=${SUPERBUILD_STAGING_PREFIX}/${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}:${CMAKE_CURRENT_BINARY_DIR}/libminc:${SUPERBUILD_STAGING_PREFIX}/${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}:${CMAKE_CURRENT_BINARY_DIR}/libminc/ezminc:$ENV{DYLD_LIBRARY_PATH}")
-ELSE(APLLE)
+ELSE(APPLE)
   LIST(APPEND MINC_TEST_ENVIRONMENT "LD_LIBRARY_PATH=${SUPERBUILD_STAGING_PREFIX}/${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}:${CMAKE_CURRENT_BINARY_DIR}/libminc:${CMAKE_CURRENT_BINARY_DIR}/libminc/ezminc:$ENV{LD_LIBRARY_PATH}")
 ENDIF(APPLE)
 
