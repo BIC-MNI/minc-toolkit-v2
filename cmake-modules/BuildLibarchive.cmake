@@ -82,6 +82,10 @@ macro(build_libarchive install_prefix staging_prefix)
         -DENABLE_LZMA:BOOL=OFF
         -DENABLE_COMPRESSION:BOOL=OFF
         -DENABLE_TEST:BOOL=OFF
+        # libarchive autodetects libiconv on macOS and pulls in _iconv symbols
+        # that downstream consumers (ITK's link) don't resolve. We don't need
+        # charset conversion, so disable it.
+        -DENABLE_ICONV:BOOL=OFF
         -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
         -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
         ${CMAKE_EXTERNAL_PROJECT_ARGS}
