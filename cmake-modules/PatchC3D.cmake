@@ -40,3 +40,35 @@ if(NOT _tc STREQUAL _tc2)
   file(WRITE "${_top}" "${_tc2}")
   message(STATUS "Patched C3D link order: cnd_driver before cnd_adapters")
 endif()
+
+# Same single-pass-linker problem, different pair, buried inside ${ITK_LIBRARIES}
+# itself: ITK's own library list places libfftw3f.a (defines
+# fftwf_set_planner_hooks) immediately BEFORE libfftw3f_threads.a (whose
+# threads.c.o references it) -- backwards for a single-pass linker: ld scans
+# fftw3f.a first (nothing needs that symbol yet), discards it, then pulls
+# fftw3f_threads.a, whose new undefined reference to fftwf_set_planner_hooks
+# can no longer be satisfied: "undefined reference to fftwf_set_planner_hooks".
+#
+# Can't fix this the same way as above (textual reordering), because CMake's
+# link-line computation defers ANY imported target's (i.e. anything findable
+# via find_package(ITK), unlike our own plain cnd_driver/cnd_adapters targets)
+# transitive INTERFACE_LINK_LIBRARIES to a closure appended AFTER the *entire*
+# explicit list -- verified empirically: neither an extra
+# target_link_libraries() call, nor LINK_FLAGS (which actually lands before
+# the object files, not after), nor wrapping just ${ITK_LIBRARIES} in
+# -Wl,--start-group/--end-group moved that closure earlier; it's always last.
+# Fix: open an -Wl,--start-group with NO matching --end-group. GNU ld accepts
+# this and auto-closes the group at the true end of the whole command line
+# ("missing --end-group; added as last command line option"), so every
+# archive -- including whatever CMake's closure appends after our explicit
+# list -- ends up inside the group and gets rescanned until symbols resolve.
+set(_top2 "${SOURCE_DIR}/CMakeLists.txt")
+file(READ "${_top2}" _fc)
+string(REPLACE
+  "LINK_LIBRARIES(\n  cnd_driver cnd_adapters"
+  "LINK_LIBRARIES(\n  -Wl,--start-group cnd_driver cnd_adapters"
+  _fc2 "${_fc}")
+if(NOT _fc STREQUAL _fc2)
+  file(WRITE "${_top2}" "${_fc2}")
+  message(STATUS "Patched C3D: open unclosed -Wl,--start-group so ld rescans the whole link line")
+endif()
