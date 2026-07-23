@@ -62,13 +62,21 @@ endif()
 # ("missing --end-group; added as last command line option"), so every
 # archive -- including whatever CMake's closure appends after our explicit
 # list -- ends up inside the group and gets rescanned until symbols resolve.
-set(_top2 "${SOURCE_DIR}/CMakeLists.txt")
-file(READ "${_top2}" _fc)
-string(REPLACE
-  "LINK_LIBRARIES(\n  cnd_driver cnd_adapters"
-  "LINK_LIBRARIES(\n  -Wl,--start-group cnd_driver cnd_adapters"
-  _fc2 "${_fc}")
-if(NOT _fc STREQUAL _fc2)
-  file(WRITE "${_top2}" "${_fc2}")
-  message(STATUS "Patched C3D: open unclosed -Wl,--start-group so ld rescans the whole link line")
+#
+# GNU ld / gold / lld ONLY. Apple's ld64 (macOS) rescans archives by default
+# (see the cnd_driver note above -- it never hits this problem in the first
+# place) and rejects the flag outright: "ld: unknown options: --start-group",
+# which broke every macOS C3D link. So skip the injection on Darwin hosts.
+# (The patch host is the build host here; the superbuild never cross-compiles.)
+if(NOT CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+  set(_top2 "${SOURCE_DIR}/CMakeLists.txt")
+  file(READ "${_top2}" _fc)
+  string(REPLACE
+    "LINK_LIBRARIES(\n  cnd_driver cnd_adapters"
+    "LINK_LIBRARIES(\n  -Wl,--start-group cnd_driver cnd_adapters"
+    _fc2 "${_fc}")
+  if(NOT _fc STREQUAL _fc2)
+    file(WRITE "${_top2}" "${_fc2}")
+    message(STATUS "Patched C3D: open unclosed -Wl,--start-group so ld rescans the whole link line")
+  endif()
 endif()
