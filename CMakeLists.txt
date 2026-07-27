@@ -34,6 +34,19 @@ ENDIF(COMMAND CMAKE_POLICY)
 SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_C_STANDARD 99)
 
+# BuildNIFTI.cmake (and libminc's own install rules) reference
+# CMAKE_INSTALL_LIBDIR. The only place that variable got defined was
+# libminc/CMakeLists.txt's own `include(GNUInstallDirs)`, reached via
+# ADD_SUBDIRECTORY(libminc) far below -- well after build_nifti() already
+# ran and computed NIFTI_LIBRARY/ZNZ_LIBRARY with an empty
+# CMAKE_INSTALL_LIBDIR (e.g. ".../external//app/minc_itkv5//libniftiio.a",
+# missing the "lib" segment entirely). This only "worked" on a second/
+# incremental configure, once CMAKE_INSTALL_LIBDIR was already cached from
+# a prior run's later execution -- a genuinely clean, from-scratch configure
+# always broke the NIFTI link. Include it here, before anything can consume
+# CMAKE_INSTALL_LIBDIR.
+include(GNUInstallDirs)
+
 
 # Version components are overridable from the cmake CLI so CI can set them
 # from a tag without touching this file.
