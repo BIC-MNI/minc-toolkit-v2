@@ -223,8 +223,18 @@ LIST(APPEND MINC_TEST_ENVIRONMENT "PERL5LIB=${CMAKE_SOURCE_DIR}/mni-perllib:${CM
 
 IF(APPLE)
   LIST(APPEND MINC_TEST_ENVIRONMENT "DYLD_LIBRARY_PATH=${SUPERBUILD_STAGING_PREFIX}/${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}:${CMAKE_CURRENT_BINARY_DIR}/libminc:${SUPERBUILD_STAGING_PREFIX}/${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}:${CMAKE_CURRENT_BINARY_DIR}/libminc/ezminc:$ENV{DYLD_LIBRARY_PATH}")
-ELSE(APLLE)
+ELSE(APPLE)
   LIST(APPEND MINC_TEST_ENVIRONMENT "LD_LIBRARY_PATH=${SUPERBUILD_STAGING_PREFIX}/${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}:${CMAKE_CURRENT_BINARY_DIR}/libminc:${CMAKE_CURRENT_BINARY_DIR}/libminc/ezminc:$ENV{LD_LIBRARY_PATH}")
+ENDIF(APPLE)
+
+# ExternalProject_Add passes CMAKE_ARGS as a ;-separated list, so a multi-arch
+# CMAKE_OSX_ARCHITECTURES such as "arm64;x86_64" gets split into two arguments
+# and only the first reaches the sub-build -- leaving vendored dependencies
+# single-arch and breaking the universal link. Re-encode it with the ::: list
+# separator (paired with LIST_SEPARATOR ::: in each ExternalProject_Add) so the
+# full architecture list propagates.
+IF(APPLE)
+  STRING(REPLACE ";" ":::" CMAKE_OSX_ARCHITECTURES_EXTSEP "${CMAKE_OSX_ARCHITECTURES}")
 ENDIF(APPLE)
 
 
