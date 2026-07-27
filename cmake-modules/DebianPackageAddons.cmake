@@ -1,54 +1,12 @@
-# Additional settings for building a debian package
+# Additional settings for building a Debian package via CPack DEB.
+#
+# Runtime ELF dependencies are resolved via dpkg-shlibdeps so the Depends:
+# field is generated correctly per-distro from the actual binaries linked
+# in the build container. The manual list below covers only deps that are
+# used at runtime but never linked (so shlibdeps cannot find them).
 
-# make a list of used system libraries
-SET(DEBIAN_DEPENDENCIES libc6 libstdc++6 imagemagick perl )
-
-IF(BUILD_VISUAL_TOOLS)
-  LIST(APPEND DEBIAN_DEPENDENCIES freeglut3 libgl1  libxcb1 libxdmcp6 libx11-6 libxext6 libxau6  )
-ENDIF(BUILD_VISUAL_TOOLS)
-
-IF(BUILD_ITK_TOOLS)
-  LIST(APPEND DEBIAN_DEPENDENCIES  libuuid1 libjpeg62 libexpat1 libtiff4 ) # libssl1.0.0 - the name changes depending on distribution
-ENDIF(BUILD_ITK_TOOLS)
-
-IF(USE_SYSTEM_ITK)
-  LIST(APPEND DEBIAN_DEPENDENCIES libinsighttoolkit3.20 )
-ENDIF(USE_SYSTEM_ITK)
-
-IF(USE_SYSTEM_ZLIB)
-  LIST(APPEND DEBIAN_DEPENDENCIES zlib1g )
-ENDIF(USE_SYSTEM_ZLIB)
-
-IF(USE_SYSTEM_NETCDF)
-  LIST(APPEND DEBIAN_DEPENDENCIES libnetcdf6 netcdf-bin )
-ENDIF(USE_SYSTEM_NETCDF)
-
-IF(USE_SYSTEM_HDF5)
-  LIST(APPEND DEBIAN_DEPENDENCIES libhdf5-serial-1.8.4 hdf5-tools )
-ENDIF(USE_SYSTEM_HDF5)
-
-IF(USE_SYSTEM_PCRE)
-  LIST(APPEND DEBIAN_DEPENDENCIES libpcre3 libpcrecpp0 )
-ENDIF(USE_SYSTEM_PCRE)
-
-IF(USE_SYSTEM_GSL)
-  LIST(APPEND DEBIAN_DEPENDENCIES libgsl0ldbl)
-ENDIF(USE_SYSTEM_GSL)
-
-IF(USE_SYSTEM_FFTW3F)
-  LIST(APPEND DEBIAN_DEPENDENCIES libfftw3-3)
-ENDIF(USE_SYSTEM_FFTW3F)
-
-SET(CPACK_DEBIAN_PACKAGE_DEPENDS "")
-
-# assemble all pieces together
-foreach(arg ${DEBIAN_DEPENDENCIES})
-  IF(CPACK_DEBIAN_PACKAGE_DEPENDS)
-   set(CPACK_DEBIAN_PACKAGE_DEPENDS "${arg}, ${CPACK_DEBIAN_PACKAGE_DEPENDS}")
-  ELSE(CPACK_DEBIAN_PACKAGE_DEPENDS)
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "${arg}")
-  ENDIF(CPACK_DEBIAN_PACKAGE_DEPENDS)
-endforeach(arg ${DEBIAN_DEPENDENCIES})
-
-
+SET(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+SET(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
+SET(CPACK_DEBIAN_PACKAGE_DEPENDS "perl, imagemagick")
 SET(CPACK_DEBIAN_PACKAGE_SECTION "science")
+SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
