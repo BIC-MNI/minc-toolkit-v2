@@ -42,7 +42,7 @@ macro(build_openjpeg install_prefix staging_prefix)
         -DCMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
   )
-  
+
   if(APPLE)
     list(APPEND CMAKE_EXTERNAL_PROJECT_ARGS
       -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES_EXTSEP}
@@ -50,12 +50,12 @@ macro(build_openjpeg install_prefix staging_prefix)
       -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
     )
   endif()
-    
-  GET_PACKAGE("https://github.com/uclouvain/openjpeg/archive/v2.3.0.tar.gz" "6a1f8aaa1fe55d2088e3a9c942e0f698" "openjpeg-2.3.0.tar.gz" LIBOPENJPEG_PATH ) 
+
+  GET_PACKAGE("https://github.com/uclouvain/openjpeg/archive/refs/tags/v2.5.4.tar.gz" "6160de075bb5191e482bc0f024b375e4" "openjpeg-2.5.4.tar.gz" LIBOPENJPEG_PATH )
 
   ExternalProject_Add(OPENJPEG
     URL "${LIBOPENJPEG_PATH}"
-    URL_MD5 "6a1f8aaa1fe55d2088e3a9c942e0f698"
+    URL_HASH SHA256=a695fbe19c0165f295a8531b1e4e855cd94d0875d2f88ec4b61080677e27188a
     SOURCE_DIR OPENJPEG
     BINARY_DIR OPENJPEG-build
     LIST_SEPARATOR :::
@@ -66,19 +66,19 @@ macro(build_openjpeg install_prefix staging_prefix)
       -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
       -DMACOSX_RPATH:BOOL=ON
       -DBUILD_CODEC:BOOL=OFF
-      -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
+      -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/${CMAKE_INSTALL_LIBDIR}
       -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
       ${CMAKE_EXTERNAL_PROJECT_ARGS}
       "-DCMAKE_CXX_FLAGS:STRING=-fPIC ${CMAKE_CXX_FLAGS}"
       "-DCMAKE_C_FLAGS:STRING=-fPIC ${CMAKE_C_FLAGS}"
-      -DCMAKE_INSTALL_LIBDIR:PATH=${install_prefix}/lib${LIB_SUFFIX} # DISABLING Multiarch support for now ?
+      -DCMAKE_INSTALL_LIBDIR:PATH=${install_prefix}/${CMAKE_INSTALL_LIBDIR}
         INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
         INSTALL_DIR ${staging_prefix}/${install_prefix}
         )
-        
-  SET(OPENJPEG_LIBRARY     ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libopenjp2.a )
+
+  SET(OPENJPEG_LIBRARY     ${staging_prefix}/${install_prefix}/${CMAKE_INSTALL_LIBDIR}/libopenjp2.a )
   SET(OPENJPEG_LIBRARYS    ${OPENJPEG_LIBRARY})
-  SET(OPENJPEG_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include/openjpeg-2.3 )
+  SET(OPENJPEG_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include/openjpeg-2.5 )
   SET(OPENJPEG_FOUND       ON)
-endmacro(build_openjpeg)
-  
+endmacro()
+
