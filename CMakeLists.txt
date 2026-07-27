@@ -138,9 +138,10 @@ OPTION(USE_SYSTEM_PNG        "Use system libPNG for ITK (fixes bundled libpng on
 
 OPTION(MT_BUILD_ITK_TOOLS    "Build ITK-based tools"  ON)
 OPTION(MT_BUILD_VISUAL_TOOLS "Build visual tools (Display, Register, postf, ray_trace) requires OpenGL & Glut"  OFF)
-# GLUT is deprecated on macOS (and freeglut is fragile to build there); use
-# bicgl's GLFW/native-Cocoa windowing backend instead when building on Apple.
-OPTION(MT_USE_GLFW           "Use GLFW for visual tools instead of GLUT" ${APPLE})
+# GLUT is deprecated on macOS and GLX-only on Linux (no x2go / SSH X11); use
+# bicgl's GLFW windowing backend (native Cocoa on macOS, X11/EGL on Linux)
+# everywhere by default. -DMT_USE_GLFW=OFF falls back to GLUT (non-Apple only).
+OPTION(MT_USE_GLFW           "Use GLFW for visual tools instead of GLUT" ON)
 # On Apple, GLUT/freeglut is not supported; always use the GLFW backend.
 IF(APPLE AND NOT MT_USE_GLFW)
   MESSAGE(STATUS "Forcing MT_USE_GLFW=ON on Apple (GLUT/freeglut unsupported)")
