@@ -748,6 +748,22 @@ INCLUDE(DebianPackageAddons)
 # setup additional variables for making RPM package
 INCLUDE(RPMPackageAddons)
 
+# Source tarball generation: `cpack --config CPackSourceConfig.cmake -G TGZ`
+SET(CPACK_SOURCE_GENERATOR "TGZ")
+SET(CPACK_SOURCE_PACKAGE_FILE_NAME "minc-toolkit-v2-${MINC_TOOLKIT_VERSION_FULL}-src")
+SET(CPACK_SOURCE_IGNORE_FILES
+    "/\\.git/"
+    "/\\.github/"
+    "/minc-build.*/"
+    "/build/"
+    "\\.gitignore$"
+    "\\.tar\\.gz$"
+    "\\.deb$"
+    "\\.rpm$"
+    "\\.pkg$"
+    "/\\.vscode/"
+    "/\\.idea/")
+
 
 # according to http://www.cmake.org/pipermail/cmake/2011-November/047137.html it's better to put this in the end
 INCLUDE(CPack)
