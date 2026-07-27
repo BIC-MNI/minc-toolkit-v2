@@ -40,8 +40,8 @@ ExternalProject_Add(GSL
           "RANLIB=${CMAKE_C_COMPILER_RANLIB}"
           "NM=${CMAKE_NM}"
           "STRIP=${CMAKE_STRIP}"
-          "CPPFLAGS=${EXT_CXX_FLAGS}"  
-          "CXXFLAGS=${EXT_CXX_FLAGS}" 
+          "CPPFLAGS=${EXT_C_FLAGS}"
+          "CXXFLAGS=${EXT_CXX_FLAGS}"
           "CFLAGS=${EXT_C_FLAGS}" 
           "LDFLAGS=${EXT_LDFLAGS}"
   #        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/external
