@@ -45,7 +45,7 @@ macro(build_nifti install_prefix staging_prefix)
   
   if(APPLE)
     list(APPEND CMAKE_OSX_EXTERNAL_PROJECT_ARGS
-      -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
+      -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES_EXTSEP}
       -DCMAKE_OSX_SYSROOT:STRING=${CMAKE_OSX_SYSROOT}
       -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
     )
@@ -69,6 +69,7 @@ macro(build_nifti install_prefix staging_prefix)
     BINARY_DIR NIFTI-build
     URL "${NIFTILIB_PATH}"
     URL_HASH SHA256=fe6cb1076974df01844f3f4dab1aa844953b3bc1d679126c652975158573d03d
+    LIST_SEPARATOR :::
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
             -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
@@ -78,6 +79,12 @@ macro(build_nifti install_prefix staging_prefix)
             -DMACOSX_RPATH:BOOL=ON
             -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/${CMAKE_INSTALL_LIBDIR}
             -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
+            -DCMAKE_INSTALL_LIBDIR:PATH=${CMAKE_INSTALL_LIBDIR}
+            # NIFTI's CMakeLists uses its own NIFTI_INSTALL_LIBRARY_DIR variable
+            # (default 'lib'), not CMAKE_INSTALL_LIBDIR. Override it explicitly so
+            # libniftiio.a / libznz.a end up in lib64 on Fedora x86_64. ARCHIVE_DIR
+            # inherits from LIBRARY_DIR per NIFTI's own logic.
+            -DNIFTI_INSTALL_LIBRARY_DIR:PATH=${CMAKE_INSTALL_LIBDIR}
             "-DCMAKE_CXX_FLAGS_RELEASE:STRING=${NIFTI_CMAKE_CXX_FLAGS_RELEASE}"
             "-DCMAKE_C_FLAGS_RELEASE:STRING=${NIFTI_CMAKE_C_FLAGS_RELEASE}"
             "-DCMAKE_CXX_FLAGS_DEBUG:STRING=${NIFTI_CMAKE_CXX_FLAGS_DEBUG}"
@@ -98,7 +105,7 @@ macro(build_nifti install_prefix staging_prefix)
             -DUSE_NIFTI2_CODE:BOOL=OFF
             -DUSE_NIFTICDF_CODE:BOOL=OFF
             -DNIFTI_INSTALL_NO_DOCS:BOOL=ON
-   
+            ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
   )
