@@ -367,20 +367,12 @@ SET(MINC_TOOLKIT_INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
 #setup parameters
 SET(LIBMINC_BUILD_V2           ON)
 SET(LIBMINC_MINC1_SUPPORT      ON)
-# Keep minc2 from linking this superbuild's own libniftiio.a/libznz.a: ITK's
-# NIFTI third-party module has no ITK_USE_SYSTEM_NIFTI switch and always
-# builds its own bundled ITKniftiio (cf. BuildITKv5.cmake), so any
-# ITK-consumer that also links minc2 (via ITK_USE_SYSTEM_MINC's ITKIOMINC
-# module) would otherwise get the same nifti1_io.c symbols defined twice and
-# fail to link ("multiple definition of 'nifti_image_read'" etc). minc2 not
-# linking NIFTI directly does not affect nii2mnc/mnc2nii -- they link
-# NIFTI_LIBRARY/ZNZ_LIBRARY themselves (minctools/conversion/CMakeLists.txt),
-# independent of this flag. It does drop volume_io's own generic
-# input_nifti.c/input_mgh.c/input_nrrd.c auto-readers (bundled together under
-# this one flag in libminc/CMakeLists.txt), so direct .nii/.mgh/.nrrd loads
-# via input_volume() are unavailable on this branch -- acceptable here since
-# the dedicated nii2mnc/mnc2nii converters still work.
-SET(LIBMINC_NIFTI_SUPPORT      OFF)
+# Full NIfTI support in minc2 (volume_io input_nifti/mgh/nrrd readers). The old
+# "multiple definition of nifti_image_read" clash with ITK's own bundled
+# niftiio is now solved at the source level: libminc's BuildNIFTI mangles all
+# nifti_clib symbols to a minc_ prefix (see libminc/cmake-modules/nifti_mangle.h),
+# so minc2's copy can no longer collide with ITK's unprefixed one.
+SET(LIBMINC_NIFTI_SUPPORT      ON)
 SET(LIBMINC_FOUND              ON)
 SET(LIBMINC_BUILD_TOOLS        ON)
 SET(LIBMINC_BUILD_CONVERTERS   ON)

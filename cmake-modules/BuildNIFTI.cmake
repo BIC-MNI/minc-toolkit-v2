@@ -24,6 +24,14 @@ macro(build_nifti install_prefix staging_prefix)
     BINARY_DIR NIFTI-build
     URL "${NIFTILIB_PATH}"
     URL_HASH SHA256=fe6cb1076974df01844f3f4dab1aa844953b3bc1d679126c652975158573d03d
+    # Mangle all exported nifti/znz symbols to a minc_ prefix so libminc's copy
+    # cannot collide with ITK's own bundled niftiio (ITK has no
+    # ITK_USE_SYSTEM_NIFTI switch). Single source of truth lives in the libminc
+    # submodule (nifti_mangle.h / PatchNiftiMangle.cmake).
+    PATCH_COMMAND ${CMAKE_COMMAND}
+        -DSRC=<SOURCE_DIR>
+        -DMANGLE=${CMAKE_SOURCE_DIR}/libminc/cmake-modules/nifti_mangle.h
+        -P ${CMAKE_SOURCE_DIR}/libminc/cmake-modules/PatchNiftiMangle.cmake
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
             -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
