@@ -615,12 +615,23 @@ IF(MT_BUILD_VISUAL_TOOLS)
   ELSE()
     SET(BICGL_USE_GLUT ON)
     IF(USE_SYSTEM_GLUT)
+      # On macOS, CMake's FindGLUT prefers Apple's GLUT.framework, whose header
+      # is <GLUT/glut.h>; but Display/bicgl include <GL/glut.h>. Point GLUT at
+      # Homebrew freeglut (which provides GL/glut.h) when present.
+      IF(APPLE AND EXISTS "/opt/homebrew/include/GL/glut.h")
+        SET(GLUT_INCLUDE_DIR  "/opt/homebrew/include"          CACHE PATH     "" FORCE)
+        SET(GLUT_glut_LIBRARY "/opt/homebrew/lib/libglut.dylib" CACHE FILEPATH "" FORCE)
+      ENDIF()
       FIND_PACKAGE( GLUT   REQUIRED )
     ELSE(USE_SYSTEM_GLUT)
       INCLUDE(BuildFREEGLUT) # newer version of build_freeglut seem to be causing problems
       build_freeglut( ${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
     ENDIF(USE_SYSTEM_GLUT)
   ENDIF()
+
+  # Homebrew's include dir is not on macOS's default compiler search path, so
+  # make the freeglut/OpenGL headers visible to the visual-tool subdirs.
+  INCLUDE_DIRECTORIES(${GLUT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
 
   ADD_SUBDIRECTORY(bicgl)
   INCLUDE(${CMAKE_BINARY_DIR}/bicgl/BICGLConfig.cmake)
