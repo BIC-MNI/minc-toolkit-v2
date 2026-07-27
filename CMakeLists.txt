@@ -83,6 +83,38 @@ IF( NOT CMAKE_BUILD_TYPE )
    SET( CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE )
 ENDIF()
 
+# Cap C++ at gnu++17. This vintage codebase and its pinned ITK use
+# constructs removed in C++20 -- notably std::allocator::rebind, dropped from
+# libstdc++ 15+, which breaks downstream consumers of ITK's KWSys hash_map
+# (Convert3D etc.) on compilers that now default to C++20 (GCC 15/16). C++17
+# still provides them. Components forward ${CMAKE_CXX_FLAGS} to their
+# ExternalProjects, so this reaches every consumer; ITK keeps its own internal
+# standard. Matches the existing -std=gnu17 handling for C.
+#
+# These are GCC/Clang flag spellings; MSVC and clang-cl use /std: and reject
+# -std= / -Wno-register. Windows/MSVC is not a supported build target (Linux and
+# macOS only), but guard on NOT MSVC so a stray MSVC configure does not error.
+IF(NOT MSVC)
+  IF(NOT CMAKE_CXX_FLAGS MATCHES "-std=")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17")
+  ENDIF()
+
+  # The 'register' storage-class keyword was removed in C++17. Vintage vendored
+  # code still uses it (e.g. Elastix's ANN/ann_1.1). clang makes this a hard
+  # error at C++17 ([-Wregister]); gcc only warns (so Linux built). Downgrade it
+  # everywhere so the C++17 cap doesn't break this code on clang/macOS.
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-register")
+ENDIF()
+
+# At C++17 std::unary_function/binary_function (and other C++17-removed cruft)
+# are gone. libstdc++ still ships them as deprecated, but macOS libc++ removes
+# them, so ITK's KWSys hash_map (used by Convert3D/Elastix) fails to compile
+# ("no template named 'unary_function' in namespace 'std'"). Re-enable the
+# removed features on libc++ via its escape-hatch macros. No-op on libstdc++.
+IF(APPLE)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_LIBCPP_ENABLE_CXX17_REMOVED_FEATURES -D_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION")
+ENDIF()
+
 SET(CPACK_PACKAGE_FILE_NAME "minc-toolkit-${MINC_TOOLKIT_VERSION_FULL}-${MT_SYSTEM_NAME}")
 
 # register local modules
