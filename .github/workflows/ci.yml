@@ -75,6 +75,7 @@ jobs:
             -DMT_BUILD_ELASTIX=$FULL \
             -DMT_BUILD_VISUAL_TOOLS=$FULL \
             -DMT_BUILD_OPENBLAS=OFF \
+            -DMT_BUILD_ABC=OFF \
             -DMT_USE_OPENMP=ON \
             -DUSE_SYSTEM_ZLIB=ON \
             -DUSE_SYSTEM_NETCDF=ON \
@@ -151,6 +152,7 @@ jobs:
             -DMT_BUILD_VISUAL_TOOLS=$FULL \
             -DMT_BUILD_OPENBLAS=OFF \
             -DMT_USE_OPENMP=ON \
+            -DMT_BUILD_ABC=OFF \
             -DUSE_SYSTEM_ZLIB=ON \
             -DUSE_SYSTEM_NETCDF=ON \
             -DUSE_SYSTEM_HDF5=ON \
@@ -210,6 +212,7 @@ jobs:
             -DMT_BUILD_ANTS=$FULL \
             -DMT_BUILD_C3D=$FULL \
             -DMT_BUILD_ELASTIX=$FULL \
+            -DMT_BUILD_ABC=OFF \
             -DMT_BUILD_OPENBLAS=OFF \
             -DMT_USE_OPENMP=OFF \
             -DUSE_SYSTEM_ITK=OFF \
