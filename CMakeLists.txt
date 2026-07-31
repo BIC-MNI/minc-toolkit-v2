@@ -737,6 +737,15 @@ ADD_SUBDIRECTORY(man-pages)
 
 
 # write configuration information
+# ANTSPATH is only meaningful when the integrated ANTs tools were built.
+IF(MT_BUILD_ANTS)
+  SET(MT_ANTSPATH_SH  "# integrated ANTs tools\nexport ANTSPATH=\${MINC_TOOLKIT}/bin")
+  SET(MT_ANTSPATH_CSH "# integrated ANTs tools\nsetenv ANTSPATH \${MINC_TOOLKIT}/bin")
+ELSE()
+  SET(MT_ANTSPATH_SH  "")
+  SET(MT_ANTSPATH_CSH "")
+ENDIF()
+
 IF(UNIX)
   CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/minc-toolkit-config.unix.sh.cmake ${CMAKE_CURRENT_BINARY_DIR}/minc-toolkit-config.sh @ONLY)
   CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/minc-toolkit-config.unix.csh.cmake ${CMAKE_CURRENT_BINARY_DIR}/minc-toolkit-config.csh @ONLY)
