@@ -164,7 +164,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
 
 # superbuild options
 OPTION(MT_BUILD_LITE         "Build lite version of minc-toolkit, without ITK or visual tools" OFF)
-OPTION(MT_BUILD_SHARED_LIBS  "Build shared libraries." OFF)
+OPTION(MT_BUILD_SHARED_LIBS  "Build shared libraries." ON)
 OPTION(USE_SYSTEM_ZLIB       "Use System ZLIB "       OFF)
 #OPTION(USE_SYSTEM_NIFTI      "Use System NIFTI "       OFF)
 #OPTION(USE_SYSTEM_GIFTI      "Use System GIfTI"       OFF)
