@@ -41,7 +41,7 @@ jobs:
           apt-get install -y \
             build-essential cmake git ccache lsb-release file bc \
             bison flex perl gfortran imagemagick \
-            zlib1g-dev libnetcdf-dev libhdf5-dev libpcre3-dev \
+            zlib1g-dev libnetcdf-dev libhdf5-dev \
             libgsl-dev libfftw3-dev libjpeg-dev libopenjp2-7-dev \
             libarchive-dev libexpat1-dev libopenblas-dev
           if [ "${{ matrix.variant }}" = "full" ]; then
@@ -79,7 +79,6 @@ jobs:
             -DUSE_SYSTEM_ZLIB=ON \
             -DUSE_SYSTEM_NETCDF=ON \
             -DUSE_SYSTEM_HDF5=ON \
-            -DUSE_SYSTEM_PCRE=ON \
             -DUSE_SYSTEM_GSL=ON \
             -DUSE_SYSTEM_FFTW3F=ON \
             -DUSE_SYSTEM_FFTW3D=ON \
@@ -116,7 +115,7 @@ jobs:
           dnf install -y \
             gcc gcc-c++ gcc-gfortran cmake make git ccache file which bc \
             bison flex perl perl-FindBin perl-File-Path ImageMagick \
-            zlib-devel netcdf-devel hdf5-devel pcre-devel gsl-devel \
+            zlib-devel netcdf-devel hdf5-devel gsl-devel \
             fftw-devel libjpeg-turbo-devel openjpeg2-devel \
             libarchive-devel expat-devel openblas-devel
           if [ "${{ matrix.variant }}" = "full" ]; then
@@ -154,7 +153,6 @@ jobs:
             -DUSE_SYSTEM_ZLIB=ON \
             -DUSE_SYSTEM_NETCDF=ON \
             -DUSE_SYSTEM_HDF5=ON \
-            -DUSE_SYSTEM_PCRE=ON \
             -DUSE_SYSTEM_GSL=ON \
             -DUSE_SYSTEM_FFTW3F=ON \
             -DUSE_SYSTEM_FFTW3D=ON \
