@@ -31,9 +31,6 @@
 [submodule "oobicpl"]
 	path = oobicpl
 	url = https://github.com/BIC-MNI/oobicpl.git
-[submodule "arguments"]
-	path = arguments
-	url = https://github.com/BIC-MNI/arguments.git
 [submodule "Register"]
 	path = Register
 	url = https://github.com/BIC-MNI/Register.git
@@ -85,3 +82,6 @@
 [submodule "minc_gco"]
 	path = minc_gco
 	url = https://github.com/BIC-MNI/minc_gco.git
+[submodule "cxxopts"]
+	path = cxxopts
+	url = https://github.com/jarro2783/cxxopts.git

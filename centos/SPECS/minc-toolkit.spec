@@ -24,7 +24,6 @@ This metaproject is designed to bundle together various related MINC-based packa
  * minc - base Medical Imaging NetCDF package, file IO library, low-level image manipulation tools
  * bicpl - BIC programming library, adds supports for 3D objects in terms of io-library and low-level tools
  * EBTKS - Everything but the kitchen sink library, higher level C++ library for image manipulation
- * arguments - helper library for parsin command line arguments 
  * oobicpl - Object Oriented BIC programming library, provides higher level C++ interface to bicpl, and some higher level object manipulation tools
  * conglomerate - conglomerate of low-level volume and object manipilation tools
  * inormalize - intensity normalization tools

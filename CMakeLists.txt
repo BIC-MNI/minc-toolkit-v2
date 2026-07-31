@@ -389,8 +389,6 @@ IF(MT_BUILD_SHARED_LIBS)
   SET(BICPL_BUILD_SHARED_LIBS      ON)
   #oobicpl
   SET(OOBICPL_BUILD_SHARED_LIBS    ON)
-  #arguments
-  SET(ARGUMENTS_BUILD_SHARED_LIBS  ON)
   #bicgl
   SET(BICGL_BUILD_SHARED_LIBS      OFF)
 ELSE(MT_BUILD_SHARED_LIBS)
@@ -401,8 +399,6 @@ ELSE(MT_BUILD_SHARED_LIBS)
   SET(BICPL_BUILD_SHARED_LIBS      OFF)
   #oobicpl
   SET(OOBICPL_BUILD_SHARED_LIBS    OFF)
-  #arguments
-  SET(ARGUMENTS_BUILD_SHARED_LIBS  OFF)
   #bicgl
   SET(BICGL_BUILD_SHARED_LIBS      OFF)
 ENDIF(MT_BUILD_SHARED_LIBS)
@@ -489,15 +485,13 @@ INCLUDE(${CMAKE_BINARY_DIR}/bicpl/BICPLConfig.cmake)
 INCLUDE(${BICPL_USE_FILE})
 ADD_DEPENDENCIES(bicpl minc2)
 
-ADD_SUBDIRECTORY(arguments)
-
-#setup arguments variables
-SET(ARGUMENTS_USE_FILE ${CMAKE_BINARY_DIR}/bicpl/UseARGUMENTS.cmake CACHE INTERNAL "ARGUMENTS use file")
-INCLUDE(${CMAKE_BINARY_DIR}/arguments/ARGUMENTSConfig.cmake)
-INCLUDE(${ARGUMENTS_USE_FILE})
+# cxxopts is header-only; install it so standalone builds of oobicpl and
+# friends can FIND_PACKAGE(cxxopts) against the toolkit prefix.
+SET(CXXOPTS_ENABLE_INSTALL ON CACHE BOOL "" FORCE)
+ADD_SUBDIRECTORY(cxxopts)
 
 ADD_SUBDIRECTORY(oobicpl)
-ADD_DEPENDENCIES(oobicpl minc2 bicpl arguments)
+ADD_DEPENDENCIES(oobicpl minc2 bicpl)
 
 
 #setup oobicpl variables
