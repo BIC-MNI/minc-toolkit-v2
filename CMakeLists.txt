@@ -166,6 +166,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
 OPTION(MT_BUILD_LITE         "Build lite version of minc-toolkit, without ITK or visual tools" OFF)
 OPTION(MT_BUILD_SHARED_LIBS  "Build shared libraries." ON)
 OPTION(USE_SYSTEM_ZLIB       "Use System ZLIB "       OFF)
+OPTION(USE_SYSTEM_NIFTI      "Use System NIFTI "      OFF)
 #OPTION(USE_SYSTEM_GIFTI      "Use System GIfTI"       OFF)
 OPTION(USE_SYSTEM_NETCDF     "Use System NETCDF > 3.6.3" OFF)
 OPTION(USE_SYSTEM_HDF5       "Use System HDF5 > 1.8"     OFF)
@@ -296,14 +297,24 @@ ELSE()
   ENDIF()
 ENDIF()
 
-# NIFTI is always built from the pinned nifti_clib, never taken from the system:
-# our copy is symbol-mangled to minc_* (see libminc/cmake-modules/nifti_mangle.h)
-# so it cannot collide with the unmangled niftiio ITK bundles. A system nifti
-# would reintroduce that collision, so there is no USE_SYSTEM_NIFTI option.
-INCLUDE(BuildNIFTI)
-build_nifti( ${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
-IF(NOT USE_SYSTEM_ZLIB)
-  add_dependencies(NIFTI ZLIB)
+# Either path defines the NIFTI::niftiio / NIFTI::znz imported targets, which is
+# all the consumers below (libminc, minctools, Display) ask for.
+#
+# The bundled build renames every exported symbol to minc_* (see
+# libminc/cmake-modules/nifti_mangle.h). A system nifti is of course whatever
+# the distro shipped, i.e. unmangled: fine against the shared libniftiio.so
+# distros package, which is what the release .deb/.rpm link, but do not pair
+# USE_SYSTEM_NIFTI with a *static* system nifti and MT_BUILD_ITK_TOOLS -- that
+# collides with ITK's own bundled ITKniftiio on nifti_image_read and friends,
+# since ITK 4.x has no ITK_USE_SYSTEM_NIFTI switch.
+IF(USE_SYSTEM_NIFTI)
+  FIND_PACKAGE(NIFTI CONFIG REQUIRED)
+ELSE()
+  INCLUDE(BuildNIFTI)
+  build_nifti( ${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
+  IF(NOT USE_SYSTEM_ZLIB)
+    add_dependencies(NIFTI ZLIB)
+  ENDIF()
 ENDIF()
 
 # IF(USE_SYSTEM_GIFTI)
@@ -360,6 +371,9 @@ SET(MINC_TOOLKIT_INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
 SET(LIBMINC_BUILD_V2           ON)
 SET(LIBMINC_MINC1_SUPPORT      ON)
 SET(LIBMINC_NIFTI_SUPPORT      ON)
+# Tells libminc whether its NIfTI is the mangled bundled build or the system
+# one, so it can skip the mangling invariant test in the latter case.
+SET(LIBMINC_USE_SYSTEM_NIFTI   ${USE_SYSTEM_NIFTI})
 SET(LIBMINC_FOUND              ON)
 SET(LIBMINC_BUILD_TOOLS        ON)
 SET(LIBMINC_BUILD_CONVERTERS   ON)
@@ -422,7 +436,9 @@ IF(NOT USE_SYSTEM_HDF5)
   SET(MINC2_deps ${MINC2_deps} HDF5)
 ENDIF()
 
-SET(MINC2_deps ${MINC2_deps} NIFTI)
+IF(NOT USE_SYSTEM_NIFTI)
+  SET(MINC2_deps ${MINC2_deps} NIFTI)
+ENDIF()
 
 # IF(NOT USE_SYSTEM_GIFTI)
 #   SET(MINC2_deps ${MINC2_deps} GIFTI)
