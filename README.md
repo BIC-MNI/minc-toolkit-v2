@@ -254,8 +254,14 @@ right choice for a personal install. The release packages use the system
 libraries instead, so that the resulting `.deb` and `.rpm` files depend on the
 distribution packages.
 
-`USE_SYSTEM_NIFTI` has no `option()` entry, so it does not show up in `ccmake`.
-Passing it on the command line still works.
+`USE_SYSTEM_NIFTI` carries one caveat. The bundled NIfTI is built from a pinned
+`nifti_clib` with every exported symbol renamed to `minc_*`, so that it cannot
+collide with the unmangled `niftiio` that ITK bundles (ITK 4.x has no
+`ITK_USE_SYSTEM_NIFTI` switch). A system NIfTI is unmangled. That is fine
+against the shared `libniftiio.so` distributions package — which is what the
+release `.deb` and `.rpm` link — but do not combine `USE_SYSTEM_NIFTI` with a
+*static* system NIfTI and `MT_BUILD_ITK_TOOLS`, or the two copies will collide
+on `nifti_image_read` and friends at link time.
 
 ## Build dependencies
 
