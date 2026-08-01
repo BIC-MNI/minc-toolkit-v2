@@ -62,13 +62,19 @@ macro(build_nifti install_prefix staging_prefix)
   SET(NIFTI_CMAKE_CXX_FLAGS "-fPIC ${CMAKE_CXX_FLAGS} -I${ZLIB_INCLUDE_DIR}")
   SET(NIFTI_CMAKE_C_FLAGS   "-fPIC ${CMAKE_C_FLAGS} -I${ZLIB_INCLUDE_DIR}")
 
-  GET_PACKAGE("https://github.com/NIFTI-Imaging/nifti_clib/archive/refs/tags/v3.0.0.tar.gz" "ee40068103775a181522166e435ee82d" "nifti_clib-3.0.0.tar.gz" NIFTILIB_PATH )
+  # nifti_clib upstream (NIFTI-Imaging) has been dormant since v3.0.0 (2020);
+  # the ITK fork is the maintained line and carries the bug fixes ITK ships.
+  # It has no tags, so the pin is a commit SHA. Keep this pin in sync with
+  # libminc/cmake-modules/BuildNIFTI.cmake, and regenerate nifti_mangle.h
+  # (see the recipe in its header) whenever it moves.
+  SET(NIFTI_GIT_SHA f24a607843c1fe4726ad774d0476bdf36bc11f2a)
+  GET_PACKAGE("https://github.com/InsightSoftwareConsortium/nifti_clib/archive/${NIFTI_GIT_SHA}.tar.gz" "7099e80a905e26e0e2eb22f07c8a7faf" "nifti_clib-${NIFTI_GIT_SHA}.tar.gz" NIFTILIB_PATH )
 
   ExternalProject_Add(NIFTI
     SOURCE_DIR NIFTI
     BINARY_DIR NIFTI-build
     URL "${NIFTILIB_PATH}"
-    URL_HASH SHA256=fe6cb1076974df01844f3f4dab1aa844953b3bc1d679126c652975158573d03d
+    URL_HASH SHA256=1829700c16ac0679487d9b7eb1d8d63a5d8a045e990d4b37b38f4760499aea16
     LIST_SEPARATOR :::
     # Mangle all exported nifti/znz symbols to a minc_ prefix so libminc's copy
     # cannot collide with ITK's own bundled niftiio (ITK has no
@@ -124,6 +130,31 @@ SET(NIFTI_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include/nifti )
 SET(ZNZ_LIBRARY       ${staging_prefix}/${install_prefix}/${CMAKE_INSTALL_LIBDIR}/libznz.a )
 SET(ZNZ_INCLUDE_DIR   ${staging_prefix}/${install_prefix}/include/nifti )
 SET(NIFTI_FOUND ON)
+
+# Mirror the NIFTI::niftiio / NIFTI::znz imported targets that nifti_clib's own
+# NIFTIConfig.cmake would provide, so consumers link the same way whether NIFTI
+# came from here or from find_package(NIFTI CONFIG). The config package itself
+# is not usable at this point: ExternalProject builds at build time, long after
+# the ADD_SUBDIRECTORY()'d consumers are configured.
+# Build ordering is not carried by these targets -- keep the explicit
+# add_dependencies(<target> NIFTI) calls at the call sites.
+file(MAKE_DIRECTORY ${NIFTI_INCLUDE_DIR}) # imported INTERFACE include dirs must exist at configure time
+
+IF(NOT TARGET NIFTI::znz)
+  add_library(NIFTI::znz STATIC IMPORTED GLOBAL)
+  set_target_properties(NIFTI::znz PROPERTIES
+    IMPORTED_LOCATION "${ZNZ_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${ZNZ_INCLUDE_DIR}"
+    INTERFACE_LINK_LIBRARIES "${ZLIB_LIBRARY}")
+ENDIF()
+
+IF(NOT TARGET NIFTI::niftiio)
+  add_library(NIFTI::niftiio STATIC IMPORTED GLOBAL)
+  set_target_properties(NIFTI::niftiio PROPERTIES
+    IMPORTED_LOCATION "${NIFTI_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${NIFTI_INCLUDE_DIR}"
+    INTERFACE_LINK_LIBRARIES "NIFTI::znz;m")
+ENDIF()
 
 endmacro()
 
