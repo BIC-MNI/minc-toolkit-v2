@@ -99,17 +99,11 @@ jobs:
       - name: Install build deps
         run: |
           apt-get update
-          # PCRE 1 (libpcre3-dev) is removed in Ubuntu 26.04 (resolute) and
-          # Debian 13 (trixie). Use vendored PCRE there.
-          case "${{ matrix.codename }}" in
-            resolute|trixie) PCRE_PKG="" ;;
-            *)               PCRE_PKG="libpcre3-dev" ;;
-          esac
           # bc is used by the mni_autoreg / patch_morphology test scripts.
           apt-get install -y \
             build-essential cmake git ccache lsb-release file bc \
             bison flex perl gfortran imagemagick \
-            zlib1g-dev libnetcdf-dev libhdf5-dev $PCRE_PKG \
+            zlib1g-dev libnetcdf-dev libhdf5-dev \
             libgsl-dev libfftw3-dev libjpeg-dev libopenjp2-7-dev \
             libarchive-dev libexpat1-dev libopenblas-dev
           if [ "${{ matrix.variant }}" = "full" ]; then
@@ -132,10 +126,6 @@ jobs:
         run: |
           set -euxo pipefail
           if [ "${{ matrix.variant }}" = "full" ]; then FULL=ON; else FULL=OFF; fi
-          case "${{ matrix.codename }}" in
-            resolute|trixie) USE_SYSTEM_PCRE=OFF ;;
-            *)               USE_SYSTEM_PCRE=ON  ;;
-          esac
           cmake -B build \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=/opt/minc/${{ needs.meta.outputs.version }} \
@@ -155,7 +145,6 @@ jobs:
             -DUSE_SYSTEM_ZLIB=ON \
             -DUSE_SYSTEM_NETCDF=ON \
             -DUSE_SYSTEM_HDF5=ON \
-            -DUSE_SYSTEM_PCRE=$USE_SYSTEM_PCRE \
             -DUSE_SYSTEM_GSL=ON \
             -DUSE_SYSTEM_FFTW3F=ON \
             -DUSE_SYSTEM_FFTW3D=ON \
@@ -216,7 +205,7 @@ jobs:
           dnf install -y \
             gcc gcc-c++ gcc-gfortran cmake make git ccache rpm-build file which bc \
             bison flex perl perl-FindBin perl-File-Path ImageMagick \
-            zlib-devel netcdf-devel hdf5-devel pcre-devel gsl-devel \
+            zlib-devel netcdf-devel hdf5-devel gsl-devel \
             fftw-devel libjpeg-turbo-devel openjpeg2-devel \
             libarchive-devel expat-devel openblas-devel
           if [ "${{ matrix.variant }}" = "full" ]; then
@@ -258,7 +247,6 @@ jobs:
             -DUSE_SYSTEM_ZLIB=ON \
             -DUSE_SYSTEM_NETCDF=ON \
             -DUSE_SYSTEM_HDF5=ON \
-            -DUSE_SYSTEM_PCRE=ON \
             -DUSE_SYSTEM_GSL=ON \
             -DUSE_SYSTEM_FFTW3F=ON \
             -DUSE_SYSTEM_FFTW3D=ON \
