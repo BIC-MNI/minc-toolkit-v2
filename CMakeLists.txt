@@ -307,21 +307,32 @@ ENDIF()
 # unprefixed. A distribution nifti is unmangled too, so in any binary that links
 # both -- c3d, elastix, ANTs, the EZminc tools -- those eight names clash.
 #
-# It does not fail at link time. ITK's copies are pulled into the executable and
-# land in its dynamic symbol table, where they interpose over libznz.so; the
-# system libniftiio.so then reaches ITK's znz layer for every read and
-# nifti_image_read returns NULL on files that are perfectly valid.
+# Nothing fails at link time, and on the platforms we ship it does not fail
+# loudly at runtime either. ITK's copies are pulled into the executable and land
+# in its dynamic symbol table -- measured: 8 znz names in .dynsym -- where they
+# interpose over libznz.so, so the system libniftiio.so runs ITK's znz layer for
+# every read. On LP64 the two implementations happen to agree well enough that
+# reads still work. That is one definition of each function silently replacing
+# another, though, and it stops being harmless as soon as they diverge: on
+# ILP32 with large-file support they already have, ITK's znzseek/znztell taking
+# and returning long (4 bytes) against nifti_clib 3.x's znz_off_t (8), and
+# sizeof(struct znzptr) differs between any two builds that disagree on
+# HAVE_ZLIB.
 #
 # The bundled build sidesteps all of this by renaming every symbol to minc_*
 # (libminc/cmake-modules/nifti_mangle.h). A prebuilt system library cannot be
-# renamed, and ITK 4.x has no ITK_USE_SYSTEM_NIFTI to point it at one copy, so
-# refuse the combination rather than ship silently broken NIfTI support.
+# renamed, and ITK 4.x has no ITK_USE_SYSTEM_NIFTI to point it at one copy.
+#
+# The real fix is upstream: give ITK's znzlib the mangle header its niftiio
+# already has. Once the pinned ITK carries that, this guard can go.
 IF(USE_SYSTEM_NIFTI AND MT_BUILD_ITK_TOOLS)
   MESSAGE(FATAL_ERROR
     "USE_SYSTEM_NIFTI=ON is incompatible with MT_BUILD_ITK_TOOLS=ON.\n"
-    "ITK bundles an unmangled znzlib whose znzopen/znzread/znzseek/... "
-    "interpose over a system libznz.so at runtime, silently breaking NIfTI "
-    "reading in every tool that links both ITK and libminc.\n"
+    "ITK bundles an unmangled znzlib, so its znzopen/znzread/znzseek/... "
+    "interpose over a system libznz.so at runtime in every tool that links "
+    "both ITK and libminc. The two implementations agree on 64-bit builds "
+    "today, but this is undefined behaviour that breaks on ILP32 with "
+    "large-file support and on any future divergence.\n"
     "Use USE_SYSTEM_NIFTI=ON with MT_BUILD_ITK_TOOLS=OFF (or MT_BUILD_LITE=ON), "
     "or keep the bundled, symbol-mangled NIfTI with USE_SYSTEM_NIFTI=OFF.")
 ENDIF()
