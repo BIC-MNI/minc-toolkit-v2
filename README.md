@@ -254,14 +254,19 @@ right choice for a personal install. The release packages use the system
 libraries instead, so that the resulting `.deb` and `.rpm` files depend on the
 distribution packages.
 
-`USE_SYSTEM_NIFTI` carries one caveat. The bundled NIfTI is built from a pinned
-`nifti_clib` with every exported symbol renamed to `minc_*`, so that it cannot
-collide with the unmangled `niftiio` that ITK bundles (ITK 4.x has no
-`ITK_USE_SYSTEM_NIFTI` switch). A system NIfTI is unmangled. That is fine
-against the shared `libniftiio.so` distributions package — which is what the
-release `.deb` and `.rpm` link — but do not combine `USE_SYSTEM_NIFTI` with a
-*static* system NIfTI and `MT_BUILD_ITK_TOOLS`, or the two copies will collide
-on `nifti_image_read` and friends at link time.
+`USE_SYSTEM_NIFTI` cannot be combined with `MT_BUILD_ITK_TOOLS`, and configuring
+both fails with an explanation. ITK bundles its own NIfTI. It renames the
+`niftiio` half out of the way, but not `znzlib`, so it exports `znzopen`,
+`znzread`, `znzseek` and five siblings under their plain names. A distribution
+NIfTI exports the same names, and in a tool that links both — `c3d`, `elastix`,
+ANTs — ITK's copies interpose over the system `libznz.so` at runtime. Nothing
+fails at link time, and on 64-bit builds the two implementations agree closely
+enough that reads still work; it is nonetheless one definition silently
+replacing another, and it already breaks on 32-bit builds with large-file
+support, where the two disagree on the width of a file offset. The bundled
+NIfTI avoids this by renaming every symbol to `minc_*`, which a prebuilt system
+library cannot do. Use `USE_SYSTEM_NIFTI` with `MT_BUILD_ITK_TOOLS=OFF` or
+`MT_BUILD_LITE=ON`.
 
 ## Build dependencies
 
