@@ -180,6 +180,14 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
     URL "${ITKv4_PATH}"
     URL_MD5 "9a3fd160f88a27e664098b94a5de3062"
     UPDATE_COMMAND ""
+    # ITK mangles its bundled niftiio to itk_* but not its znzlib, so ITKznz
+    # exports plain znzopen/znzread/znzseek/... and collides with any other
+    # znzlib in the same binary. Apply the missing half. Submitted upstream as
+    # InsightSoftwareConsortium/ITK#6756; drop this once the pin carries it.
+    PATCH_COMMAND ${CMAKE_COMMAND}
+        -DSRC=<SOURCE_DIR>
+        -DMANGLE=${CMAKE_SOURCE_DIR}/cmake-modules/itk_znzlib_mangle.h
+        -P ${CMAKE_SOURCE_DIR}/cmake-modules/PatchITKZnzMangle.cmake
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
     CMAKE_GENERATOR ${CMAKE_GEN}
