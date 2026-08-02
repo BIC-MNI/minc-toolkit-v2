@@ -136,24 +136,35 @@ SET(NIFTI_FOUND ON)
 # came from here or from find_package(NIFTI CONFIG). The config package itself
 # is not usable at this point: ExternalProject builds at build time, long after
 # the ADD_SUBDIRECTORY()'d consumers are configured.
-# Build ordering is not carried by these targets -- keep the explicit
-# add_dependencies(<target> NIFTI) calls at the call sites.
-file(MAKE_DIRECTORY ${NIFTI_INCLUDE_DIR}) # imported INTERFACE include dirs must exist at configure time
+#
+# Same shape as the ZLIB::ZLIB target in BuildZLIB.cmake, ADD_DEPENDENCIES
+# included: that is what orders a consumer of the target after the
+# ExternalProject that produces the archive.
+FILE(MAKE_DIRECTORY "${NIFTI_INCLUDE_DIR}" "${ZNZ_INCLUDE_DIR}") # imported INTERFACE include dirs must exist at configure time
+
+# nifti_clib links a math library only where one exists -- see its own
+# NIFTI_SYSTEM_MATH_LIB, empty on WIN32 -- so do not hardcode m.
+SET(NIFTI_INTERFACE_LIBS NIFTI::znz)
+IF(UNIX)
+  LIST(APPEND NIFTI_INTERFACE_LIBS m)
+ENDIF()
 
 IF(NOT TARGET NIFTI::znz)
-  add_library(NIFTI::znz STATIC IMPORTED GLOBAL)
-  set_target_properties(NIFTI::znz PROPERTIES
-    IMPORTED_LOCATION "${ZNZ_LIBRARY}"
+  ADD_LIBRARY(NIFTI::znz STATIC IMPORTED GLOBAL)
+  SET_TARGET_PROPERTIES(NIFTI::znz PROPERTIES
+    IMPORTED_LOCATION             "${ZNZ_LIBRARY}"
     INTERFACE_INCLUDE_DIRECTORIES "${ZNZ_INCLUDE_DIR}"
-    INTERFACE_LINK_LIBRARIES "${ZLIB_LIBRARY}")
+    INTERFACE_LINK_LIBRARIES      ZLIB::ZLIB)
+  ADD_DEPENDENCIES(NIFTI::znz NIFTI)
 ENDIF()
 
 IF(NOT TARGET NIFTI::niftiio)
-  add_library(NIFTI::niftiio STATIC IMPORTED GLOBAL)
-  set_target_properties(NIFTI::niftiio PROPERTIES
-    IMPORTED_LOCATION "${NIFTI_LIBRARY}"
+  ADD_LIBRARY(NIFTI::niftiio STATIC IMPORTED GLOBAL)
+  SET_TARGET_PROPERTIES(NIFTI::niftiio PROPERTIES
+    IMPORTED_LOCATION             "${NIFTI_LIBRARY}"
     INTERFACE_INCLUDE_DIRECTORIES "${NIFTI_INCLUDE_DIR}"
-    INTERFACE_LINK_LIBRARIES "NIFTI::znz;m")
+    INTERFACE_LINK_LIBRARIES      "${NIFTI_INTERFACE_LIBS}")
+  ADD_DEPENDENCIES(NIFTI::niftiio NIFTI)
 ENDIF()
 
 endmacro()
