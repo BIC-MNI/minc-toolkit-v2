@@ -300,13 +300,32 @@ ENDIF()
 # Either path defines the NIFTI::niftiio / NIFTI::znz imported targets, which is
 # all the consumers below (libminc, minctools, Display) ask for.
 #
-# The bundled build renames every exported symbol to minc_* (see
-# libminc/cmake-modules/nifti_mangle.h). A system nifti is of course whatever
-# the distro shipped, i.e. unmangled: fine against the shared libniftiio.so
-# distros package, which is what the release .deb/.rpm link, but do not pair
-# USE_SYSTEM_NIFTI with a *static* system nifti and MT_BUILD_ITK_TOOLS -- that
-# collides with ITK's own bundled ITKniftiio on nifti_image_read and friends,
-# since ITK 4.x has no ITK_USE_SYSTEM_NIFTI switch.
+# A system nifti cannot be combined with the ITK-based tools. ITK mangles its
+# bundled niftiio (Modules/ThirdParty/NIFTI/.../itk_nifti_mangle.h, pulled in by
+# its nifti1.h) but ships no equivalent for znzlib, so ITKznz exports
+# Xznzclose, znzopen, znzputs, znzread, znzrewind, znzseek, znztell and znzwrite
+# unprefixed. A distribution nifti is unmangled too, so in any binary that links
+# both -- c3d, elastix, ANTs, the EZminc tools -- those eight names clash.
+#
+# It does not fail at link time. ITK's copies are pulled into the executable and
+# land in its dynamic symbol table, where they interpose over libznz.so; the
+# system libniftiio.so then reaches ITK's znz layer for every read and
+# nifti_image_read returns NULL on files that are perfectly valid.
+#
+# The bundled build sidesteps all of this by renaming every symbol to minc_*
+# (libminc/cmake-modules/nifti_mangle.h). A prebuilt system library cannot be
+# renamed, and ITK 4.x has no ITK_USE_SYSTEM_NIFTI to point it at one copy, so
+# refuse the combination rather than ship silently broken NIfTI support.
+IF(USE_SYSTEM_NIFTI AND MT_BUILD_ITK_TOOLS)
+  MESSAGE(FATAL_ERROR
+    "USE_SYSTEM_NIFTI=ON is incompatible with MT_BUILD_ITK_TOOLS=ON.\n"
+    "ITK bundles an unmangled znzlib whose znzopen/znzread/znzseek/... "
+    "interpose over a system libznz.so at runtime, silently breaking NIfTI "
+    "reading in every tool that links both ITK and libminc.\n"
+    "Use USE_SYSTEM_NIFTI=ON with MT_BUILD_ITK_TOOLS=OFF (or MT_BUILD_LITE=ON), "
+    "or keep the bundled, symbol-mangled NIfTI with USE_SYSTEM_NIFTI=OFF.")
+ENDIF()
+
 IF(USE_SYSTEM_NIFTI)
   FIND_PACKAGE(NIFTI CONFIG REQUIRED)
 ELSE()
