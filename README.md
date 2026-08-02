@@ -20,7 +20,6 @@ Here is a list of bundled packages:
  * minc-tools - low-level image manipulation tools
  * bicpl - BIC programming library, adds supports for 3D objects in terms of io-library and low-level tools
  * EBTKS - Everything But The Kitchen Sink library, higher level C++ library for image manipulation
- * arguments - helper library for parsing command line arguments 
  * oobicpl - Object Oriented BIC programming library, provides a higher level C++ interface to bicpl, 
       and some higher level object manipulation tools
  * conglomerate - conglomerate of low-level volume and object manipulation tools
