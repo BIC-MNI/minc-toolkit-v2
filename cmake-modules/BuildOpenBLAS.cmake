@@ -86,7 +86,7 @@ macro(build_open_blas install_prefix staging_prefix build_parallel)
         -DNO_WARMAP:BOOL=ON
         -DUSE_THREAD:BOOL=OFF
         -DUSE_OPENMP:BOOL=OFF
-        -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
+        -DCMAKE_INSTALL_RPATH:PATH=${MT_RPATH_ORIGIN}/../lib${LIB_SUFFIX}
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
         ${CMAKE_EXTERNAL_PROJECT_ARGS}
         "-DCMAKE_CXX_FLAGS:STRING=-fPIC ${CMAKE_CXX_FLAGS}"

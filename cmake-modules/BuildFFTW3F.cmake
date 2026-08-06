@@ -88,7 +88,7 @@ macro(build_fftw3f install_prefix staging_prefix)
           -DCMAKE_SKIP_RPATH:BOOL=OFF
           -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
           -DMACOSX_RPATH:BOOL=ON
-          -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
+          -DCMAKE_INSTALL_RPATH:PATH=${MT_RPATH_ORIGIN}/../lib${LIB_SUFFIX}
           -DINSTALL_LIB_DIR:PATH=${install_prefix}/lib${LIB_SUFFIX}
           -DINSTALL_INC_DIR:PATH=${install_prefix}/include
           ${CMAKE_EXTERNAL_PROJECT_ARGS}
