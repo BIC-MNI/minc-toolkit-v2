@@ -254,19 +254,15 @@ right choice for a personal install. The release packages use the system
 libraries instead, so that the resulting `.deb` and `.rpm` files depend on the
 distribution packages.
 
-`USE_SYSTEM_NIFTI` cannot be combined with `MT_BUILD_ITK_TOOLS`, and configuring
-both fails with an explanation. ITK bundles its own NIfTI. It renames the
-`niftiio` half out of the way, but not `znzlib`, so it exports `znzopen`,
-`znzread`, `znzseek` and five siblings under their plain names. A distribution
-NIfTI exports the same names, and in a tool that links both — `c3d`, `elastix`,
-ANTs — ITK's copies interpose over the system `libznz.so` at runtime. Nothing
-fails at link time, and on 64-bit builds the two implementations agree closely
-enough that reads still work; it is nonetheless one definition silently
-replacing another, and it already breaks on 32-bit builds with large-file
-support, where the two disagree on the width of a file offset. The bundled
-NIfTI avoids this by renaming every symbol to `minc_*`, which a prebuilt system
-library cannot do. Use `USE_SYSTEM_NIFTI` with `MT_BUILD_ITK_TOOLS=OFF` or
-`MT_BUILD_LITE=ON`.
+`USE_SYSTEM_NIFTI` works alongside the ITK tools, but only as of the ITK pinned
+in `cmake-modules/BuildITKv4.cmake`. ITK bundles its own NIfTI, and until
+[ITK#6756](https://github.com/InsightSoftwareConsortium/ITK/pull/6756) it
+renamed the `niftiio` half out of the way but not `znzlib` — so it exported
+`znzopen`, `znzread`, `znzseek` and a dozen siblings under their plain names.
+A distribution NIfTI exports the same names, and in a tool linking both —
+`c3d`, `elastix`, ANTs — ITK's copies interpose over the system `libznz.so` at
+runtime, with nothing failing at link time to say so. Both halves are prefixed
+now. If you pin an older ITK, keep `USE_SYSTEM_NIFTI=OFF`.
 
 ## Build dependencies
 
