@@ -102,7 +102,7 @@ macro(build_ABC install_prefix staging_prefix)
         -DCOMPILE_STANDALONEGUI:BOOL=OFF
         -DCMAKE_SKIP_RPATH:BOOL=OFF
         -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
-        -DCMAKE_INSTALL_RPATH:PATH=${MT_RPATH_ORIGIN}/../lib${LIB_SUFFIX}
+        -DCMAKE_INSTALL_RPATH:STRING=${MT_RPATH_ORIGIN}/../lib${LIB_SUFFIX}
         ${CMAKE_EXTERNAL_PROJECT_ARGS}
     INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}

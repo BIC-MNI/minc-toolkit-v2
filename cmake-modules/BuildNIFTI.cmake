@@ -86,7 +86,7 @@ macro(build_nifti install_prefix staging_prefix)
             -DCMAKE_SKIP_RPATH:BOOL=OFF
             -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
             -DMACOSX_RPATH:BOOL=ON
-            -DCMAKE_INSTALL_RPATH:PATH=${MT_RPATH_ORIGIN}/../${CMAKE_INSTALL_LIBDIR}
+            -DCMAKE_INSTALL_RPATH:STRING=${MT_RPATH_ORIGIN}/../${CMAKE_INSTALL_LIBDIR}
             -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
             -DCMAKE_INSTALL_LIBDIR:PATH=${CMAKE_INSTALL_LIBDIR}
             # NIFTI's CMakeLists uses its own NIFTI_INSTALL_LIBRARY_DIR variable

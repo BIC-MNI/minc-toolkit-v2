@@ -98,7 +98,7 @@ macro(build_ANTS install_prefix staging_prefix itk_dir ) #boost_dir
         -DITK_USE_FFTWD:BOOL=ON
         -DITK_USE_FFTWF:BOOL=ON
         -DITK_USE_SYSTEM_FFTW:BOOL=ON
-        -DCMAKE_INSTALL_RPATH:PATH=${MT_RPATH_ORIGIN}/../lib${LIB_SUFFIX}
+        -DCMAKE_INSTALL_RPATH:STRING=${MT_RPATH_ORIGIN}/../lib${LIB_SUFFIX}
         ${CMAKE_EXTERNAL_PROJECT_ARGS}
     INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
