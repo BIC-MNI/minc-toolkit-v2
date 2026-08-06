@@ -300,43 +300,18 @@ ENDIF()
 # Either path defines the NIFTI::niftiio / NIFTI::znz imported targets, which is
 # all the consumers below (libminc, minctools, Display) ask for.
 #
-# A system nifti cannot be combined with the ITK-based tools. ITK mangles its
-# bundled niftiio (Modules/ThirdParty/NIFTI/.../itk_nifti_mangle.h, pulled in by
-# its nifti1.h) but ships no equivalent for znzlib, so ITKznz exports
-# Xznzclose, znzopen, znzputs, znzread, znzrewind, znzseek, znztell and znzwrite
-# unprefixed. A distribution nifti is unmangled too, so in any binary that links
-# both -- c3d, elastix, ANTs, the EZminc tools -- those eight names clash.
+# A system nifti is safe alongside the ITK tools as of the ITK pinned in
+# BuildITKv4.cmake. ITK has mangled its bundled niftiio to itk_* since 2017, but
+# left znzlib alone until InsightSoftwareConsortium/ITK#6756, so ITKznz used to
+# export plain znzopen/znzread/znzseek/... Those interpose over any other znzlib
+# in the same binary -- and every tool linking both ITK and libminc has one:
+# c3d, elastix, ANTs, the EZminc tools. Nothing failed at link time; ITK's
+# copies simply landed in the executable's dynamic symbol table and took over.
+# Both halves are prefixed now, so the two copies no longer meet.
 #
-# Nothing fails at link time, and on the platforms we ship it does not fail
-# loudly at runtime either. ITK's copies are pulled into the executable and land
-# in its dynamic symbol table -- measured: 8 znz names in .dynsym -- where they
-# interpose over libznz.so, so the system libniftiio.so runs ITK's znz layer for
-# every read. On LP64 the two implementations happen to agree well enough that
-# reads still work. That is one definition of each function silently replacing
-# another, though, and it stops being harmless as soon as they diverge: on
-# ILP32 with large-file support they already have, ITK's znzseek/znztell taking
-# and returning long (4 bytes) against nifti_clib 3.x's znz_off_t (8), and
-# sizeof(struct znzptr) differs between any two builds that disagree on
-# HAVE_ZLIB.
-#
-# The bundled build sidesteps all of this by renaming every symbol to minc_*
-# (libminc/cmake-modules/nifti_mangle.h). A prebuilt system library cannot be
-# renamed, and ITK 4.x has no ITK_USE_SYSTEM_NIFTI to point it at one copy.
-#
-# The real fix is upstream: give ITK's znzlib the mangle header its niftiio
-# already has. Once the pinned ITK carries that, this guard can go.
-IF(USE_SYSTEM_NIFTI AND MT_BUILD_ITK_TOOLS)
-  MESSAGE(FATAL_ERROR
-    "USE_SYSTEM_NIFTI=ON is incompatible with MT_BUILD_ITK_TOOLS=ON.\n"
-    "ITK bundles an unmangled znzlib, so its znzopen/znzread/znzseek/... "
-    "interpose over a system libznz.so at runtime in every tool that links "
-    "both ITK and libminc. The two implementations agree on 64-bit builds "
-    "today, but this is undefined behaviour that breaks on ILP32 with "
-    "large-file support and on any future divergence.\n"
-    "Use USE_SYSTEM_NIFTI=ON with MT_BUILD_ITK_TOOLS=OFF (or MT_BUILD_LITE=ON), "
-    "or keep the bundled, symbol-mangled NIfTI with USE_SYSTEM_NIFTI=OFF.")
-ENDIF()
-
+# Our own bundled build stays renamed to minc_* regardless
+# (libminc/cmake-modules/nifti_mangle.h) -- that is what keeps it clear of ITK,
+# which still has no ITK_USE_SYSTEM_NIFTI to share a single copy.
 IF(USE_SYSTEM_NIFTI)
   FIND_PACKAGE(NIFTI CONFIG REQUIRED)
 ELSE()

@@ -165,20 +165,26 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
 
 
 
-  # Pinned to release-4.14 branch tip (2026-06-14). No v4.14.X release tag has
+  # Pinned to release-4.14 branch tip (2026-08-05). No v4.14.X release tag has
   # been cut yet; bump this SHA when upstream pushes a meaningful fix. This tip
   # adds modern-toolchain fixes: spFactor.c C23 prototypes, dropping Carbon-era
   # fp.h from the bundled libpng on macOS, and CMake 4.x support.
+  #
+  # It also carries InsightSoftwareConsortium/ITK#6756, which gives ITK's
+  # bundled znzlib the itk_* symbol mangling its niftiio has had since 2017.
+  # Without it ITKznz exported plain znzopen/znzread/znzseek/..., which
+  # interpose over any other znzlib in the same binary -- the reason a system
+  # NIfTI could not be combined with the ITK tools.
   GET_PACKAGE(
-    "https://github.com/InsightSoftwareConsortium/ITK/archive/cae3eb95758e70ff879f3ab5d3cbd5a764d70cf9.tar.gz"
-    "9a3fd160f88a27e664098b94a5de3062"
-    "InsightToolkit-4.14-cae3eb9.tar.gz"
+    "https://github.com/InsightSoftwareConsortium/ITK/archive/6073b9688acd38e8defe1f25b5ce5faf66861789.tar.gz"
+    "cd4d0d42a24a4ccd994eee92dd012733"
+    "InsightToolkit-4.14-6073b96.tar.gz"
     ITKv4_PATH)
 
 
   ExternalProject_Add(ITKv4
     URL "${ITKv4_PATH}"
-    URL_MD5 "9a3fd160f88a27e664098b94a5de3062"
+    URL_MD5 "cd4d0d42a24a4ccd994eee92dd012733"
     UPDATE_COMMAND ""
     SOURCE_DIR ITKv4
     BINARY_DIR ITKv4-build
