@@ -214,6 +214,8 @@ OPTION(MT_USE_OPENMP         "Use OpenMP multi-threading" OFF)
 #OPTION(MT_USE_OPENMP_BLAS    "Use Build OpenBLAS with OpenMP support" OFF) # TODO: finish this to compile on some platforms
 OPTION(MNI_AUTOREG_OLD_AMOEBA_INIT "Use legacy version of the code to initialize AMOEBA in minctracc" OFF)
 OPTION(MT_BUILD_DCM2MNC_TESTS "Download dcm2niix DICOM test data and enable dcm2mnc integration tests (requires internet at build time)" OFF)
+# See the BLAS detection block below for what this controls.
+OPTION(MT_EBTKS_USE_SUPERBUILD_BLAS "Automatically point EBTKS/N3's own BLAS backend (EBTKS_BLAS_BACKEND) at whatever BLAS/LAPACKE this superbuild resolved -- built from source (MT_BUILD_OPENBLAS=ON) or an existing system BLAS -- once its LAPACKE C API is available. Turn OFF to set EBTKS_BLAS_BACKEND / EBTKS_LAPACK_* manually instead." ON)
 
 SET(MT_PACKAGES_PATH "${CMAKE_BINARY_DIR}/cache" CACHE PATH  "Directory containing 3rd party packages")
 
@@ -505,9 +507,118 @@ IF(NOT USE_SYSTEM_LIBARCHIVE)
   ADD_DEPENDENCIES(dcm2mnc  LIBARCHIVE)
 ENDIF(NOT USE_SYSTEM_LIBARCHIVE)
 
+# BLAS detection: single point that exports BLAS::BLAS for in-tree consumers
+# and emits forwarding -D flags via blas_external_project_args() for ExternalProject
+# children (BEAST, patch_morphology). When MT_BUILD_OPENBLAS=ON, BLASSourceBuild
+# emits a marker; the actual OpenBLAS ExternalProject is wired below.
+# When MT_USE_BLAS=OFF, BLASSetup short-circuits and creates empty stub targets;
+# the MT_BUILD_OPENBLAS block below is also skipped (BLASSetup rejects that combo).
+#
+# This has to run BEFORE ADD_SUBDIRECTORY(EBTKS)/ADD_SUBDIRECTORY(N3) below: both
+# are ADD_SUBDIRECTORY'd in-tree rather than built as ExternalProjects, so their
+# own CMakeLists.txt (which reads EBTKS_BLAS_BACKEND / EBTKS_LAPACK_LIBRARIES to
+# pick a BLAS backend, see EBTKS/CMakeLists.txt) is processed synchronously as
+# part of this same configure pass -- setting these variables any later would be
+# a no-op for this run.
+IF(MT_USE_BLAS AND MT_BUILD_OPENBLAS)
+  enable_language(Fortran)
+ENDIF()
+include(${CMAKE_SOURCE_DIR}/cmake-modules/BLASSetup.cmake)
+IF(MT_USE_BLAS AND MT_BUILD_OPENBLAS)
+  include(BuildOpenBLAS)
+  build_open_blas(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX} ${MT_USE_OPENMP})
+  set(BLAS_LIBRARIES    "${OpenBLAS_LIBRARIES}")
+  set(BLAS_INCLUDE_DIRS "${OpenBLAS_INCLUDE_DIRS}")
+  set(BLAS_LINKER_FLAGS "")
+  blas_create_target_shim("${OpenBLAS_LIBRARIES}" "" "${OpenBLAS_INCLUDE_DIRS}")
+  # Source build was configured with -DLAPACKE=ON; the staged include dir
+  # owns lapacke.h (materialised at make time, not configure time, so we
+  # don't probe for it — we trust the build flag).
+  set_property(TARGET LAPACKE::LAPACKE APPEND PROPERTY
+    INTERFACE_INCLUDE_DIRECTORIES "${OpenBLAS_INCLUDE_DIRS}")
+  set_property(TARGET LAPACKE::LAPACKE APPEND PROPERTY
+    INTERFACE_COMPILE_DEFINITIONS "HAVE_LAPACKE")
+ENDIF()
+
+# Point EBTKS/N3's own BLAS backend (EBTKS_BLAS_BACKEND, see EBTKS/CMakeLists.txt)
+# at whatever BLAS::BLAS/LAPACKE::LAPACKE the block above resolved -- built from
+# source (MT_BUILD_OPENBLAS=ON) or an existing system BLAS (MT_BUILD_OPENBLAS=OFF,
+# BLAS_PREFERENCE=Auto/OpenBLAS/MKL/Netlib/...). One block covers both: it just reads
+# the two canonical targets, not which branch above populated them.
+#
+# Only "lapacke" is auto-selected: it's the one backend validated against this
+# superbuild (EBTKS/shim/dsysv_lapacke.c, N3/testing/brain_nu_ref_external_blas.mnc).
+# When the resolved BLAS has no LAPACKE C API (Apple Accelerate, plain Netlib BLAS
+# without liblapacke -- LAPACKESetup.cmake leaves LAPACKE::LAPACKE without
+# HAVE_LAPACKE in that case), EBTKS keeps its own "bundled" default rather than
+# guessing at a "lapack" link that might not resolve.
+#
+# Also restricted to LAPACKESetup.cmake's "LAPACKE bundled inside BLAS::BLAS" branch
+# (OpenBLAS/MKL/Auto -- its INTERFACE_LINK_LIBRARIES is the literal target reference
+# "BLAS::BLAS", read below): Netlib/ATLAS with a separately-found liblapacke puts the
+# real LAPACKE symbols in their own library, distinct from BLAS::BLAS, and forwarding
+# just BLAS::BLAS's libraries there would drop it and fail to link. Left on EBTKS's
+# bundled default instead of guessing at that combination too.
+#
+# The EXISTS check matters specifically for a from-source OpenBLAS build: its
+# ExternalProject builds at `make` time, not this configure, so lapacke.h doesn't
+# exist yet on a from-scratch build directory the first time this runs (HAVE_LAPACKE
+# above is set from the build flag, not a probe). That first pass fails closed to
+# "bundled" (no error); reconfiguring again once `cmake --build` has run once picks
+# it up. A system BLAS has no such lag -- the header either exists right now or not.
+#
+# Set MT_EBTKS_USE_SUPERBUILD_BLAS=OFF to skip all of this and set EBTKS_BLAS_BACKEND
+# / EBTKS_LAPACK_* by hand instead.
+IF(MT_USE_BLAS AND MT_EBTKS_USE_SUPERBUILD_BLAS AND TARGET LAPACKE::LAPACKE)
+  GET_TARGET_PROPERTY(_ebtks_lapacke_defs LAPACKE::LAPACKE INTERFACE_COMPILE_DEFINITIONS)
+  GET_TARGET_PROPERTY(_ebtks_lapacke_incs LAPACKE::LAPACKE INTERFACE_INCLUDE_DIRECTORIES)
+  GET_TARGET_PROPERTY(_ebtks_lapacke_link LAPACKE::LAPACKE INTERFACE_LINK_LIBRARIES)
+  IF(_ebtks_lapacke_defs MATCHES "HAVE_LAPACKE" AND _ebtks_lapacke_incs AND EXISTS "${_ebtks_lapacke_incs}/lapacke.h"
+     AND _ebtks_lapacke_link STREQUAL "BLAS::BLAS")
+    GET_TARGET_PROPERTY(_ebtks_blas_libs BLAS::BLAS INTERFACE_LINK_LIBRARIES)
+    SET(_ebtks_blas_libdirs "")
+    FOREACH(_ebtks_blas_lib ${_ebtks_blas_libs})
+      IF(IS_ABSOLUTE "${_ebtks_blas_lib}")
+        GET_FILENAME_COMPONENT(_ebtks_blas_libdir "${_ebtks_blas_lib}" DIRECTORY)
+        LIST(APPEND _ebtks_blas_libdirs "${_ebtks_blas_libdir}")
+      ENDIF()
+    ENDFOREACH()
+    IF(_ebtks_blas_libdirs)
+      LIST(REMOVE_DUPLICATES _ebtks_blas_libdirs)
+    ENDIF()
+
+    SET(EBTKS_BLAS_BACKEND "lapacke" CACHE STRING
+        "Which LAPACK/BLAS legacy/EBTKS and legacy/N3 link: bundled, lapack, lapacke, or cblas." FORCE)
+    SET(EBTKS_LAPACK_LIBRARIES "${_ebtks_blas_libs}" CACHE STRING
+        "External LAPACK/BLAS to link when EBTKS_BLAS_BACKEND != bundled." FORCE)
+    SET(EBTKS_LAPACK_LIBRARY_DIRS "${_ebtks_blas_libdirs}" CACHE STRING
+        "Extra -L directories for EBTKS_LAPACK_LIBRARIES." FORCE)
+    SET(EBTKS_LAPACK_INCLUDE_DIRS "${_ebtks_lapacke_incs}" CACHE STRING
+        "Include directories for EBTKS_LAPACK_LIBRARIES." FORCE)
+    MESSAGE(STATUS "EBTKS/N3 BLAS backend: lapacke (${_ebtks_blas_libs})")
+
+    UNSET(_ebtks_blas_libs)
+    UNSET(_ebtks_blas_libdirs)
+    UNSET(_ebtks_blas_lib)
+    UNSET(_ebtks_blas_libdir)
+  ENDIF()
+  UNSET(_ebtks_lapacke_defs)
+  UNSET(_ebtks_lapacke_incs)
+  UNSET(_ebtks_lapacke_link)
+ENDIF()
+
 ADD_SUBDIRECTORY(minc-widgets)
 ADD_SUBDIRECTORY(EBTKS)
 ADD_DEPENDENCIES(EBTKS minc2)
+IF(MT_BUILD_OPENBLAS AND EBTKS_BLAS_BACKEND STREQUAL "lapacke")
+  # EBTKS/N3 link EBTKS_LAPACK_LIBRARIES directly (see above and N3/CMakeLists.txt's
+  # LINK_LIBRARIES(... ${EBTKS_LAPACK_LIBRARIES} ...)), not through the BLAS::BLAS
+  # imported target -- so unlike BEAST/patch_morphology this ordering dependency has
+  # to be added explicitly, or a from-scratch parallel build can link against a
+  # not-yet-built libopenblas.so. Harmless no-op if EBTKS_BLAS_BACKEND=lapacke here
+  # doesn't actually point at this superbuild's own OpenBLAS (e.g. set by hand).
+  ADD_DEPENDENCIES(EBTKS OpenBLAS)
+ENDIF()
 
 # setup EBTKS variables
 SET(EBTKS_USE_FILE ${CMAKE_BINARY_DIR}/EBTKS/UseEBTKS.cmake CACHE INTERNAL "EBTKS use file")
@@ -554,32 +665,6 @@ ADD_SUBDIRECTORY(mrisim)
 ADD_SUBDIRECTORY(bic-pipelines)
 ADD_SUBDIRECTORY(perl-modules)
 ADD_SUBDIRECTORY(minc_gco)
-
-# BLAS detection: single point that exports BLAS::BLAS for in-tree consumers
-# and emits forwarding -D flags via blas_external_project_args() for ExternalProject
-# children (BEAST, patch_morphology). When MT_BUILD_OPENBLAS=ON, BLASSourceBuild
-# emits a marker; the actual OpenBLAS ExternalProject is wired below.
-# When MT_USE_BLAS=OFF, BLASSetup short-circuits and creates empty stub targets;
-# the MT_BUILD_OPENBLAS block below is also skipped (BLASSetup rejects that combo).
-IF(MT_USE_BLAS AND MT_BUILD_OPENBLAS)
-  enable_language(Fortran)
-ENDIF()
-include(${CMAKE_SOURCE_DIR}/cmake-modules/BLASSetup.cmake)
-IF(MT_USE_BLAS AND MT_BUILD_OPENBLAS)
-  include(BuildOpenBLAS)
-  build_open_blas(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX} ${MT_USE_OPENMP})
-  set(BLAS_LIBRARIES    "${OpenBLAS_LIBRARIES}")
-  set(BLAS_INCLUDE_DIRS "${OpenBLAS_INCLUDE_DIRS}")
-  set(BLAS_LINKER_FLAGS "")
-  blas_create_target_shim("${OpenBLAS_LIBRARIES}" "" "${OpenBLAS_INCLUDE_DIRS}")
-  # Source build was configured with -DLAPACKE=ON; the staged include dir
-  # owns lapacke.h (materialised at make time, not configure time, so we
-  # don't probe for it — we trust the build flag).
-  set_property(TARGET LAPACKE::LAPACKE APPEND PROPERTY
-    INTERFACE_INCLUDE_DIRECTORIES "${OpenBLAS_INCLUDE_DIRS}")
-  set_property(TARGET LAPACKE::LAPACKE APPEND PROPERTY
-    INTERFACE_COMPILE_DEFINITIONS "HAVE_LAPACKE")
-ENDIF()
 
 #required for EZminc
 IF(USE_SYSTEM_GSL)
