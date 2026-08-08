@@ -569,6 +569,15 @@ ENDIF()
 #
 # Set MT_EBTKS_USE_SUPERBUILD_BLAS=OFF to skip all of this and set EBTKS_BLAS_BACKEND
 # / EBTKS_LAPACK_* by hand instead.
+#
+# Written CACHE INTERNAL, not STRING: EBTKS/N3 each also declare these (for their own
+# standalone, non-superbuild builds), non-FORCE -- whichever SET(...CACHE...) reaches a
+# variable first wins its type as well as its value, and since this block runs before
+# ADD_SUBDIRECTORY(EBTKS)/(N3), that's this one. INTERNAL keeps them out of ccmake/
+# cmake-gui entirely: they're superbuild-computed plumbing, not something to hand-edit
+# while MT_EBTKS_USE_SUPERBUILD_BLAS is ON. With it OFF this block never runs, so
+# EBTKS's own CACHE STRING declaration (with its bundled/lapack/lapacke/cblas dropdown)
+# applies instead and they're editable again.
 IF(MT_USE_BLAS AND MT_EBTKS_USE_SUPERBUILD_BLAS AND TARGET LAPACKE::LAPACKE)
   GET_TARGET_PROPERTY(_ebtks_lapacke_defs LAPACKE::LAPACKE INTERFACE_COMPILE_DEFINITIONS)
   GET_TARGET_PROPERTY(_ebtks_lapacke_incs LAPACKE::LAPACKE INTERFACE_INCLUDE_DIRECTORIES)
@@ -587,14 +596,14 @@ IF(MT_USE_BLAS AND MT_EBTKS_USE_SUPERBUILD_BLAS AND TARGET LAPACKE::LAPACKE)
       LIST(REMOVE_DUPLICATES _ebtks_blas_libdirs)
     ENDIF()
 
-    SET(EBTKS_BLAS_BACKEND "lapacke" CACHE STRING
-        "Which LAPACK/BLAS legacy/EBTKS and legacy/N3 link: bundled, lapack, lapacke, or cblas." FORCE)
-    SET(EBTKS_LAPACK_LIBRARIES "${_ebtks_blas_libs}" CACHE STRING
-        "External LAPACK/BLAS to link when EBTKS_BLAS_BACKEND != bundled." FORCE)
-    SET(EBTKS_LAPACK_LIBRARY_DIRS "${_ebtks_blas_libdirs}" CACHE STRING
-        "Extra -L directories for EBTKS_LAPACK_LIBRARIES." FORCE)
-    SET(EBTKS_LAPACK_INCLUDE_DIRS "${_ebtks_lapacke_incs}" CACHE STRING
-        "Include directories for EBTKS_LAPACK_LIBRARIES." FORCE)
+    SET(EBTKS_BLAS_BACKEND "lapacke" CACHE INTERNAL
+        "Which LAPACK/BLAS legacy/EBTKS and legacy/N3 link: bundled, lapack, lapacke, or cblas.")
+    SET(EBTKS_LAPACK_LIBRARIES "${_ebtks_blas_libs}" CACHE INTERNAL
+        "External LAPACK/BLAS to link when EBTKS_BLAS_BACKEND != bundled.")
+    SET(EBTKS_LAPACK_LIBRARY_DIRS "${_ebtks_blas_libdirs}" CACHE INTERNAL
+        "Extra -L directories for EBTKS_LAPACK_LIBRARIES.")
+    SET(EBTKS_LAPACK_INCLUDE_DIRS "${_ebtks_lapacke_incs}" CACHE INTERNAL
+        "Include directories for EBTKS_LAPACK_LIBRARIES.")
     MESSAGE(STATUS "EBTKS/N3 BLAS backend: lapacke (${_ebtks_blas_libs})")
 
     UNSET(_ebtks_blas_libs)
