@@ -520,11 +520,15 @@ ENDIF(NOT USE_SYSTEM_LIBARCHIVE)
 # pick a BLAS backend, see EBTKS/CMakeLists.txt) is processed synchronously as
 # part of this same configure pass -- setting these variables any later would be
 # a no-op for this run.
-IF(MT_USE_BLAS AND MT_BUILD_OPENBLAS)
-  enable_language(Fortran)
-ENDIF()
 include(${CMAKE_SOURCE_DIR}/cmake-modules/BLASSetup.cmake)
 IF(MT_USE_BLAS AND MT_BUILD_OPENBLAS)
+  # After the include(), not before it: MT_USE_BLAS and MT_BUILD_OPENBLAS are
+  # declared by option() inside BLASSetup.cmake, so on a first configure this
+  # condition reads two undefined variables if it is tested any earlier -- it
+  # is then false whatever the user asked for, CMAKE_Fortran_COMPILER stays
+  # empty, and build_open_blas() below only warns about it (BuildOpenBLAS.cmake:3).
+  # Nothing between here and there needs Fortran; only build_open_blas does.
+  enable_language(Fortran)
   include(BuildOpenBLAS)
   build_open_blas(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX} ${MT_USE_OPENMP})
   set(BLAS_LIBRARIES    "${OpenBLAS_LIBRARIES}")
