@@ -157,7 +157,18 @@ SET(CPACK_STRIP_FILES    ON)
 
 # MAC OS X magick
 SET(MACOSX_RPATH  ON)
-SET(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX})
+
+# Resolve run paths relative to the loaded object instead of baking in
+# CMAKE_INSTALL_PREFIX, so a moved install still finds its libraries. Every
+# component uses this: binaries land in <prefix>/bin and libraries in
+# <prefix>/lib, and "<origin>/../lib" is correct from both -- from a library in
+# lib/ it normalises back to the same directory.
+IF(APPLE)
+  SET(MT_RPATH_ORIGIN "@loader_path")
+ELSE()
+  SET(MT_RPATH_ORIGIN "$ORIGIN")
+ENDIF()
+SET(CMAKE_INSTALL_RPATH ${MT_RPATH_ORIGIN}/../lib${LIB_SUFFIX})
 SET(CMAKE_SKIP_RPATH OFF)
 SET(CMAKE_SKIP_INSTALL_RPATH OFF)
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)

@@ -77,7 +77,7 @@ ExternalProject_Add(HDF5
       -DCMAKE_SKIP_RPATH:BOOL=OFF
       -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
       -DMACOSX_RPATH:BOOL=ON
-      -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
+      -DCMAKE_INSTALL_RPATH:STRING=${MT_RPATH_ORIGIN}/../lib${LIB_SUFFIX}
       -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
       # Must be RELATIVE to the install prefix. Passing the absolute ${install_prefix}
       # made HDF5 emit a broken package config: `include(${PACKAGE_PREFIX_DIR}//app/install/-targets.cmake)`,

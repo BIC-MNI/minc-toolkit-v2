@@ -190,7 +190,7 @@ macro(build_itkv4 install_prefix staging_prefix minc_dir)
         -DCMAKE_SKIP_RPATH:BOOL=OFF
         -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
         -DMACOSX_RPATH:BOOL=ON
-        -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
+        -DCMAKE_INSTALL_RPATH:STRING=${MT_RPATH_ORIGIN}/../lib${LIB_SUFFIX}
         ${CMAKE_EXTERNAL_PROJECT_ARGS}
         ${CMAKE_ITK_HDF5_SETTINGS}
         -DBUILD_EXAMPLES:BOOL=OFF

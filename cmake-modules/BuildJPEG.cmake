@@ -70,7 +70,7 @@ macro(build_jpeg install_prefix staging_prefix)
       -DMACOSX_RPATH:BOOL=ON
       -DWITH_SIMD:BOOL=OFF
       -DWITH_TURBOJPEG:BOOL=OFF
-      -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
+      -DCMAKE_INSTALL_RPATH:STRING=${MT_RPATH_ORIGIN}/../lib${LIB_SUFFIX}
       -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
       ${CMAKE_EXTERNAL_PROJECT_ARGS}
       "-DCMAKE_CXX_FLAGS:STRING=-fPIC ${CMAKE_CXX_FLAGS}"
