@@ -582,7 +582,31 @@ ENDIF()
 # while MT_EBTKS_USE_SUPERBUILD_BLAS is ON. With it OFF this block never runs, so
 # EBTKS's own CACHE STRING declaration (with its bundled/lapack/lapacke/cblas dropdown)
 # applies instead and they're editable again.
-IF(MT_USE_BLAS AND MT_EBTKS_USE_SUPERBUILD_BLAS AND TARGET LAPACKE::LAPACKE)
+#
+# *** APPLE WARNING ***
+# Excluded on APPLE: TBSpline::solveSymmetricSystem's classic (non-equilibrated)
+# Bunch-Kaufman solve, used by spline_smooth and hence by the nu_correct/nu_estimate
+# Perl drivers, runs on a normal-equation matrix with condition number ~1.5e13.
+# eps_double*kappa is close to 1 at that condition number, so any last-bit difference
+# in the linked LAPACK's dsysv_ -- OpenBLAS ships platform-tuned (AVX2/NEON) kernels
+# for both x86_64 and arm64 -- is amplified into an O(1e-2) to O(1e-3) difference in
+# the fitted spline coefficients, which nu_estimate's iterative feedback loop then
+# compounds far past N3/testing's nu_reference_1 1e-4 tolerance. Forcing EBTKS's own
+# "bundled" CLAPACK (EBTKS/clapack/) on APPLE removes those platform-tuned kernels;
+# see EBTKS/CMakeLists.txt and N3/CMakeLists.txt for the paired -ffp-contract=off
+# fix this enables (the two are only meaningful together -- bundled CLAPACK alone
+# got nu_reference_1's relative RMS from 0.0108 to 0.00085, still ~8.5x over
+# tolerance; only isolating and disabling FMA contraction on the two files that
+# actually matter closed the remaining gap, confirmed by a file-by-file bisection).
+IF(APPLE)
+  MESSAGE(WARNING "macOS: leaving EBTKS_BLAS_BACKEND at EBTKS's own \"bundled\" "
+    "default instead of forwarding it to the superbuild's OpenBLAS/lapacke, because "
+    "OpenBLAS's platform-tuned dsysv_ kernels diverge enough on the ill-conditioned "
+    "(kappa~1.5e13) legacy spline_smooth solve to fail nu_reference_1. Paired with "
+    "-ffp-contract=off on EBTKS/clapack/dger.c,dsyr.c and N3's spline_smooth target "
+    "-- see EBTKS/CMakeLists.txt and N3/CMakeLists.txt.")
+ENDIF(APPLE)
+IF(MT_USE_BLAS AND MT_EBTKS_USE_SUPERBUILD_BLAS AND TARGET LAPACKE::LAPACKE AND NOT APPLE)
   GET_TARGET_PROPERTY(_ebtks_lapacke_defs LAPACKE::LAPACKE INTERFACE_COMPILE_DEFINITIONS)
   GET_TARGET_PROPERTY(_ebtks_lapacke_incs LAPACKE::LAPACKE INTERFACE_INCLUDE_DIRECTORIES)
   GET_TARGET_PROPERTY(_ebtks_lapacke_link LAPACKE::LAPACKE INTERFACE_LINK_LIBRARIES)
