@@ -89,7 +89,6 @@ macro(build_EZMINC install_prefix staging_prefix libminc_dir bicpl_dir itk_dir)
         -DLIBMINC_DIR:PATH=${libminc_dir}
         -DITK_DIR:PATH=${itk_dir}
         -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
-        -DEZMINC_BUILD_MINCNLM:BOOL=ON
         -DEZMINC_BUILD_DISTORTION_CORRECTION:BOOL=ON
         -DEZMINC_BUILD_MRFSEG:BOOL=ON
         -DEZMINC_BUILD_DD:BOOL=ON
