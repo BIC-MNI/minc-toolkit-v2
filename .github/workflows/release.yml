@@ -337,9 +337,115 @@ jobs:
           name: ${{ matrix.runner }}-${{ matrix.variant }}
           path: '*.pkg'
 
+  # Fully vendored superbuild -> one relocatable tarball per variant, for people
+  # who are not on a distro this workflow packages for, or who cannot install to
+  # a system prefix. Passing no USE_SYSTEM_* flags leaves them at their OFF
+  # default, so zlib, HDF5, netCDF, GSL, FFTW, JPEG, OpenJPEG, libarchive,
+  # OpenBLAS and ITK are all built from source and shipped inside the tarball.
+  superbuild-tarball:
+    needs: meta
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [minimal, full]
+    # 22.04, not 24.04: this artifact has to run somewhere other than the machine
+    # that built it, so build against the oldest glibc (2.35) whose CMake (3.22)
+    # still satisfies every vendored dependency (HDF5 asks the most: >= 3.18).
+    container: 'ubuntu:22.04'
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      CCACHE_DIR: /root/.ccache
+      CCACHE_MAXSIZE: 2G
+    steps:
+      - name: Install build deps
+        run: |
+          apt-get update
+          # Deliberately no -dev package for anything the superbuild vendors, so
+          # nothing quietly falls back to a system copy and escapes the tarball.
+          # bc is used by the mni_autoreg / patch_morphology test scripts.
+          apt-get install -y \
+            build-essential cmake git ccache lsb-release file bc \
+            bison flex perl gfortran imagemagick
+          # The visual tools have no vendored windowing stack -- bicgl links the
+          # system GLFW, exactly as the .deb does.
+          if [ "${{ matrix.variant }}" = "full" ]; then
+            apt-get install -y libx11-dev libxi-dev libxmu-dev \
+              libgl-dev libglu1-mesa-dev libglfw3-dev libxrandr-dev libxext-dev
+          fi
+      - name: Allow git to read the workspace owned by the runner user
+        run: git config --global --add safe.directory '*'
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: actions/cache@v6
+        with:
+          path: /root/.ccache
+          key: ccache-superbuild-${{ matrix.variant }}-${{ github.sha }}
+          restore-keys: |
+            ccache-superbuild-${{ matrix.variant }}-
+      - name: Configure + build
+        run: |
+          set -euxo pipefail
+          if [ "${{ matrix.variant }}" = "full" ]; then FULL=ON; else FULL=OFF; fi
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/opt/minc/${{ needs.meta.outputs.version }} \
+            -DMINC_TOOLKIT_PACKAGE_VERSION_MAJOR=${{ needs.meta.outputs.major }} \
+            -DMINC_TOOLKIT_PACKAGE_VERSION_MINOR=${{ needs.meta.outputs.minor }} \
+            -DMINC_TOOLKIT_PACKAGE_VERSION_PATCH=${{ needs.meta.outputs.patch }} \
+            -DMT_BUILD_SHARED_LIBS=ON \
+            -DBUILD_TESTING=ON \
+            -DMT_BUILD_ITK_TOOLS=ON \
+            -DMT_BUILD_ANTS=$FULL \
+            -DMT_BUILD_C3D=$FULL \
+            -DMT_BUILD_ELASTIX=$FULL \
+            -DMT_BUILD_VISUAL_TOOLS=$FULL \
+            -DMT_BUILD_OPENBLAS=ON \
+            -DMT_USE_OPENMP=ON \
+            -DUSE_SYSTEM_ITK=OFF \
+            .
+          cmake --build build -j"$(nproc)"
+          df -h && du -sh build/ || true
+      - name: Run test suite
+        run: |
+          set -euxo pipefail
+          cd build
+          ctest --output-on-failure -j"$(nproc)"
+      - name: Build tarball
+        run: |
+          set -euxo pipefail
+          VER="${{ needs.meta.outputs.version }}"
+          DESTDIR="$PWD/pkgroot" cmake --build build --target install
+          # Repoint the top directory at a self-describing name: the tree unpacks
+          # anywhere, so the /opt/minc/<ver> prefix it was configured with is only
+          # a build-time detail.
+          mv "pkgroot/opt/minc/$VER" "pkgroot/minc-toolkit-$VER"
+          tar czf "minc-toolkit-v2-$VER-${{ matrix.variant }}-linux-x86_64.tar.gz" \
+            -C pkgroot "minc-toolkit-$VER"
+          ls -lh ./*.tar.gz
+      - name: Check the tarball actually relocates
+        run: |
+          set -euxo pipefail
+          # Unpack somewhere the build never mentioned. Sourcing the config script
+          # and writing a volume covers the whole chain the run paths have to carry:
+          # libminc -> HDF5 -> zlib (MINC_COMPRESS=4 puts the write through deflate).
+          mkdir -p /tmp/relocated
+          tar xzf ./*.tar.gz -C /tmp/relocated
+          . /tmp/relocated/minc-toolkit-*/minc-toolkit-config.sh
+          # Same geometry as the mni_autoreg ellipse0 test; the defaults do not
+          # overlap a small volume.
+          make_phantom -clobber -ellipse -nelements 64 64 64 -step 2 2 2 -start -64 -64 -64 -center 0 0 0 /tmp/relocated/phantom.mnc
+          mincinfo /tmp/relocated/phantom.mnc
+      - uses: actions/upload-artifact@v7
+        with:
+          name: tarball-${{ matrix.variant }}
+          path: '*.tar.gz'
+
   release:
     if: github.event_name == 'push'
-    needs: [meta, source-tarball, deb, rpm, macos]
+    needs: [meta, source-tarball, deb, rpm, macos, superbuild-tarball]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v8
@@ -358,6 +464,13 @@ jobs:
             **Linux**:
             - Ubuntu 22.04 / 24.04 / 26.04 / Debian 11 / 12 / 13: `sudo dpkg -i minc-toolkit-v2_<version>_<distro>-<codename>-<variant>_amd64.deb && sudo apt-get install -fy`
             - Fedora 42 / 43 / 44: `sudo dnf install minc-toolkit-v2-<version>-fc<release>-<variant>.x86_64.rpm`
+
+            **Linux, any distro** (`minc-toolkit-v2-<version>-<variant>-linux-x86_64.tar.gz`):
+            - Self-contained and relocatable — unpack it anywhere, no root needed:
+              `tar xzf minc-toolkit-v2-<version>-<variant>-linux-x86_64.tar.gz -C ~/opt`
+              then `source ~/opt/minc-toolkit-<version>/minc-toolkit-config.sh`.
+            - Every dependency the toolkit vendors (zlib, HDF5, netCDF, GSL, FFTW, JPEG, OpenJPEG, libarchive, OpenBLAS, ITK) is inside the tarball. Only glibc 2.35+ and, for the `full` variant, the system X11/OpenGL/GLFW runtime libraries are needed.
+            - Source the config script from **bash**: it locates the prefix through `BASH_SOURCE`, and other shells fall back to the path baked in at build time.
 
             **macOS** (Apple Silicon / arm64; built on macos-14 / 15 / 26 runners):
             - Open the matching `.pkg` for your macOS version. **First run is unsigned**: right-click → Open to bypass Gatekeeper.
