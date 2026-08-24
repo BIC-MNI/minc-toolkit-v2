@@ -418,6 +418,13 @@ jobs:
           set -euxo pipefail
           VER="${{ needs.meta.outputs.version }}"
           DESTDIR="$PWD/pkgroot" cmake --build build --target install
+          # Strip the ELF objects. CPACK_STRIP_FILES only covers the CPack
+          # generators, so this tree would otherwise ship whatever debug info the
+          # build produced -- and the toolkit's own components compile with -g.
+          # Perl scripts, data and man pages are matched out by file(1).
+          find pkgroot -type f -exec file -N {} + 2>/dev/null \
+            | awk -F': ' '/ELF .*(executable|shared object)/ { print $1 }' \
+            | xargs -r strip --strip-unneeded 2>/dev/null || true
           # Repoint the top directory at a self-describing name: the tree unpacks
           # anywhere, so the /opt/minc/<ver> prefix it was configured with is only
           # a build-time detail.
