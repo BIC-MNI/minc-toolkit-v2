@@ -211,6 +211,37 @@ Pass these to `cmake` as `-D<option>=ON` or `-D<option>=OFF`.
 `MT_BUILD_ANTS`, `MT_BUILD_C3D`, `MT_BUILD_ELASTIX`, and `MT_BUILD_ABC` only
 appear in the CMake cache after `MT_BUILD_ITK_TOOLS` is on.
 
+### Compiler flags
+
+| Option | Default | Effect |
+| --- | --- | --- |
+| `MT_USE_DEFAULT_FLAGS` | `ON` | Apply the default hardening flags below. `OFF` leaves the compiler entirely to `CMAKE_C_FLAGS` / `CMAKE_CXX_FLAGS`. |
+
+A `Release` build of the toolkit's own components compiles with:
+
+| Flag | Why |
+| --- | --- |
+| `-g` | Debug info, as every distribution ships. Changes no generated code; `CPACK_STRIP_FILES` removes it from the packages. The optimisation level is left alone, so `Release` keeps CMake's `-O3`. |
+| `-fstack-protector-strong` | Stack smashing detection. Every supported distribution enables it. |
+| `-D_FORTIFY_SOURCE=2` | Compile-time and run-time checks on the string and memory functions. Skipped in `Debug`, where it does nothing. |
+| `-Wl,-z,relro -Wl,-z,now` | Full RELRO. Linux only; Mach-O has no equivalent. |
+
+These reach the components built from this repository. The vendored
+third-party projects — ITK, ANTs, Convert3D, Elastix, HDF5, netCDF, OpenBLAS
+and the rest — keep their own defaults, because they are configured as separate
+CMake projects. Set `MT_USE_DEFAULT_FLAGS=OFF` to drive the compiler entirely
+yourself, for example to build with `-march=native`.
+
+Not enabled, and why: `-O2` (every distribution ships it, but it costs 6.6%
+across the toolkit and 43% on `mincresample -tricubic` for bit-identical output
+— the whole difference is `-fipa-cp-clone`, which `-O3` enables and `-O2` does
+not), `-Werror=format-security` (every distribution sets it, but this code has
+never compiled under it), link-time optimisation (costly and a known source of
+breakage across ITK and ANTs), `-D_GLIBCXX_ASSERTIONS` (bounds checking in
+imaging inner loops), and `-march=`/`-mtune=` (the x86-64 baseline is already
+the compiler default, and OpenBLAS — where the choice actually has teeth —
+builds with `DYNAMIC_ARCH` and selects its kernels from CPUID at run time).
+
 ### Windowing backend
 
 | Option | Default | Effect |

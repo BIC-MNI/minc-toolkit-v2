@@ -137,6 +137,84 @@ IF(APPLE)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_LIBCPP_ENABLE_CXX17_REMOVED_FEATURES -D_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION")
 ENDIF()
 
+# ---------------------------------------------------------------------------
+# Default build flags for the in-tree components
+#
+# CMake's Release default is -O3, with no debug info and no hardening. Every
+# distribution this project packages for has shipped -O2 -g plus a baseline of
+# hardening flags for years; the toolkit never picked any of it up, because the
+# .deb and .rpm are produced by CPack rather than by dpkg-buildflags or
+# rpmbuild, so the distribution flags never reach the compiler.
+#
+# Measured defaults, for the record:
+#   Debian 11/12/13   -O2 -g -fstack-protector-strong -D_FORTIFY_SOURCE=2
+#                     -Wformat -Werror=format-security, ld -Wl,-z,relro
+#   Ubuntu 22.04+     as Debian, plus LTO; 24.04+ adds _FORTIFY_SOURCE=3,
+#                     -fstack-clash-protection, -fcf-protection, frame pointers
+#   Fedora 42+        as above, plus -D_GLIBCXX_ASSERTIONS, full RELRO
+#                     (-Wl,-z,relro -Wl,-z,now) and -march=x86-64 -mtune=generic
+#   Homebrew          -Os for clang, -O2 for gcc, no hardening, no -march
+#
+# Take the hardening the distributions have shipped since Debian 11, and the
+# debug info that goes with it. Keep CMake's -O3.
+#
+# The optimisation level is deliberately NOT lowered to -O2, even though every
+# distribution ships -O2. Benchmarked on the ICBM152 2009c template, -O2 costs
+# 6.6% across the toolkit and 43% on `mincresample -tricubic`, for output that
+# is bit-identical. The entire 43% comes from one optimisation, -fipa-cp-clone,
+# which -O3 enables and -O2 does not. Distributions choose -O2 to balance build
+# time and code size across tens of thousands of packages; that trade does not
+# apply to a compute toolkit.
+#
+# The hardening below measures at 0.3% over the same workload set, which is why
+# it is on by default.
+#
+# Deliberately left out:
+#   -Werror=format-security      this code has never been compiled with it and
+#                                would fail rather than warn -- its own change
+#   -flto=auto                   costly across ITK/ANTs, a known breakage source
+#   -D_GLIBCXX_ASSERTIONS        real cost in imaging inner loops
+#   -Wl,-z,pack-relative-relocs  needs glibc >= 2.36 at run time, and the
+#                                relocatable tarball targets glibc 2.35
+#   -Wl,-Bsymbolic-functions     Ubuntu-specific; changes interposition
+#   -march= / -mtune=            -march=x86-64 -mtune=generic is already the
+#                                compiler default on x86-64, and OpenBLAS -- the
+#                                one component where the choice has teeth --
+#                                already builds DYNAMIC_ARCH and dispatches on
+#                                the CPU at run time
+#
+# add_compile_options()/link_libraries() rather than CMAKE_C_FLAGS: these reach
+# the ADD_SUBDIRECTORY() components below but are not part of
+# CMAKE_EXTERNAL_PROJECT_ARGS, so the vendored ExternalProjects (ITK, ANTs,
+# C3D, Elastix, HDF5, netCDF, ...) keep their own defaults. link_libraries()
+# rather than add_link_options() because the latter needs CMake 3.13 and this
+# project still declares 3.10.
+# ---------------------------------------------------------------------------
+OPTION(MT_USE_DEFAULT_FLAGS "Apply the toolkit's default hardening flags and debug info to its own components. Turn OFF to drive the compiler entirely from CMAKE_C_FLAGS/CMAKE_CXX_FLAGS." ON)
+
+IF(MT_USE_DEFAULT_FLAGS AND NOT MSVC)
+  # Debug info only: the optimisation level is left to the build type, so a
+  # Release build keeps CMake's -O3. -g changes no generated code, only the
+  # sections the linker emits, and CPACK_STRIP_FILES drops them again from the
+  # .deb/.rpm/.pkg.
+  add_compile_options($<$<CONFIG:Release>:-g>)
+
+  add_compile_options(-fstack-protector-strong)
+
+  # _FORTIFY_SOURCE does nothing without optimisation and warns at -O0, so key
+  # it to the optimised configurations. -U first because some toolchains (Arch,
+  # Gentoo) predefine it and redefining warns; Fedora's own flags do the same.
+  add_compile_options(
+    $<$<NOT:$<CONFIG:Debug>>:-U_FORTIFY_SOURCE>
+    $<$<NOT:$<CONFIG:Debug>>:-D_FORTIFY_SOURCE=2>)
+
+  # Mach-O has no -z options and ld64 errors on them, so full RELRO is
+  # Linux-only. macOS keeps the stack protector above.
+  IF(UNIX AND NOT APPLE)
+    link_libraries(-Wl,-z,relro -Wl,-z,now)
+  ENDIF()
+ENDIF()
+
 SET(CPACK_PACKAGE_FILE_NAME "minc-toolkit-${MINC_TOOLKIT_VERSION_FULL}-${MT_SYSTEM_NAME}")
 
 # register local modules
