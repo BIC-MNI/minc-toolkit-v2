@@ -254,6 +254,14 @@ ELSE(APPLE)
   LIST(APPEND MINC_TEST_ENVIRONMENT "LD_LIBRARY_PATH=${SUPERBUILD_STAGING_PREFIX}/${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}:${CMAKE_CURRENT_BINARY_DIR}/libminc:${CMAKE_CURRENT_BINARY_DIR}/libminc/ezminc:$ENV{LD_LIBRARY_PATH}")
 ENDIF(APPLE)
 
+# Embed a real build-tree RPATH pointing at the staged shared libraries
+# (e.g. libhdf5.dylib/.so under external/), so binaries built here resolve
+# their runtime dependencies whether run via ctest, invoked directly, or
+# from a build-time custom command -- without relying on
+# DYLD_LIBRARY_PATH/LD_LIBRARY_PATH (MINC_TEST_ENVIRONMENT above remains a
+# harmless fallback for ctest specifically).
+SET(CMAKE_BUILD_RPATH ${SUPERBUILD_STAGING_PREFIX}/${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX})
+
 # ExternalProject_Add passes CMAKE_ARGS as a ;-separated list, so a multi-arch
 # CMAKE_OSX_ARCHITECTURES such as "arm64;x86_64" gets split into two arguments
 # and only the first reaches the sub-build -- leaving vendored dependencies
