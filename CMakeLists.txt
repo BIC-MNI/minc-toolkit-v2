@@ -608,6 +608,29 @@ ENDIF(USE_SYSTEM_FFTW3D)
 # NLM: mincnlm / minc_anlm denoising tools, no ITK dependency
 ADD_SUBDIRECTORY(NLM)
 
+# NLM/CMakeLists.txt only wires ADD_DEPENDENCIES on GSL/FFTW3F when built
+# standalone (NOT MINC_TOOLKIT_BUILD); inside this superbuild it reuses the
+# GSL/FFTW3F resolved above but nothing links these targets to those
+# ExternalProject build steps, so a parallel build can link against a
+# not-yet-built static archive. Wire it here instead.
+IF(NOT USE_SYSTEM_GSL)
+  ADD_DEPENDENCIES(mincnlm GSL)
+  ADD_DEPENDENCIES(noise_estimate GSL)
+  ADD_DEPENDENCIES(test_nlm_denoise GSL)
+  ADD_DEPENDENCIES(test_anlm_denoise GSL)
+  ADD_DEPENDENCIES(test_noise_estimate GSL)
+ENDIF()
+IF(NOT USE_SYSTEM_FFTW3F)
+  ADD_DEPENDENCIES(mincnlm FFTW3F)
+  ADD_DEPENDENCIES(noise_estimate FFTW3F)
+  ADD_DEPENDENCIES(test_noise_estimate FFTW3F)
+ENDIF()
+IF(NOT USE_SYSTEM_NIFTI)
+  ADD_DEPENDENCIES(mincnlm NIFTI)
+  ADD_DEPENDENCIES(minc_anlm NIFTI)
+  ADD_DEPENDENCIES(noise_estimate NIFTI)
+ENDIF()
+
 # build tools that require ITK
 IF(MT_BUILD_ITK_TOOLS)
 
