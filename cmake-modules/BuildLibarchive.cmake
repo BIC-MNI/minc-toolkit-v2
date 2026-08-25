@@ -68,6 +68,7 @@ macro(build_libarchive install_prefix staging_prefix)
         -DMACOSX_RPATH:BOOL=ON
         -DCMAKE_INSTALL_RPATH:STRING=${MT_RPATH_ORIGIN}/../lib${LIB_SUFFIX}
         -DINSTALL_LIB_DIR:PATH=${install_prefix}/lib${LIB_SUFFIX}
+        -DCMAKE_INSTALL_LIBDIR:PATH=lib${LIB_SUFFIX}
         -DINSTALL_INC_DIR:PATH=${install_prefix}/include
         -DENABLE_EXPAT:BOOL=OFF
         -DENABLE_OPENSSL:BOOL=OFF
