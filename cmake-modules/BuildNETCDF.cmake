@@ -53,11 +53,11 @@ macro(build_netcdf install_prefix staging_prefix)
     )
   endif()
 
-  GET_PACKAGE("https://github.com/Unidata/netcdf-c/archive/v4.9.3.tar.gz" "bc9eb96e1983bf90fb3a99cc358c5ac3" "netcdf-v4.9.3.tar.gz" NETCDF_PATH )
+  GET_PACKAGE("https://github.com/Unidata/netcdf-c/archive/v4.9.3.tar.gz" "990f46d49525d6ab5dc4249f8684c6deeaf54de6fec63a187e9fb382cc0ffdff" "netcdf-v4.9.3.tar.gz" NETCDF_PATH )
 
   ExternalProject_Add(NETCDF
     URL "${NETCDF_PATH}"
-    URL_MD5 "bc9eb96e1983bf90fb3a99cc358c5ac3"
+    URL_HASH SHA256=990f46d49525d6ab5dc4249f8684c6deeaf54de6fec63a187e9fb382cc0ffdff
   SOURCE_DIR NETCDF
   BINARY_DIR NETCDF-build
   LIST_SEPARATOR :::
