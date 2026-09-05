@@ -452,17 +452,20 @@ until you supply it.
 
 ### Perl modules that are not included
 
-Two installed scripts need a module from CPAN. Every other program works
-without them.
+Two installed scripts need CPAN modules. Every other program works without
+them.
 
 | Script | Module | Debian and Ubuntu | Fedora |
 | --- | --- | --- | --- |
 | `xfmdecomp.pl` | `Math::MatrixReal` | `libmath-matrixreal-perl` | `perl-Math-MatrixReal` |
 | `patch_segmentation_pipeline.pl` | `Parallel::ForkManager` | `libparallel-forkmanager-perl` | `perl-Parallel-ForkManager` |
 
-The `.deb` recommends both packages and the `.rpm` suggests them, so a normal
-`apt` or `dnf` install pulls them in. Install them yourself if you use the
-relocatable tarball, or build from source.
+The `.deb` lists both as `Recommends`, so `apt` installs them unless you tell it
+not to. The `.rpm` lists them weakly too, but `dnf` installs only `Recommends`
+automatically, and Fedora 42 and 43 build with a CMake too old to emit that, so
+they get `Suggests`, which `dnf` shows and does not install. Install the two
+packages by hand there, and if you use the relocatable tarball or build from
+source.
 
 ## Bundled packages
 
