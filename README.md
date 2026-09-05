@@ -58,7 +58,7 @@ sudo dnf install minc-toolkit-v2-<version>-fc<release>-<variant>.x86_64.rpm
 Install on macOS: open the `.pkg` file. The package is not signed. On the first
 run, right-click the file and select **Open** to get past Gatekeeper.
 
-Install on any other Linux, or without root, from the relocatable tarball:
+Install on any other x86_64 Linux, or without root, from the relocatable tarball:
 
 ```sh
 tar xzf minc-toolkit-v2-<version>-<variant>-linux-x86_64.tar.gz -C ~/opt
@@ -66,11 +66,12 @@ source ~/opt/minc-toolkit-<version>/minc-toolkit-config.sh
 ```
 
 This tarball carries its own zlib, HDF5, netCDF, GSL, FFTW, JPEG, OpenJPEG,
-libarchive, OpenBLAS and ITK, so it needs nothing from the distribution beyond
-glibc 2.35 or newer — and, for the `full` variant, the system X11, OpenGL and
-GLFW runtime libraries. Unpack it wherever you like; the binaries find their own
-libraries, and the config script finds the prefix through `BASH_SOURCE`, so
-source it from bash.
+libarchive, OpenBLAS and ITK. From the distribution it needs glibc 2.35 or newer
+and the GCC runtime libraries — `libstdc++` and `libgcc_s`, plus `libgfortran`,
+`libquadmath` and `libgomp` for OpenBLAS and OpenMP — and, for the `full`
+variant, the system X11, OpenGL and GLFW runtime libraries. Unpack it wherever
+you like and source the config script from bash: it finds the prefix through
+`BASH_SOURCE` and puts the tarball's own `lib` directory on `LD_LIBRARY_PATH`.
 
 The `.deb`, `.rpm` and `.pkg` packages install into `/opt/minc/<version>`. After
 you install, read [Set up your shell](#set-up-your-shell).

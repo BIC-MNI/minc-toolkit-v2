@@ -477,7 +477,7 @@ jobs:
             - Self-contained and relocatable — unpack it anywhere, no root needed:
               `tar xzf minc-toolkit-v2-<version>-<variant>-linux-x86_64.tar.gz -C ~/opt`
               then `source ~/opt/minc-toolkit-<version>/minc-toolkit-config.sh`.
-            - Every dependency the toolkit vendors (zlib, HDF5, netCDF, GSL, FFTW, JPEG, OpenJPEG, libarchive, OpenBLAS, ITK) is inside the tarball. Only glibc 2.35+ and, for the `full` variant, the system X11/OpenGL/GLFW runtime libraries are needed.
+            - Every dependency the toolkit vendors (zlib, HDF5, netCDF, GSL, FFTW, JPEG, OpenJPEG, libarchive, OpenBLAS, ITK) is inside the tarball. From the distribution it needs glibc 2.35+ and the GCC runtime libraries (`libstdc++`, `libgcc_s`, `libgfortran`, `libquadmath`, `libgomp`), plus the system X11/OpenGL/GLFW runtime libraries for the `full` variant.
             - Source the config script from **bash**: it locates the prefix through `BASH_SOURCE`, and other shells fall back to the path baked in at build time.
 
             **macOS** (Apple Silicon / arm64; built on macos-14 / 15 / 26 runners):
