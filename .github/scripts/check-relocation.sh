@@ -104,7 +104,10 @@ started=0
 for cmd in "$PREFIX"/bin/* "$PREFIX"/pipeline/*; do
   [ -f "$cmd" ] && [ -x "$cmd" ] || continue
   started=$((started + 1))
-  out=$(timeout 20 "$cmd" </dev/null 2>&1 || true)
+  # Capped: two commands in the full tarball write enough in 20 seconds to
+  # exhaust the command-substitution buffer ("xrealloc: cannot allocate").
+  # head closing the pipe also stops them early instead of at the timeout.
+  out=$(timeout 20 "$cmd" </dev/null 2>&1 | head -c 65536 || true)
   if line=$(printf '%s' "$out" | grep -m1 -E "$loader_error"); then
     printf '%s: %s\n' "${cmd#"$PREFIX"/}" "$line" >> "$WORK/loader-failed"
   elif line=$(printf '%s' "$out" | grep -m1 "Can't locate"); then

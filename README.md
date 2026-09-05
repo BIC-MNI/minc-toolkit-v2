@@ -66,11 +66,11 @@ source ~/opt/minc-toolkit-<version>/minc-toolkit-config.sh
 ```
 
 This tarball carries its own zlib, HDF5, netCDF, GSL, FFTW, JPEG, OpenJPEG,
-libarchive, OpenBLAS and ITK. From the distribution it needs glibc 2.35 or newer
-and the GCC runtime libraries — `libstdc++` and `libgcc_s`, plus `libgfortran`,
-`libquadmath` and `libgomp` for OpenBLAS and OpenMP — and, for the `full`
-variant, the system X11, OpenGL and GLFW runtime libraries. Unpack it wherever
-you like and source the config script from bash: it finds the prefix through
+libarchive, OpenBLAS and ITK. The `minimal` variant links five host libraries
+and nothing else: `libc`, `libm`, `libgcc_s`, `libstdc++` and `libgomp`, so it
+needs glibc 2.35 or newer and the GCC runtime. `full` adds the system X11,
+OpenGL and GLFW runtime libraries for the visual tools. Unpack it wherever you
+like and source the config script from bash: it finds the prefix through
 `BASH_SOURCE` and puts the tarball's own `lib` directory on `LD_LIBRARY_PATH`.
 
 The `.deb`, `.rpm` and `.pkg` packages install into `/opt/minc/<version>`. After
