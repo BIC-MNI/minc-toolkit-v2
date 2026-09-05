@@ -450,6 +450,20 @@ until you supply it.
   [BEaST_library](https://github.com/BIC-MNI/BEaST_library). See `BEaST/README`
   for the file layout the library must have.
 
+### Perl modules that are not included
+
+Two installed scripts need a module from CPAN. Every other program works
+without them.
+
+| Script | Module | Debian and Ubuntu | Fedora |
+| --- | --- | --- | --- |
+| `xfmdecomp.pl` | `Math::MatrixReal` | `libmath-matrixreal-perl` | `perl-Math-MatrixReal` |
+| `patch_segmentation_pipeline.pl` | `Parallel::ForkManager` | `libparallel-forkmanager-perl` | `perl-Parallel-ForkManager` |
+
+The `.deb` recommends both packages and the `.rpm` suggests them, so a normal
+`apt` or `dnf` install pulls them in. Install them yourself if you use the
+relocatable tarball, or build from source.
+
 ## Bundled packages
 
 Core MINC packages, all built by default:

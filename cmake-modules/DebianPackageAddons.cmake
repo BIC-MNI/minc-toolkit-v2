@@ -8,5 +8,11 @@
 SET(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 SET(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
 SET(CPACK_DEBIAN_PACKAGE_DEPENDS "perl, imagemagick")
+# Two scripts out of the several hundred installed need a CPAN module:
+# xfmdecomp.pl needs Math::MatrixReal, patch_segmentation_pipeline.pl needs
+# Parallel::ForkManager. Everything else works without them, so these are
+# Recommends rather than Depends -- apt installs them by default, and the
+# package stays installable where they are not available.
+SET(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libmath-matrixreal-perl, libparallel-forkmanager-perl")
 SET(CPACK_DEBIAN_PACKAGE_SECTION "science")
 SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
