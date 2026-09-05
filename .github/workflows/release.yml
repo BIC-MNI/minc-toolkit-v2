@@ -342,6 +342,8 @@ jobs:
   # a system prefix. Passing no USE_SYSTEM_* flags leaves them at their OFF
   # default, so zlib, HDF5, netCDF, GSL, FFTW, JPEG, OpenJPEG, libarchive,
   # OpenBLAS and ITK are all built from source and shipped inside the tarball.
+  # `full` also builds every optional component: ANTs, C3D, Elastix, ABC and the
+  # visual tools.
   superbuild-tarball:
     needs: meta
     runs-on: ubuntu-latest
@@ -401,9 +403,11 @@ jobs:
             -DMT_BUILD_ANTS=$FULL \
             -DMT_BUILD_C3D=$FULL \
             -DMT_BUILD_ELASTIX=$FULL \
+            -DMT_BUILD_ABC=$FULL \
             -DMT_BUILD_VISUAL_TOOLS=$FULL \
             -DMT_BUILD_OPENBLAS=ON \
             -DMT_USE_OPENMP=ON \
+            -DMT_BUILD_DCM2MNC_TESTS=ON \
             -DUSE_SYSTEM_ITK=OFF \
             .
           cmake --build build -j"$(nproc)"
@@ -435,16 +439,13 @@ jobs:
       - name: Check the tarball actually relocates
         run: |
           set -euxo pipefail
-          # Unpack somewhere the build never mentioned. Sourcing the config script
-          # and writing a volume covers the whole chain the run paths have to carry:
-          # libminc -> HDF5 -> zlib (MINC_COMPRESS=4 puts the write through deflate).
+          # Unpack somewhere the build never mentioned and hand the tree to the
+          # check: the config script finds its own prefix, every shipped object
+          # resolves its libraries inside the tarball, every installed command
+          # starts, and the MINC, ITK and third-party tools do real work.
           mkdir -p /tmp/relocated
           tar xzf ./*.tar.gz -C /tmp/relocated
-          . /tmp/relocated/minc-toolkit-*/minc-toolkit-config.sh
-          # Same geometry as the mni_autoreg ellipse0 test; the defaults do not
-          # overlap a small volume.
-          make_phantom -clobber -ellipse -nelements 64 64 64 -step 2 2 2 -start -64 -64 -64 -center 0 0 0 /tmp/relocated/phantom.mnc
-          mincinfo /tmp/relocated/phantom.mnc
+          .github/scripts/check-relocation.sh /tmp/relocated/minc-toolkit-* '${{ matrix.variant }}'
       - uses: actions/upload-artifact@v7
         with:
           name: tarball-${{ matrix.variant }}
