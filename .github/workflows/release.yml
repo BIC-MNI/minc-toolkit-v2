@@ -407,7 +407,6 @@ jobs:
             -DMT_BUILD_VISUAL_TOOLS=$FULL \
             -DMT_BUILD_OPENBLAS=ON \
             -DMT_USE_OPENMP=ON \
-            -DMT_BUILD_DCM2MNC_TESTS=ON \
             -DUSE_SYSTEM_ITK=OFF \
             .
           cmake --build build -j"$(nproc)"

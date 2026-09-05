@@ -226,9 +226,14 @@ jobs:
   # other Linux job in this file sets nine of those to ON, so without this one
   # the vendored path is never built on Linux at all.
   #
-  # `full` turns on every component the tree can build -- ANTs, C3D, Elastix,
-  # ABC, the visual tools -- and both variants enable the dcm2mnc integration
-  # tests. It also produces the relocatable tarball that release.yml ships.
+  # `full` turns on every component the tree can build: ANTs, C3D, Elastix, ABC
+  # and the visual tools. It also produces the relocatable tarball that
+  # release.yml ships.
+  #
+  # MT_BUILD_DCM2MNC_TESTS stays off here. minctools passes
+  # DOWNLOAD_EXTRACT_TIMESTAMP to ExternalProject_Add unconditionally, and CMake
+  # only accepts it from 3.24; on 22.04's 3.22 it reaches the generated extract
+  # script as a stray execute_process argument and the download step fails.
   superbuild:
     runs-on: ubuntu-latest
     strategy:
@@ -288,7 +293,6 @@ jobs:
             -DMT_BUILD_VISUAL_TOOLS=$FULL \
             -DMT_BUILD_OPENBLAS=ON \
             -DMT_USE_OPENMP=ON \
-            -DMT_BUILD_DCM2MNC_TESTS=ON \
             -DUSE_SYSTEM_ITK=OFF \
             .
           cmake --build build -j"$(nproc)"

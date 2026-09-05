@@ -82,14 +82,19 @@ echo "=== 3. Every installed command starts ==="
 # that is fine and is not what this looks at. What matters is the loader or the
 # interpreter giving up, which is what a broken relocation looks like.
 #
-# Perl scripts that cannot find a module are a different problem: these modules
-# are missing from the .deb and .rpm too, which declare only "perl". Report
-# them, and fail only on a script that is not already known to be in that state.
-#   normalize_mri, smooth_mask, lgmask  -- ctime.pl, dropped from perl core in 5.30
+# A perl script that cannot find a module is a different problem, and not one
+# this tarball introduced. Report those, and fail only on a script that is not
+# already known to be in that state:
+#   normalize_mri, smooth_mask, lgmask  -- ctime.pl, removed from perl core in
+#                                          5.16. Fixed in BIC-MNI/inormalize#5
+#                                          and BIC-MNI/conglomerate#7; drop these
+#                                          three from the list when those pins
+#                                          bump, so a regression cannot hide.
 #   xfmdecomp.pl                        -- Math::MatrixReal (CPAN)
 #   patch_segmentation_pipeline.pl      -- Parallel::ForkManager (CPAN)
-#   ana2mnc_xfm_reduce.pl               -- Parallel::ForkManager (CPAN)
-known_perl_gap='normalize_mri|smooth_mask|lgmask|xfmdecomp[.]pl|patch_segmentation_pipeline[.]pl|ana2mnc_xfm_reduce[.]pl'
+# The two CPAN modules stay: nothing ships them, and #238 declares them as
+# package dependencies instead.
+known_perl_gap='normalize_mri|smooth_mask|lgmask|xfmdecomp[.]pl|patch_segmentation_pipeline[.]pl'
 loader_error='error while loading shared libraries|cannot open shared object file|symbol lookup error|undefined symbol'
 
 cd "$WORK"
