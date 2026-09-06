@@ -71,7 +71,7 @@ and nothing else: `libc`, `libm`, `libgcc_s`, `libstdc++` and `libgomp`, so it
 needs glibc 2.35 or newer and the GCC runtime. `full` adds the system X11,
 OpenGL and GLFW runtime libraries for the visual tools. Unpack it wherever you
 like and source the config script from bash: it finds the prefix through
-`BASH_SOURCE` and puts the tarball's own `lib` directory on `LD_LIBRARY_PATH`.
+`BASH_SOURCE`.
 
 The `.deb`, `.rpm` and `.pkg` packages install into `/opt/minc/<version>`. After
 you install, read [Set up your shell](#set-up-your-shell).

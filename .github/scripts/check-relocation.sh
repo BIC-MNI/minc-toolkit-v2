@@ -29,7 +29,7 @@ echo "=== 1. Config script ==="
 [ "${MINC_TOOLKIT:-}" = "$PREFIX" ] \
   || fail "config script set MINC_TOOLKIT=${MINC_TOOLKIT:-unset}, expected $PREFIX"
 # Asserted, not assumed: the checks below rely on the config script exporting
-# this, and on MNI_DATAPATH and LD_LIBRARY_PATH alongside it.
+# this, and on MNI_DATAPATH alongside it.
 [ "${MINC_COMPRESS:-}" = 4 ] || fail "config script did not export MINC_COMPRESS=4"
 echo "MINC_TOOLKIT=$MINC_TOOLKIT"
 echo "MINC_TOOLKIT_VERSION=${MINC_TOOLKIT_VERSION:-unset}"
