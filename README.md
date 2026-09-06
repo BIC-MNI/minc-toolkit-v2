@@ -450,6 +450,23 @@ until you supply it.
   [BEaST_library](https://github.com/BIC-MNI/BEaST_library). See `BEaST/README`
   for the file layout the library must have.
 
+### Perl modules that are not included
+
+Two installed scripts need CPAN modules. Every other program works without
+them.
+
+| Script | Module | Debian and Ubuntu | Fedora |
+| --- | --- | --- | --- |
+| `xfmdecomp.pl` | `Math::MatrixReal` | `libmath-matrixreal-perl` | `perl-Math-MatrixReal` |
+| `patch_segmentation_pipeline.pl` | `Parallel::ForkManager` | `libparallel-forkmanager-perl` | `perl-Parallel-ForkManager` |
+
+The `.deb` lists both as `Recommends`, so `apt` installs them unless you tell it
+not to. The `.rpm` lists them weakly too, but `dnf` installs only `Recommends`
+automatically, and Fedora 42 and 43 build with a CMake too old to emit that, so
+they get `Suggests`, which `dnf` shows and does not install. Install the two
+packages by hand there, and if you use the relocatable tarball or build from
+source.
+
 ## Bundled packages
 
 Core MINC packages, all built by default:
