@@ -688,20 +688,6 @@ INCLUDE(${OOBICPL_USE_FILE})
 ADD_SUBDIRECTORY(conglomerate)
 ADD_SUBDIRECTORY(classify)
 ADD_SUBDIRECTORY(mni-perllib)
-ADD_SUBDIRECTORY(N3)
-
-ADD_SUBDIRECTORY(glim_image)
-ADD_SUBDIRECTORY(mni_autoreg)
-
-ADD_DEPENDENCIES(minctracc   LIBLBFGS)
-ADD_DEPENDENCIES(mni_autoreg LIBLBFGS)
-ADD_DEPENDENCIES(mni_autoreg mincresample)
-
-ADD_SUBDIRECTORY(inormalize)
-ADD_SUBDIRECTORY(mrisim)
-ADD_SUBDIRECTORY(bic-pipelines)
-ADD_SUBDIRECTORY(perl-modules)
-ADD_SUBDIRECTORY(minc_gco)
 
 #required for EZminc
 IF(USE_SYSTEM_GSL)
@@ -727,7 +713,10 @@ ELSE(USE_SYSTEM_FFTW3D)
   build_fftw3d(${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
 ENDIF(USE_SYSTEM_FFTW3D)
 
-# NLM: mincnlm / minc_anlm denoising tools, no ITK dependency
+# NLM: the `nlm` denoising library plus the mincnlm / minc_anlm / noise_estimate
+# tools, no ITK dependency.  This, and the GSL/FFTW3F resolution it needs, sit ahead
+# of ADD_SUBDIRECTORY(N3) because N3's nu_correct_cxx links the `nlm` target for its
+# optional -denoise flag, and CMake needs the target to exist first.
 ADD_SUBDIRECTORY(NLM)
 
 # NLM/CMakeLists.txt only wires ADD_DEPENDENCIES on GSL/FFTW3F when built
@@ -736,22 +725,31 @@ ADD_SUBDIRECTORY(NLM)
 # ExternalProject build steps, so a parallel build can link against a
 # not-yet-built static archive. Wire it here instead.
 IF(NOT USE_SYSTEM_GSL)
-  ADD_DEPENDENCIES(mincnlm GSL)
-  ADD_DEPENDENCIES(noise_estimate GSL)
-  ADD_DEPENDENCIES(test_nlm_denoise GSL)
-  ADD_DEPENDENCIES(test_anlm_denoise GSL)
-  ADD_DEPENDENCIES(test_noise_estimate GSL)
+  ADD_DEPENDENCIES(nlm GSL)
 ENDIF()
 IF(NOT USE_SYSTEM_FFTW3F)
-  ADD_DEPENDENCIES(mincnlm FFTW3F)
-  ADD_DEPENDENCIES(noise_estimate FFTW3F)
-  ADD_DEPENDENCIES(test_noise_estimate FFTW3F)
+  ADD_DEPENDENCIES(nlm FFTW3F)
 ENDIF()
 IF(NOT USE_SYSTEM_NIFTI)
   ADD_DEPENDENCIES(mincnlm NIFTI)
   ADD_DEPENDENCIES(minc_anlm NIFTI)
   ADD_DEPENDENCIES(noise_estimate NIFTI)
 ENDIF()
+
+ADD_SUBDIRECTORY(N3)
+
+ADD_SUBDIRECTORY(glim_image)
+ADD_SUBDIRECTORY(mni_autoreg)
+
+ADD_DEPENDENCIES(minctracc   LIBLBFGS)
+ADD_DEPENDENCIES(mni_autoreg LIBLBFGS)
+ADD_DEPENDENCIES(mni_autoreg mincresample)
+
+ADD_SUBDIRECTORY(inormalize)
+ADD_SUBDIRECTORY(mrisim)
+ADD_SUBDIRECTORY(bic-pipelines)
+ADD_SUBDIRECTORY(perl-modules)
+ADD_SUBDIRECTORY(minc_gco)
 
 # build tools that require ITK
 IF(MT_BUILD_ITK_TOOLS)
