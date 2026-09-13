@@ -382,6 +382,15 @@ change sampling and extent. `mincstats` and `volume_stats` report statistics.
 two halves, for when you need to control the steps. See the
 [N3 documentation](http://en.wikibooks.org/wiki/MINC/Tools/N3).
 
+**Denoise images**
+`mincnlm` applies the non-local means filter, with Gaussian, speckle, or Rician
+noise models, and estimates the noise level itself when you do not give it one.
+`minc_anlm` is the adaptive variant, for volumes whose noise level varies in
+space. `noise_estimate` reports the noise level or the SNR of a volume without
+filtering it. All three also read and write NIfTI. See the
+[NLM documentation](NLM/README.md), which covers the options, the `nlm` library
+behind them, and the known limitations.
+
 **Register images**
 `minctracc` performs linear and non-linear registration and implements the
 ANIMAL algorithm. `mritotal` registers a T1 brain scan into stereotaxic space.
@@ -420,12 +429,11 @@ light X11 viewer; and `ray_trace`, which renders 3D objects to an image.
 volumes. `glim_image` fits a voxel-wise general linear model.
 
 **ITK-based tools** (need `MT_BUILD_ITK_TOOLS=ON`)
-EZminc adds `itk_resample`, `itk_morph`, `itk_convert`, the `mincnlm` and
-`minc_anlm` non-local means filters, the `fit_harmonics_grids` distortion
-correction tools, and `DemonsRegistration`. patch_morphology adds
-`itk_patch_morphology`, `itk_patch_segmentation`, `itk_patch_grading`, and
-`itk_minc_nonlocal_filter`. ANTs adds `ANTS`, `antsRegistration`,
-`antsApplyTransforms`, `N4BiasFieldCorrection`, `Atropos`, and the rest of the
+EZminc adds `itk_resample`, `itk_morph`, `itk_convert`, the
+`fit_harmonics_grids` distortion correction tools, and `DemonsRegistration`.
+patch_morphology adds `itk_patch_morphology`, `itk_patch_segmentation`,
+`itk_patch_grading`, and `itk_minc_nonlocal_filter`. ANTs adds `ANTS`,
+`antsRegistration`, `antsApplyTransforms`, `N4BiasFieldCorrection`, `Atropos`, and the rest of the
 ANTs programs. Convert3D adds `c3d`. Elastix adds `elastix` and `transformix`.
 
 ### Pipeline scripts
@@ -500,6 +508,7 @@ Core MINC packages, all built by default:
 | [conglomerate](https://github.com/BIC-MNI/conglomerate) | A large set of volume and surface programs. |
 | [inormalize](https://github.com/BIC-MNI/inormalize) | Intensity normalisation. |
 | [N3](https://github.com/BIC-MNI/N3) | Non-parametric intensity non-uniformity correction. |
+| [NLM](https://github.com/BIC-MNI/NLM) | Non-local means denoising: `mincnlm`, `minc_anlm`, `noise_estimate`, and the `nlm` library. See [NLM/README.md](NLM/README.md). |
 | [classify](https://github.com/BIC-MNI/classify) | Tissue classification. |
 | [mni_autoreg](https://github.com/BIC-MNI/mni_autoreg) | Linear and non-linear registration. Implements ANIMAL. |
 | [glim_image](https://github.com/BIC-MNI/glim_image) | Voxel-wise general linear modelling. |
@@ -513,7 +522,7 @@ Built when `MT_BUILD_ITK_TOOLS=ON`:
 
 | Package | What it is |
 | --- | --- |
-| [EZminc](https://github.com/BIC-MNI/EZminc) | Easy MINC: a higher-level C++ interface, plus distortion correction, non-local means filtering, MRF classification, and diffeomorphic demons registration. |
+| [EZminc](https://github.com/BIC-MNI/EZminc) | Easy MINC: a higher-level C++ interface, plus distortion correction, MRF classification, and diffeomorphic demons registration. |
 | [patch_morphology](https://github.com/NIST-MNI/patch_morphology) | Patch-based segmentation and grading. |
 | [ANTs](https://github.com/vfonov/ANTs) | Advanced Normalization Tools, from a fork with MINC support. Build with `MT_BUILD_ANTS`. |
 | [Convert3D](http://www.itksnap.org/c3d/) | Multi-purpose image processing. Build with `MT_BUILD_C3D`. |
