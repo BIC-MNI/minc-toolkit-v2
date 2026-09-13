@@ -53,33 +53,47 @@ macro(build_netcdf install_prefix staging_prefix)
     )
   endif()
 
-  GET_PACKAGE("https://github.com/Unidata/netcdf-c/archive/v4.7.4.tar.gz" "33979e8f0cf4ee31323fc0934282111b" "netcdf-v4.7.4.tar.gz" NETCDF_PATH )
+  GET_PACKAGE("https://github.com/Unidata/netcdf-c/archive/v4.9.3.tar.gz" "990f46d49525d6ab5dc4249f8684c6deeaf54de6fec63a187e9fb382cc0ffdff" "netcdf-v4.9.3.tar.gz" NETCDF_PATH )
 
   ExternalProject_Add(NETCDF
     URL "${NETCDF_PATH}"
-    URL_MD5 "33979e8f0cf4ee31323fc0934282111b"
+    URL_HASH SHA256=990f46d49525d6ab5dc4249f8684c6deeaf54de6fec63a187e9fb382cc0ffdff
   SOURCE_DIR NETCDF
   BINARY_DIR NETCDF-build
   LIST_SEPARATOR :::
   CMAKE_GENERATOR ${CMAKE_GEN}
   CMAKE_ARGS
       -DBUILD_SHARED_LIBS:BOOL=OFF
-      -DBUILD_TESTING:BOOL=${NETCDF_TESTS}
-      -DBUILD_TESTSETS:BOOL=${NETCDF_TESTS}
-      -DENABLE_TESTS:BOOL=${NETCDF_TESTS}
-      -DENABLE_V2_API:BOOL=ON
-      -DNC_ENABLE_HDF_16_API:BOOL=OFF
-      -DUSE_HDF5:BOOL=OFF
-      -DUSE_NETCDF4:BOOL=OFF
       -DCMAKE_SKIP_RPATH:BOOL=OFF
-      -DENABLE_DAP:BOOL=OFF
-      -DENABLE_LARGE_FILE_SUPPORT:BOOL=ON
       -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
       -DMACOSX_RPATH:BOOL=ON
       -DCMAKE_INSTALL_RPATH:STRING=${MT_RPATH_ORIGIN}/../lib${LIB_SUFFIX}
-      -DENABLE_NETCDF4:BOOL=OFF
-      -DENABLE_NETCDF_4:BOOL=OFF
       -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
+      # netCDF 4.9.3 renamed every project option to a NETCDF_ENABLE_* prefix and ships
+      # no shim for the old spellings: an unprefixed -D is silently ignored and the
+      # option keeps its default, which for most of these is ON.
+      -DBUILD_TESTING:BOOL=${NETCDF_TESTS}
+      -DNETCDF_ENABLE_TESTS:BOOL=${NETCDF_TESTS}
+      # libminc's MINC1 code is written against the netCDF version 2 API.
+      -DNETCDF_ENABLE_V2_API:BOOL=ON
+      -DNETCDF_ENABLE_LARGE_FILE_SUPPORT:BOOL=ON
+      # Build a classic netCDF-3 library and nothing more. MINC2 talks to HDF5 directly,
+      # so netCDF must not link HDF5 as well -- that would put a second, potentially
+      # different, HDF5 underneath libminc. The remaining four default ON in 4.9.x and
+      # would pull in libcurl, libxml2, libzip and the compression filter plugins.
+      -DNETCDF_ENABLE_HDF5:BOOL=OFF
+      -DNETCDF_ENABLE_DAP:BOOL=OFF
+      -DNETCDF_ENABLE_NCZARR:BOOL=OFF
+      -DNETCDF_ENABLE_PLUGINS:BOOL=OFF
+      -DNETCDF_ENABLE_LIBXML2:BOOL=OFF
+      -DNETCDF_ENABLE_REMOTE_FUNCTIONALITY:BOOL=OFF
+      # 4.9.x links zlib into libnetcdf unconditionally (liblib/CMakeLists.txt),
+      # HDF5 or no HDF5, so point it at the zlib the superbuild already resolved --
+      # staged under USE_SYSTEM_ZLIB=OFF, system otherwise. netCDF ships its own
+      # FindZLIB, which populates ZLIB_LIBRARY directly rather than going through
+      # CMake's ZLIB_LIBRARY_RELEASE; a pre-seeded cache entry short-circuits it.
+      -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
+      -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
       ${CMAKE_EXTERNAL_PROJECT_ARGS}
       "-DCMAKE_CXX_FLAGS:STRING=-fPIC ${CMAKE_CXX_FLAGS}"
       "-DCMAKE_C_FLAGS:STRING=-fPIC ${CMAKE_C_FLAGS}"

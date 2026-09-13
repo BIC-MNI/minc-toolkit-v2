@@ -292,6 +292,10 @@ IF(USE_SYSTEM_NETCDF)
 ELSE()
   INCLUDE(BuildNETCDF)
   build_netcdf( ${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
+  # netCDF 4.9.x links zlib into libnetcdf whether or not HDF5 is enabled.
+  IF(NOT USE_SYSTEM_ZLIB)
+    add_dependencies(NETCDF ZLIB)
+  ENDIF()
 ENDIF()
 
 
