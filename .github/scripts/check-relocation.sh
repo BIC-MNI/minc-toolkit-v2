@@ -85,16 +85,17 @@ echo "=== 3. Every installed command starts ==="
 # A perl script that cannot find a module is a different problem, and not one
 # this tarball introduced. Report those, and fail only on a script that is not
 # already known to be in that state:
-#   normalize_mri, smooth_mask, lgmask  -- ctime.pl, removed from perl core in
-#                                          5.16. Fixed in BIC-MNI/inormalize#5
-#                                          and BIC-MNI/conglomerate#7; drop these
-#                                          three from the list when those pins
-#                                          bump, so a regression cannot hide.
-#   xfmdecomp.pl                        -- Math::MatrixReal (CPAN)
-#   patch_segmentation_pipeline.pl      -- Parallel::ForkManager (CPAN)
+#   smooth_mask                     -- ctime.pl, removed from perl core in 5.16.
+#                                      Fixed in BIC-MNI/conglomerate#7; drop it
+#                                      when that pin bumps. normalize_mri and
+#                                      lgmask were here for the same reason and
+#                                      came out with the inormalize bump, so a
+#                                      regression in either now fails this job.
+#   xfmdecomp.pl                    -- Math::MatrixReal (CPAN)
+#   patch_segmentation_pipeline.pl  -- Parallel::ForkManager (CPAN)
 # The two CPAN modules stay: nothing ships them, and #238 declares them as
 # package dependencies instead.
-known_perl_gap='normalize_mri|smooth_mask|lgmask|xfmdecomp[.]pl|patch_segmentation_pipeline[.]pl'
+known_perl_gap='smooth_mask|xfmdecomp[.]pl|patch_segmentation_pipeline[.]pl'
 loader_error='error while loading shared libraries|cannot open shared object file|symbol lookup error|undefined symbol'
 
 cd "$WORK"
