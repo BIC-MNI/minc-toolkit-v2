@@ -9,12 +9,6 @@ else
 setenv PERL5LIB ${MINC_TOOLKIT}/perl:${MINC_TOOLKIT}/pipeline:${PERL5LIB}
 endif
 
-if ( ! ${?DYLD_LIBRARY_PATH} ) then
-setenv DYLD_LIBRARY_PATH ${MINC_TOOLKIT}/lib:${MINC_TOOLKIT}/lib@LIB_SUFFIX@/InsightToolkit
-else
-setenv DYLD_LIBRARY_PATH ${MINC_TOOLKIT}/lib:${MINC_TOOLKIT}/lib@LIB_SUFFIX@/InsightToolkit:${DYLD_LIBRARY_PATH}
-endif
-
 if ( ! ${?MANPATH} ) then
 setenv MANPATH ${MINC_TOOLKIT}/man
 else
