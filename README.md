@@ -363,7 +363,8 @@ Everything lands under one prefix, for example `/opt/minc/1.9.18`:
 
 **Read and convert files**
 `dcm2mnc` converts DICOM to MINC. `nii2mnc` and `mnc2nii` convert to and from
-NIfTI. `ecattominc`, `minctoecat`, and `upet2mnc` handle PET formats.
+NIfTI, and `nifti_tool` reads and edits NIfTI headers directly.
+`ecattominc`, `minctoecat`, and `upet2mnc` handle PET formats.
 `rawtominc` and `minctoraw` handle raw binary data. `mincconvert` moves a file
 between MINC1 and MINC2. `mincinfo`, `mincheader`, `mincdump`, and `minchistory`
 report what is in a file. `minc_modify_header` and `mincedit` change the
