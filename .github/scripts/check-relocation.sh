@@ -40,7 +40,8 @@ echo "=== 2. Dynamic linkage of every shipped ELF object ==="
 # libraries, which is the failure this whole job exists to catch.
 find "$PREFIX" -name '*.so*' -printf '%f\n' | sort -u > "$WORK/shipped"
 
-mapfile -t objects < <(
+objects=()
+while IFS= read -r _o; do objects+=("$_o"); done < <(
   find "$PREFIX" -type f -exec file -N {} + 2>/dev/null \
     | awk -F': ' '/ELF .*(executable|shared object)/ { print $1 }' | sort
 )
