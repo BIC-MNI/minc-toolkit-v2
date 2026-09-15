@@ -114,10 +114,16 @@ macro(build_nifti install_prefix staging_prefix)
             -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
             -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
             -DGIT_REPO_VERSION:STRING=3.0.0
-            -DNIFTI_BUILD_APPLICATIONS:BOOL=OFF
+            # nifti_tool is a user-facing tool and the toolkit installed it
+            # until the v3.0.0 bump turned the applications off wholesale. It
+            # lives in nifti_clib's nifti2/ directory and links libnifti2, so
+            # USE_NIFTI2_CODE has to be ON as well -- applications alone gives
+            # nifti1_tool and not nifti_tool.
+            -DNIFTI_BUILD_APPLICATIONS:BOOL=ON
+            -DUSE_NIFTI2_CODE:BOOL=ON
             -DNIFTI_BUILD_TESTING:BOOL=OFF
             -DBUILD_TESTING:BOOL=OFF
-            -DUSE_NIFTI2_CODE:BOOL=OFF
+            # nifti_stats lives here and nothing asks for it; leave it off.
             -DUSE_NIFTICDF_CODE:BOOL=OFF
             -DNIFTI_INSTALL_NO_DOCS:BOOL=ON
             ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
