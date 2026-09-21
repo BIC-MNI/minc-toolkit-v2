@@ -92,14 +92,16 @@ macro(build_nifti install_prefix staging_prefix)
             -DCMAKE_SKIP_RPATH:BOOL=OFF
             -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
             -DMACOSX_RPATH:BOOL=ON
-            -DCMAKE_INSTALL_RPATH:STRING=${MT_RPATH_ORIGIN}/../${CMAKE_INSTALL_LIBDIR}
+            -DCMAKE_INSTALL_RPATH:STRING=${MT_RPATH_ORIGIN}/../lib${LIB_SUFFIX}
             -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
-            -DCMAKE_INSTALL_LIBDIR:PATH=${CMAKE_INSTALL_LIBDIR}
-            # NIFTI's CMakeLists uses its own NIFTI_INSTALL_LIBRARY_DIR variable
-            # (default 'lib'), not CMAKE_INSTALL_LIBDIR. Override it explicitly so
-            # libniftiio.a / libznz.a end up in lib64 on Fedora x86_64. ARCHIVE_DIR
-            # inherits from LIBRARY_DIR per NIFTI's own logic.
-            -DNIFTI_INSTALL_LIBRARY_DIR:PATH=${CMAKE_INSTALL_LIBDIR}
+            # Stage into lib${LIB_SUFFIX}, the one library directory the
+            # superbuild installs, not CMAKE_INSTALL_LIBDIR: that is lib64 on
+            # Fedora, and a lib64/ in the staging tree is never installed, which
+            # left the installed NIFTI package pointing at missing archives.
+            # NIFTI's CMakeLists uses its own NIFTI_INSTALL_LIBRARY_DIR (default
+            # 'lib'); ARCHIVE_DIR inherits from it.
+            -DCMAKE_INSTALL_LIBDIR:PATH=lib${LIB_SUFFIX}
+            -DNIFTI_INSTALL_LIBRARY_DIR:PATH=lib${LIB_SUFFIX}
             "-DCMAKE_CXX_FLAGS_RELEASE:STRING=${NIFTI_CMAKE_CXX_FLAGS_RELEASE}"
             "-DCMAKE_C_FLAGS_RELEASE:STRING=${NIFTI_CMAKE_C_FLAGS_RELEASE}"
             "-DCMAKE_CXX_FLAGS_DEBUG:STRING=${NIFTI_CMAKE_CXX_FLAGS_DEBUG}"
@@ -131,9 +133,9 @@ macro(build_nifti install_prefix staging_prefix)
     INSTALL_DIR ${staging_prefix}/${install_prefix}
   )
 
-SET(NIFTI_LIBRARY     ${staging_prefix}/${install_prefix}/${CMAKE_INSTALL_LIBDIR}/libniftiio.a )
+SET(NIFTI_LIBRARY     ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libniftiio.a )
 SET(NIFTI_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include/nifti )
-SET(ZNZ_LIBRARY       ${staging_prefix}/${install_prefix}/${CMAKE_INSTALL_LIBDIR}/libznz.a )
+SET(ZNZ_LIBRARY       ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libznz.a )
 SET(ZNZ_INCLUDE_DIR   ${staging_prefix}/${install_prefix}/include/nifti )
 SET(NIFTI_FOUND ON)
 
