@@ -1,28 +1,98 @@
-# This CITATION.cff file was generated with cffinit.
-# Visit https://bit.ly/cffinit to generate yours today!
+# Citation metadata for minc-toolkit-v2 (Citation File Format, https://citation-file-format.github.io/).
+# The author list comes from the commit history and from the history comments in the files.
 
 cff-version: 1.2.0
 title: minc-toolkit-v2
 message: >-
-  If you use this software, please cite it using the
-  metadata from this file.
+  If you use this software, please cite both the article from
+  preferred-citation and the software itself.
 type: software
 authors:
   - given-names: Vladimir
     family-names: Fonov
     email: vladimir.fonov@gmail.com
     affiliation: McGill University
-    orcid: 'https://orcid.org/0000-0003-3402-7749'
+    orcid: "https://orcid.org/0000-0003-3402-7749"
   - given-names: D. Louis
     family-names: Collins
-    orcid: 'https://orcid.org/0000-0002-8432-7021'
     affiliation: McGill University
-  - given-names: Gabriel
-    orcid: 'https://orcid.org/0000-0002-7766-1187'
+    orcid: "https://orcid.org/0000-0002-8432-7021"
+  - given-names: Gabriel A.
     family-names: Devenyi
     email: gdevenyi@gmail.com
-    affiliation: ' Douglas Mental Health University Institute'
-identifiers:
-  - type: doi
-    value: 10.3389/fninf.2016.00035
-    description: 'MINC 2.0: A Flexible Format for Multi-Modal Images'
+    affiliation: Douglas Mental Health University Institute
+    orcid: "https://orcid.org/0000-0002-7766-1187"
+  - given-names: Haz-Edine
+    family-names: Assemlal
+  - given-names: Ben
+    family-names: Darwin
+  - given-names: Benjamin
+    family-names: De Leener
+    orcid: "https://orcid.org/0000-0002-1378-2756"
+  - given-names: Steven
+    family-names: Tilley
+    orcid: "https://orcid.org/0000-0003-4853-5082"
+  - given-names: Mads
+    family-names: Boye
+  - given-names: Kyle
+    family-names: Drover
+  - given-names: Andrew L.
+    family-names: Janke
+    orcid: "https://orcid.org/0000-0003-0547-5171"
+  - given-names: Jakub
+    family-names: Kaczmarzyk
+    orcid: "https://orcid.org/0000-0002-5544-7577"
+  - given-names: Robert D.
+    family-names: Vincent
+repository-code: "https://github.com/BIC-MNI/minc-toolkit-v2"
+abstract: >-
+  Metaproject (CMake superbuild) of the MINC toolkit. It builds and installs
+  the MINC packages (the MINC file-format library, image manipulation tools,
+  registration, classification and visualisation programs) together with the
+  third-party libraries that they need.
+keywords:
+  - MINC
+  - medical imaging
+  - neuroimaging
+  - MRI
+  - image processing
+  - superbuild
+license: GPL-3.0-only
+preferred-citation:
+  type: article
+  title: "MINC 2.0: A Flexible Format for Multi-Modal Images"
+  authors:
+    - given-names: Robert D.
+      family-names: Vincent
+    - given-names: Peter
+      family-names: Neelin
+    - given-names: Najmeh
+      family-names: Khalili-Mahani
+    - given-names: Andrew L.
+      family-names: Janke
+    - given-names: Vladimir S.
+      family-names: Fonov
+    - given-names: Steven M.
+      family-names: Robbins
+    - given-names: Leila
+      family-names: Baghdadi
+    - given-names: Jason
+      family-names: Lerch
+    - given-names: John G.
+      family-names: Sled
+    - given-names: Reza
+      family-names: Adalat
+    - given-names: David
+      family-names: MacDonald
+    - given-names: Alex P.
+      family-names: Zijdenbos
+    - given-names: D. Louis
+      family-names: Collins
+    - given-names: Alan C.
+      family-names: Evans
+  journal: Frontiers in Neuroinformatics
+  volume: 10
+  start: 35
+  year: 2016
+  month: 8
+  doi: "10.3389/fninf.2016.00035"
