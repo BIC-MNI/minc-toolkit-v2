@@ -62,11 +62,11 @@ macro(build_hdf5 install_prefix staging_prefix)
   SET(HDF_CMAKE_CXX_FLAGS "-fPIC ${CMAKE_CXX_FLAGS}")
   SET(HDF_CMAKE_C_FLAGS   "-fPIC ${CMAKE_C_FLAGS}")
 
-  GET_PACKAGE("https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.1/src/hdf5-1.12.1.tar.bz2" "442469fbf43626006346e679c22cf10a" "hdf5-1.12.1.tar.bz2" HDF5_PATH )
+  GET_PACKAGE("https://github.com/HDFGroup/hdf5/releases/download/hdf5_1.14.6/hdf5-1.14.6.tar.gz" "e4defbac30f50d64e1556374aa49e574417c9e72c6b1de7a4ff88c4b1bea6e9b" "hdf5-1.14.6.tar.gz" HDF5_PATH )
 
 ExternalProject_Add(HDF5
   URL "${HDF5_PATH}"
-  URL_MD5 "442469fbf43626006346e679c22cf10a"
+  URL_HASH SHA256=e4defbac30f50d64e1556374aa49e574417c9e72c6b1de7a4ff88c4b1bea6e9b
   SOURCE_DIR HDF5
   BINARY_DIR HDF5-build
   CMAKE_GENERATOR ${CMAKE_GEN}
@@ -82,35 +82,34 @@ ExternalProject_Add(HDF5
       # Must be RELATIVE to the install prefix. Passing the absolute ${install_prefix}
       # made HDF5 emit a broken package config: `include(${PACKAGE_PREFIX_DIR}//app/install/-targets.cmake)`,
       # so config-mode find_package(HDF5 NO_MODULE) (ITK's preferred path) could not load it.
-      # NOTE: HDF5 1.12.x APPENDS "/hdf5" (the package name) to this dir, so "share/cmake"
-      # installs the package to share/cmake/hdf5 — matching HDF5_DIR below. (HDF5 1.10.x does
-      # NOT append, so develop-1.9.18 uses share/cmake/hdf5 there.)
-      -DHDF5_INSTALL_CMAKE_DIR:PATH=share/cmake
+      # HDF5 1.14.x installs the package to this dir VERBATIM (config/cmake/HDFMacros.cmake
+      # uses it as the install DESTINATION unchanged), so spell out the whole path and keep
+      # it in step with HDF5_DIR below. 1.12.x appended "/hdf5" here; 1.14.x does not.
+      -DHDF5_INSTALL_CMAKE_DIR:PATH=share/cmake/hdf5
       -DHDF5_NO_PACKAGES:BOOL=ON
       -DHDF5_BUILD_CPP_LIB:BOOL=ON
       -DHDF5_BUILD_TOOLS:BOOL=ON
       -DHDF5_BUILD_EXAMPLES:BOOL=OFF
-      -DZLIB_USE_EXTERNAL:BOOL=ON
       # OFF: we build HDF5 as a standalone ExternalProject, not embedded via add_subdirectory.
       # ON suppressed installation of HDF5's own CMake package (hdf5-config.cmake + targets),
       # so config-mode find_package(HDF5 NO_MODULE) — ITK's preferred, system-HDF5-proof path —
       # had nothing to load.
       -DHDF5_EXTERNALLY_CONFIGURED:BOOL=OFF
       -DHDF5_ENABLE_Z_LIB_SUPPORT:BOOL=ON
-      # KEEP for HDF5 1.12.x: H5_ZLIB_HEADER makes CMakeFilters.cmake take the
-      # "zlib already configured by parent" branch and set H5_HAVE_ZLIB_H/LIBZ; the
-      # subsequent `set(LINK_COMP_LIBS ... ${ZLIB_STATIC_LIBRARY})` runs unconditionally,
-      # so our zlib-ng libz.a is still linked into libhdf5. (This differs from HDF5
-      # 1.10.x, where that link line sits inside `if(NOT H5_ZLIB_HEADER)` and setting
-      # the var left libhdf5 with undefined zlib symbols — hence develop-1.9.18 drops it.)
-      -DH5_ZLIB_HEADER:STRING=zlib.h
-      -DH5_HAVE_ZLIB_H:BOOL=ON
-      -DZLIB_INCLUDE_DIRS:STRING=${ZLIB_INCLUDE_DIR}
-      -DZLIB_INCLUDE_DIR:STRING=${ZLIB_INCLUDE_DIR}
-      -DZLIB_LIBRARIES:STRING=${ZLIB_STATIC_LIBRARY}
-      -DZLIB_STATIC_LIBRARY:STRING=${ZLIB_STATIC_LIBRARY}
-      -DZLIB_SHARED_LIBRARY:STRING=${ZLIB_STATIC_LIBRARY}  # for fixing error with restricted binaries on MacOSX
-      -DSKIP_HDF5_FORTRAN_SHARED:BOOL=ON
+      # Let HDF5 resolve zlib itself through module-mode FindZLIB, seeded with the
+      # library the superbuild already resolved. Do NOT set H5_ZLIB_HEADER here: in
+      # 1.14.x that takes the "zlib already configured by the parent project" branch
+      # of CMakeFilters.cmake, which sets H5_ZLIB_FOUND but never appends zlib to
+      # LINK_COMP_LIBS — leaving libhdf5 with undefined deflate/inflate symbols.
+      # (1.12.x appended it unconditionally, hence the flag on that version.)
+      -DZLIB_USE_EXTERNAL:BOOL=OFF
+      -DHDF5_MODULE_MODE_ZLIB:BOOL=ON
+      # Pre-seeded cache entries short-circuit FindZLIB's find_path/find_library.
+      # ZLIB_LIBRARY_RELEASE, not ZLIB_LIBRARY: HDF5 has no FindZLIB of its own, so
+      # this goes to CMake's, where select_library_configurations() derives
+      # ZLIB_LIBRARY from the _RELEASE entry and would overwrite anything we set.
+      -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
+      -DZLIB_LIBRARY_RELEASE:FILEPATH=${ZLIB_LIBRARY}
       ${CMAKE_EXTERNAL_PROJECT_ARGS}
   INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
   INSTALL_DIR ${staging_prefix}/${install_prefix}

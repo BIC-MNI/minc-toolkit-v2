@@ -219,3 +219,115 @@ jobs:
           set -euxo pipefail
           cd build
           ctest --output-on-failure -j"$(sysctl -n hw.ncpu)"
+
+  # Everything vendored, everything built. Passing no USE_SYSTEM_* flags leaves
+  # them all at their OFF default, so the superbuild compiles zlib, HDF5, netCDF,
+  # GSL, FFTW, JPEG, OpenJPEG, libarchive, OpenBLAS and ITK from source. Every
+  # other Linux job in this file sets nine of those to ON, so without this one
+  # the vendored path is never built on Linux at all.
+  #
+  # `full` turns on every component the tree can build: ANTs, C3D, Elastix, ABC
+  # and the visual tools. It also produces the relocatable tarball that
+  # release.yml ships.
+  #
+  # MT_BUILD_DCM2MNC_TESTS stays off here. minctools passes
+  # DOWNLOAD_EXTRACT_TIMESTAMP to ExternalProject_Add unconditionally, and CMake
+  # only accepts it from 3.24; on 22.04's 3.22 it reaches the generated extract
+  # script as a stray execute_process argument and the download step fails.
+  superbuild:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [minimal, full]
+    # 22.04, not 24.04: the tarball has to run somewhere other than the machine
+    # that built it, so build against the oldest glibc (2.35) whose CMake (3.22)
+    # still satisfies every vendored dependency (HDF5 asks the most: >= 3.18).
+    container: 'ubuntu:22.04'
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      CCACHE_DIR: /root/.ccache
+      CCACHE_MAXSIZE: 2G
+    steps:
+      - name: Install build deps
+        run: |
+          apt-get update
+          # Deliberately no -dev package for anything the superbuild vendors: the
+          # point of this job is that nothing quietly falls back to a system copy.
+          # bc is used by the mni_autoreg / patch_morphology test scripts.
+          apt-get install -y \
+            build-essential cmake git ccache lsb-release file bc \
+            bison flex perl gfortran imagemagick
+          # The visual tools have no vendored windowing stack -- bicgl links the
+          # system GLFW, exactly as the .deb does.
+          if [ "${{ matrix.variant }}" = "full" ]; then
+            apt-get install -y libx11-dev libxi-dev libxmu-dev \
+              libgl-dev libglu1-mesa-dev libglfw3-dev libxrandr-dev libxext-dev
+          fi
+      - name: Allow git to read the workspace owned by the runner user
+        run: git config --global --add safe.directory '*'
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: actions/cache@v6
+        with:
+          path: /root/.ccache
+          key: ccache-ci-superbuild-${{ matrix.variant }}-${{ github.sha }}
+          restore-keys: |
+            ccache-ci-superbuild-${{ matrix.variant }}-
+      - name: Configure + build
+        run: |
+          set -euxo pipefail
+          if [ "${{ matrix.variant }}" = "full" ]; then FULL=ON; else FULL=OFF; fi
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/opt/minc/ci \
+            -DMT_BUILD_SHARED_LIBS=ON \
+            -DBUILD_TESTING=ON \
+            -DMT_BUILD_ITK_TOOLS=ON \
+            -DMT_BUILD_ANTS=$FULL \
+            -DMT_BUILD_C3D=$FULL \
+            -DMT_BUILD_ELASTIX=$FULL \
+            -DMT_BUILD_ABC=$FULL \
+            -DMT_BUILD_VISUAL_TOOLS=$FULL \
+            -DMT_BUILD_OPENBLAS=ON \
+            -DMT_USE_OPENMP=ON \
+            -DUSE_SYSTEM_ITK=OFF \
+            .
+          cmake --build build -j"$(nproc)"
+          df -h && du -sh build/ || true
+      - name: Run test suite
+        run: |
+          set -euxo pipefail
+          cd build
+          ctest --output-on-failure -j"$(nproc)"
+      - name: Build tarball
+        run: |
+          set -euxo pipefail
+          DESTDIR="$PWD/pkgroot" cmake --build build --target install
+          # Strip the ELF objects. CPACK_STRIP_FILES only covers the CPack
+          # generators, so this tree would otherwise ship whatever debug info the
+          # build produced -- and the toolkit's own components compile with -g.
+          # Perl scripts, data and man pages are matched out by file(1).
+          find pkgroot -type f -exec file -N {} + 2>/dev/null \
+            | awk -F': ' '/ELF .*(executable|shared object)/ { print $1 }' \
+            | xargs -r strip --strip-unneeded 2>/dev/null || true
+          TOP="minc-toolkit-${GITHUB_SHA:0:7}"
+          mv pkgroot/opt/minc/ci "pkgroot/$TOP"
+          tar czf "$TOP-${{ matrix.variant }}-linux-x86_64.tar.gz" -C pkgroot "$TOP"
+          ls -lh ./*.tar.gz
+      - name: Check the tarball actually relocates
+        run: |
+          set -euxo pipefail
+          # Unpack somewhere the build never mentioned and hand the tree to the
+          # check: the config script finds its own prefix, every shipped object
+          # resolves its libraries inside the tarball, every installed command
+          # starts, and the MINC, ITK and third-party tools do real work.
+          mkdir -p /tmp/relocated
+          tar xzf ./*.tar.gz -C /tmp/relocated
+          .github/scripts/check-relocation.sh /tmp/relocated/minc-toolkit-* '${{ matrix.variant }}'
+      - uses: actions/upload-artifact@v7
+        with:
+          name: superbuild-${{ matrix.variant }}
+          path: '*.tar.gz'

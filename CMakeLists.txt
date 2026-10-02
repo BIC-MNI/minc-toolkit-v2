@@ -177,7 +177,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
 OPTION(MT_BUILD_LITE         "Build lite version of minc-toolkit, without ITK or visual tools" OFF)
 OPTION(MT_BUILD_SHARED_LIBS  "Build shared libraries." ON)
 OPTION(USE_SYSTEM_ZLIB       "Use System ZLIB "       OFF)
-#OPTION(USE_SYSTEM_NIFTI      "Use System NIFTI "       OFF)
+OPTION(USE_SYSTEM_NIFTI      "Use System NIFTI "      OFF)
 #OPTION(USE_SYSTEM_GIFTI      "Use System GIfTI"       OFF)
 OPTION(USE_SYSTEM_NETCDF     "Use System NETCDF > 3.6.3" OFF)
 OPTION(USE_SYSTEM_HDF5       "Use System HDF5 > 1.8"     OFF)
@@ -254,6 +254,14 @@ ELSE(APPLE)
   LIST(APPEND MINC_TEST_ENVIRONMENT "LD_LIBRARY_PATH=${SUPERBUILD_STAGING_PREFIX}/${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}:${CMAKE_CURRENT_BINARY_DIR}/libminc:${CMAKE_CURRENT_BINARY_DIR}/libminc/ezminc:$ENV{LD_LIBRARY_PATH}")
 ENDIF(APPLE)
 
+# Embed a real build-tree RPATH pointing at the staged shared libraries
+# (e.g. libhdf5.dylib/.so under external/), so binaries built here resolve
+# their runtime dependencies whether run via ctest, invoked directly, or
+# from a build-time custom command -- without relying on
+# DYLD_LIBRARY_PATH/LD_LIBRARY_PATH (MINC_TEST_ENVIRONMENT above remains a
+# harmless fallback for ctest specifically).
+SET(CMAKE_BUILD_RPATH ${SUPERBUILD_STAGING_PREFIX}/${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX})
+
 # ExternalProject_Add passes CMAKE_ARGS as a ;-separated list, so a multi-arch
 # CMAKE_OSX_ARCHITECTURES such as "arm64;x86_64" gets split into two arguments
 # and only the first reaches the sub-build -- leaving vendored dependencies
@@ -284,6 +292,10 @@ IF(USE_SYSTEM_NETCDF)
 ELSE()
   INCLUDE(BuildNETCDF)
   build_netcdf( ${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
+  # netCDF 4.9.x links zlib into libnetcdf whether or not HDF5 is enabled.
+  IF(NOT USE_SYSTEM_ZLIB)
+    add_dependencies(NETCDF ZLIB)
+  ENDIF()
 ENDIF()
 
 
@@ -308,8 +320,23 @@ ELSE()
   ENDIF()
 ENDIF()
 
+# Either path defines the NIFTI::niftiio / NIFTI::znz imported targets, which is
+# all the consumers below (libminc, minctools, Display) ask for.
+#
+# A system nifti is safe alongside the ITK tools as of the ITK pinned in
+# BuildITKv4.cmake. ITK has mangled its bundled niftiio to itk_* since 2017, but
+# left znzlib alone until InsightSoftwareConsortium/ITK#6756, so ITKznz used to
+# export plain znzopen/znzread/znzseek/... Those interpose over any other znzlib
+# in the same binary -- and every tool linking both ITK and libminc has one:
+# c3d, elastix, ANTs, the EZminc tools. Nothing failed at link time; ITK's
+# copies simply landed in the executable's dynamic symbol table and took over.
+# Both halves are prefixed now, so the two copies no longer meet.
+#
+# Our own bundled build stays renamed to minc_* regardless
+# (libminc/cmake-modules/nifti_mangle.h) -- that is what keeps it clear of ITK,
+# which still has no ITK_USE_SYSTEM_NIFTI to share a single copy.
 IF(USE_SYSTEM_NIFTI)
-  FIND_PACKAGE(NIFTI REQUIRED)
+  FIND_PACKAGE(NIFTI CONFIG REQUIRED)
 ELSE()
   INCLUDE(BuildNIFTI)
   build_nifti( ${CMAKE_INSTALL_PREFIX} ${SUPERBUILD_STAGING_PREFIX})
@@ -372,6 +399,9 @@ SET(MINC_TOOLKIT_INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
 SET(LIBMINC_BUILD_V2           ON)
 SET(LIBMINC_MINC1_SUPPORT      ON)
 SET(LIBMINC_NIFTI_SUPPORT      ON)
+# Tells libminc whether its NIfTI is the mangled bundled build or the system
+# one, so it can skip the mangling invariant test in the latter case.
+SET(LIBMINC_USE_SYSTEM_NIFTI   ${USE_SYSTEM_NIFTI})
 SET(LIBMINC_FOUND              ON)
 SET(LIBMINC_BUILD_TOOLS        ON)
 SET(LIBMINC_BUILD_CONVERTERS   ON)
