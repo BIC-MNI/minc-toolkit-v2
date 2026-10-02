@@ -1,0 +1,28 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: minc-toolkit-v2
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Vladimir
+    family-names: Fonov
+    email: vladimir.fonov@gmail.com
+    affiliation: McGill University
+    orcid: 'https://orcid.org/0000-0003-3402-7749'
+  - given-names: D. Louis
+    family-names: Collins
+    orcid: 'https://orcid.org/0000-0002-8432-7021'
+    affiliation: McGill University
+  - given-names: Gabriel
+    orcid: 'https://orcid.org/0000-0002-7766-1187'
+    family-names: Devenyi
+    email: gdevenyi@gmail.com
+    affiliation: ' Douglas Mental Health University Institute'
+identifiers:
+  - type: doi
+    value: 10.3389/fninf.2016.00035
+    description: 'MINC 2.0: A Flexible Format for Multi-Modal Images'
