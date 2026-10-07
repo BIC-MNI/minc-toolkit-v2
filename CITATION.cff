@@ -1,28 +1,290 @@
-# This CITATION.cff file was generated with cffinit.
-# Visit https://bit.ly/cffinit to generate yours today!
+# Citation metadata for minc-toolkit-v2 (Citation File Format, https://citation-file-format.github.io/).
+# The author list is the union of the authors of this repository and of its 27 BIC-MNI
+# submodules (see CITATION.cff in each submodule). It comes from the commit history and from
+# the history comments in the files.
 
 cff-version: 1.2.0
 title: minc-toolkit-v2
 message: >-
-  If you use this software, please cite it using the
-  metadata from this file.
+  If you use this software, please cite both the article from
+  preferred-citation and the software itself.
 type: software
 authors:
   - given-names: Vladimir
     family-names: Fonov
     email: vladimir.fonov@gmail.com
     affiliation: McGill University
-    orcid: 'https://orcid.org/0000-0003-3402-7749'
+    orcid: "https://orcid.org/0000-0003-3402-7749"
+  - given-names: David
+    family-names: MacDonald
+  - given-names: Robert D.
+    family-names: Vincent
+  - given-names: Peter
+    family-names: Neelin
+  - given-names: Andrew L.
+    family-names: Janke
+    orcid: "https://orcid.org/0000-0003-0547-5171"
   - given-names: D. Louis
     family-names: Collins
-    orcid: 'https://orcid.org/0000-0002-8432-7021'
     affiliation: McGill University
-  - given-names: Gabriel
-    orcid: 'https://orcid.org/0000-0002-7766-1187'
+    orcid: "https://orcid.org/0000-0002-8432-7021"
+  - given-names: Steve M.
+    family-names: Robbins
+  - given-names: Remi K.-S.
+    family-names: Kwan
+  - given-names: Richard D.
+    family-names: Hoge
+  - given-names: Sean
+    family-names: McBride
+  - given-names: Gabriel A.
     family-names: Devenyi
     email: gdevenyi@gmail.com
-    affiliation: ' Douglas Mental Health University Institute'
-identifiers:
-  - type: doi
-    value: 10.3389/fninf.2016.00035
-    description: 'MINC 2.0: A Flexible Format for Multi-Modal Images'
+    affiliation: Douglas Mental Health University Institute
+    orcid: "https://orcid.org/0000-0002-7766-1187"
+  - given-names: Claude
+    family-names: Lepage
+  - given-names: Leila
+    family-names: Baghdadi
+  - given-names: Jason
+    family-names: Lerch
+    orcid: "https://orcid.org/0000-0001-6164-2881"
+  - given-names: Alex P.
+    family-names: Zijdenbos
+  - given-names: Greg
+    family-names: Ward
+  - given-names: Haz-Edine
+    family-names: Assemlal
+  - given-names: Vasken
+    family-names: Kollokian
+  - given-names: John G.
+    family-names: Sled
+    orcid: "https://orcid.org/0000-0002-4461-283X"
+  - given-names: Patricia
+    family-names: Le Nezet
+  - given-names: G. Bruce
+    family-names: Pike
+    orcid: "https://orcid.org/0000-0001-8924-683X"
+  - given-names: Jonathan
+    family-names: Harlap
+  - given-names: Pierrick
+    family-names: Coupé
+  - given-names: Simon Fristed
+    family-names: Eskildsen
+    orcid: "https://orcid.org/0000-0003-4242-9158"
+  - given-names: José V.
+    family-names: Manjón
+  - given-names: Robert
+    family-names: Brown
+  - given-names: Andrew
+    family-names: Wood
+  - given-names: Larry
+    family-names: Baer
+  - given-names: Chris
+    family-names: Cocosco
+  - given-names: Ilana
+    family-names: Leppert
+    orcid: "https://orcid.org/0000-0001-7672-0918"
+  - given-names: Massine
+    alias: "bbbxyz"
+  - given-names: Jonathan
+    family-names: Taylor
+  - given-names: Anthonin
+    family-names: Reilhac
+    orcid: "https://orcid.org/0000-0002-9997-9540"
+  - given-names: Gabriel C.
+    family-names: Léger
+  - given-names: John
+    family-names: Cupitt
+  - given-names: Weiqian
+    family-names: Dai
+  - given-names: Matthew
+    family-names: Kitching
+  - given-names: Matt
+    family-names: McCormick
+    orcid: "https://orcid.org/0000-0001-9475-3756"
+  - given-names: Vivek
+    family-names: Singh
+  - given-names: David
+    family-names: Leonard
+  - given-names: Cécile
+    family-names: Madjar
+    orcid: "https://orcid.org/0000-0003-1108-031X"
+  - given-names: Ben
+    family-names: Darwin
+  - given-names: Hans J.
+    family-names: Johnson
+    orcid: "https://orcid.org/0000-0001-9513-2660"
+  - given-names: Jim
+    family-names: Nikelski
+  - alias: "raph-rc"
+  - given-names: Matthijs
+    name-particle: van
+    family-names: Eede
+  - given-names: Mark
+    family-names: Griffin
+  - given-names: Colin
+    family-names: Holmes
+  - given-names: Martin
+    family-names: Steghöfer
+  - given-names: Sandy
+    family-names: Wang
+  - given-names: Jean-Philippe
+    family-names: Coutu
+  - given-names: Shyan
+    family-names: Ku
+  - given-names: Sean
+    family-names: Marrett
+    orcid: "https://orcid.org/0000-0001-8179-6511"
+  - given-names: Steven
+    family-names: Tilley
+    orcid: "https://orcid.org/0000-0003-4853-5082"
+  - given-names: Benjamin A.
+    family-names: Beasley
+  - given-names: Shai
+    family-names: Berger
+  - given-names: Francois
+    family-names: Budin
+  - given-names: Benjamin
+    family-names: De Leener
+    orcid: "https://orcid.org/0000-0002-1378-2756"
+  - given-names: Jordi
+    family-names: Gutiérrez Hermoso
+  - given-names: Chris
+    family-names: Hammill
+    orcid: "https://orcid.org/0000-0001-9823-2827"
+  - given-names: Cristian
+    family-names: Le
+  - given-names: Jiaxing
+    family-names: Li
+  - given-names: Bradley
+    family-names: Lowekamp
+    orcid: "https://orcid.org/0000-0002-4579-5738"
+  - given-names: Christina
+    family-names: Rossmanith
+  - given-names: Dženan
+    family-names: Zukić
+  - alias: "Abelian-grape"
+  - given-names: Georges
+    family-names: Aboutanos
+  - given-names: Yasser
+    family-names: "Ad-Dab'bagh"
+  - given-names: Samson
+    family-names: Antel
+  - given-names: Richard
+    family-names: Beare
+    orcid: "https://orcid.org/0000-0002-7530-5664"
+  - given-names: Mads
+    family-names: Boye
+  - given-names: Athena
+    family-names: Buckthought
+  - given-names: Alexandre
+    family-names: Carmel-Veilleux
+  - given-names: Kyle
+    family-names: Drover
+  - given-names: Jean-Christophe
+    family-names: Fillion-Robin
+  - given-names: Guenther
+    family-names: Grabner
+  - given-names: Nicolas
+    family-names: Guizard
+    orcid: "https://orcid.org/0000-0003-2660-5123"
+  - given-names: Carlo
+    family-names: Hamalainen
+  - given-names: Brian
+    family-names: Helba
+  - given-names: Jakub
+    family-names: Kaczmarzyk
+    orcid: "https://orcid.org/0000-0002-5544-7577"
+  - given-names: Georges
+    family-names: Le Goualher
+  - given-names: Lindsay
+    family-names: Lewis
+    orcid: "https://orcid.org/0000-0002-3056-4152"
+  - given-names: Oliver
+    family-names: Lyttelton
+  - given-names: Martino
+    family-names: Pilia
+    orcid: "https://orcid.org/0000-0002-6842-9140"
+  - given-names: Pierre-Olivier
+    family-names: Quirion
+  - given-names: Guilhem
+    family-names: Saurel
+    orcid: "https://orcid.org/0000-0002-0867-1664"
+  - given-names: Raghav
+    family-names: Sood
+  - given-names: Jon
+    family-names: Stutters
+    orcid: "https://orcid.org/0000-0002-9151-0844"
+  - given-names: Jennings
+    family-names: Zhang
+  - given-names: Lune
+    family-names: Bellec
+    orcid: "https://orcid.org/0000-0002-9111-0699"
+  - given-names: Dallas
+    family-names: Card
+  - given-names: Samir
+    family-names: Das
+  - given-names: Mishkin
+    family-names: Derakhshan
+  - given-names: Mike
+    family-names: Ferreira
+  - given-names: Irina
+    family-names: Kezele
+  - given-names: Dave
+    family-names: MacFarlane
+  - given-names: Rene
+    family-names: Mandl
+  - given-names: Tarek
+    family-names: Sherif
+repository-code: "https://github.com/BIC-MNI/minc-toolkit-v2"
+abstract: >-
+  Metaproject (CMake superbuild) of the MINC toolkit. It builds and installs
+  the MINC packages (the MINC file-format library, image manipulation tools,
+  registration, classification and visualisation programs) together with the
+  third-party libraries that they need.
+keywords:
+  - MINC
+  - medical imaging
+  - neuroimaging
+  - MRI
+  - image processing
+  - superbuild
+license: GPL-3.0-only
+preferred-citation:
+  type: article
+  title: "MINC 2.0: A Flexible Format for Multi-Modal Images"
+  authors:
+    - given-names: Robert D.
+      family-names: Vincent
+    - given-names: Peter
+      family-names: Neelin
+    - given-names: Najmeh
+      family-names: Khalili-Mahani
+    - given-names: Andrew L.
+      family-names: Janke
+    - given-names: Vladimir S.
+      family-names: Fonov
+    - given-names: Steven M.
+      family-names: Robbins
+    - given-names: Leila
+      family-names: Baghdadi
+    - given-names: Jason
+      family-names: Lerch
+    - given-names: John G.
+      family-names: Sled
+    - given-names: Reza
+      family-names: Adalat
+    - given-names: David
+      family-names: MacDonald
+    - given-names: Alex P.
+      family-names: Zijdenbos
+    - given-names: D. Louis
+      family-names: Collins
+    - given-names: Alan C.
+      family-names: Evans
+  journal: Frontiers in Neuroinformatics
+  volume: 10
+  start: 35
+  year: 2016
+  month: 8
+  doi: "10.3389/fninf.2016.00035"
